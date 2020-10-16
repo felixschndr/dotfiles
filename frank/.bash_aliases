@@ -7,3 +7,4 @@ alias repoupdate='~/repos/mydotfiles/bin/update-customers.sh'
 alias OH='ssh -p 8080 openhabian@richard-schneider.spdns.org'
 alias OH_Connect='sshfs -p 8080 openhabian@richard-schneider.spdns.org:/etc/openhab2 /home/fschneider/openhab/ && cd /home/fschneider/openhab/ && code .'
 alias formreader="stable formreader"
+
