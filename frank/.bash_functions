@@ -99,3 +99,4 @@ build()
     debian/rules clean
     sudo dpkg -i $(ls -1t *.deb | head -1 | egrep -o "abm.{1,}deb")
 }
+

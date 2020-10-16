@@ -38,3 +38,4 @@ ssh_permissions(){
     sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_rsa /var/lib/openhab2/.ssh/config
 	echo "Done"
 }
+
