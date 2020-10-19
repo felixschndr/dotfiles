@@ -1,3 +1,5 @@
+#!/bin/bash
+
 [[ $(date +%d) > 15 ]] && m=$(date +%m) || m=$(date --date='-1 month' +'%m')
 [[ $(date +%d) > 15 ]] && m1=$(( $(date +%m) + 1)) || m1=$(date +%m)
 pfad="/Store/data/Zeiterfassung/Schneider/$(date +%Y)/$m""_""$m1"".ods"

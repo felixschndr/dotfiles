@@ -1,3 +1,5 @@
+#!/bin/bash
+
 _item_completions()
 {
     items=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null| sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
