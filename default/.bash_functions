@@ -10,7 +10,13 @@ diff_function(){
     printf '\n%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
     for file in $files; do
         echo -e "\e[96m\e[1mDatei: $file\e[0m\n"
-        git diff --color-words $file
+        git --no-pager diff --color-words $file
         printf '\n%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
     done
 }
+
+#Überarbeitungsidee:
+#Zeigt ein File nach dem anderen an (mit Fortschrittsanzeige) und wartet dann auf input:
+# - skip bei kein Input
+# - Text wird angegeben: dann wird git commit mit dem Input gemacht
+# am ende fragen, ob der User pushen möchte
