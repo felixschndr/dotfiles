@@ -5,4 +5,8 @@ for file in $(find ./{default,openhab,frank} -type f 2>/dev/null); do
     mv "$file""_new" $file
 done
 
+git add .
+git commit -m "Fix LF"
+git push
+
 echo "Done"
