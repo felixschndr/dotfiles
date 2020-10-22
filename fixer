@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for file in $(find ./{default,openhab,frank} -type f 2>/dev/null); do
+    tr -d '\015' <$file >"$file""_new"
+    mv "$file""_new" $file
+done
+
+echo "Done"

@@ -52,4 +52,3 @@ diff_function(){
         echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[39m"
     fi
 }
-
