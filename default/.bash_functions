@@ -31,7 +31,7 @@ diff_function(){
         print_line "-"
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
         read commit_message
-        if [ -z $commit_message ]; then
+        if [[ -z $commit_message ]]; then
             echo -e "\e[33mEs wurde keine Nachricht angegeben somit die Datei wird übersprungen\e[39m"
             continue
         else
@@ -46,8 +46,7 @@ diff_function(){
     echo -e "\e[32mSollen die Änderungen gepusht werden?\e[39m"
     read answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        git push
-        echo -e "\e[32mDie Commits wurden hochgeladen\e[39m"
+        git push 1>/dev/null &&  echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen\e[39m"
     else
         echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[39m"
     fi
