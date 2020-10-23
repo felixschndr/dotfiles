@@ -18,7 +18,7 @@ diff_function(){
     [[ $(git status 2>&1) == *"Kein Git-Repo"* ]] && echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[39m" && return
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert" | cut -d ":" -f2-)
+    files=$(git status | grep "geändert\|neue" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commitsm die nicht hochgeladen wurden?
             if [[ $(git status) == *"Commits vor"* ]]; then
