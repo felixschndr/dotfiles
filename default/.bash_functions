@@ -36,7 +36,7 @@ commit_files(){
         git --no-pager diff --color-words $file | tail -n +5
         print_line "-"
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
-        read commit_message
+        read -e commit_message
         if [[ -z $commit_message ]]; then
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
             continue
@@ -44,7 +44,7 @@ commit_files(){
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $file -m "$last_commit_message"
         else
-            commit_message=$(echo $commit_message | sed 's/\^\[\[A//g' | sed 's/\^\[\[B//g' | sed 's/\^\[\[C//g' | sed 's/\^\[\[D//g')
+            commit_message=$(echo $commit_message)
             last_commit_message=$commit_message
             git commit $file -m "$commit_message"
         fi
@@ -59,7 +59,7 @@ commit_files(){
 
 
 push(){
-    read answer
+    read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
         git push 1>/dev/null &&  echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen\e[39m"
     else
@@ -92,6 +92,4 @@ diff_function(){
 
     echo -e "\e[32mSollen die Änderungen gepusht werden?\e[39m"
     push
-
-    exit 0
 }
