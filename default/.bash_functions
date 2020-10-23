@@ -52,7 +52,7 @@ diff_function(){
         if [[ -z $commit_message ]]; then
             echo -e "\e[33mEs wurde keine Nachricht angegeben somit die Datei wird übersprungen\e[39m"
             continue
-        elif [ $commit_message == "l" ] && [[ ! -z $last_commit_message ]]; then
+        elif [[ $commit_message == "l" ]] && [[ ! -z $last_commit_message ]]; then
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $file -m "$last_commit_message"
         else
