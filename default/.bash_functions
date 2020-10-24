@@ -72,7 +72,7 @@ diff_function(){
     if ! check_if_repo_exists; then return; fi
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert\|neue" | cut -d ":" -f2-)
+    files=$(git status | grep "geändert\|neue\|gelöscht" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             if [[ $(git status) == *"Commits vor"* ]]; then
