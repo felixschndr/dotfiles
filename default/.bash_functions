@@ -28,6 +28,7 @@ commit_files(){
     #Die Dateien durchgehen und Files committen
     changed=false
     counter=1
+    commit_messages=""
     for file in $files; do
         echo -e "\e[96m\e[1m"
         center "Datei: $file ($counter/$(echo $files | wc -w))"
@@ -36,6 +37,8 @@ commit_files(){
         git --no-pager diff --color-words $file | tail -n +5
         print_line "-"
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
+	for past_commit_message in $(echo $commit_messages | sed 's/\}/\n/g'); do
+	    echo "
         read -e commit_message
         if [[ -z $commit_message ]]; then
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
@@ -61,7 +64,7 @@ commit_files(){
 push(){
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        git push 1>/dev/null &&  echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen\e[39m"
+        git push 1>/dev/null && echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen\e[39m"
     else
         echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[39m"
     fi
