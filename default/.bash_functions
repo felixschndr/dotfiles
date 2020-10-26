@@ -55,6 +55,9 @@ commit_files(){
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
                 continue
             fi
+        elif [[ $commit_message == "a" ]]; then #Abbrechen
+            echo -e "\e[31mAbbrechen\e[39m"
+            return 1
         elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
