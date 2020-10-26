@@ -1,5 +1,4 @@
 #!/bin/bash
-
 print_line(){
     #Zeichnet eine horizontale Linie; Zeichen wird per ${1} übertragen
     COLUMNS=$(tput cols)
@@ -26,33 +25,52 @@ check_if_repo_exists(){
 
 commit_files(){
     #Die Dateien durchgehen und Files committen
+    unset commit_messages
     changed=false
-    counter=1
-    commit_messages=""
+    file_counter=1
+
     for file in $files; do
-        echo -e "\e[96m\e[1m"
-        center "Datei: $file ($counter/$(echo $files | wc -w))"
-        echo -e "\e[0m\n"
-        counter=$(($counter + 1))
+        echo -e "\e[96m\e[1m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n"
         git --no-pager diff --color-words $file | tail -n +5
         print_line "-"
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
-	for past_commit_message in $(echo $commit_messages | sed 's/\}/\n/g'); do
-	    echo "
+        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben) \e[0m"
+        commit_counter=0
+        for commit in ${commit_messages[@]} ; do
+            commit_counter=$(( $commit_counter + 1 ))
+            echo -e "$commit_counter. ${commit_messages[commit_counter]}"
+        done
         read -e commit_message
-        if [[ -z $commit_message ]]; then
+
+
+        last_commit_message=${commit_messages[$(($file_counter - 1))]}
+        if [[ -z $commit_message ]]; then #Keine Nachricht angegeben
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
             continue
-        elif [[ $commit_message == "l" ]] && [[ ! -z $last_commit_message ]]; then
+        elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
+            if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja benutze ihn
+                echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
+                git commit $file -m "{commit_messages[commit_message]}"
+            else #Sonst verwerfe ihn
+                echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
+                continue
+            fi
+        elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
+            if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
+                echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
+                continue
+            fi
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $file -m "$last_commit_message"
-        else
-            commit_message=$(echo $commit_message)
-            last_commit_message=$commit_message
+        else #Commit mit dem angegeben Text
+            commit_message=$(echo $commit_message | sed 's/"/\\"/g')
+            commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_message" #Den aktuellen Commit ins Array packen
             git commit $file -m "$commit_message"
         fi
+        file_counter=$(($file_counter + 1))
         changed=true
     done
+    unset commit_messages
 
     print_line "="
 
@@ -93,8 +111,6 @@ diff_function(){
         1) echo -e "\e[96m\e[1m\nEs wurde 1 Datei modifiziert\e[0m";;
         *) echo -e "\e[96m\e[1m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
-
-    if ! check_if_repo_exists; then return; fi
 
     if ! commit_files; then return; fi
 
