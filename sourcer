@@ -1,5 +1,7 @@
 #!/bin/bash
 
-for file in $(find /home/fschneider/repos/meine_repos/.bashrc/{default,$(hostname)} -maxdepth 1 -type f 2>/dev/null); do
+# entweder in .bash_profile oder sonst in .bashrc einfügen
+
+for file in $(find /home/.../bashrc/{default,$(hostname)} -maxdepth 1 -type f 2>/dev/null); do
     source $file
 done
