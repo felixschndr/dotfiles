@@ -3,3 +3,4 @@
 for file in $(find /home/fschneider/repos/meine_repos/.bashrc/{default,$(hostname)} -maxdepth 1 -type f 2>/dev/null); do
     source $file
 done
+#test3
