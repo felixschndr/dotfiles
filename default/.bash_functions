@@ -38,7 +38,7 @@ commit_files(){
         commit_counter=0
         for commit in ${commit_messages[@]} ; do
             commit_counter=$(( $commit_counter + 1 ))
-            echo -e "$commit_counter. ${commit_messages[commit_counter]}"
+            [[ -z ${commit_messages[commit_counter]} ]] || echo -e "$commit_counter. ${commit_messages[commit_counter]}"
         done
         read -e commit_message
 
