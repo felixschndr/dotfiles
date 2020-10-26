@@ -12,5 +12,3 @@ alias sl='ll'
 alias rm='rm -R'
 alias status='git status'
 alias update='sudo apt update && sudo apt list --upgradable'
-
-#test
