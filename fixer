@@ -10,4 +10,3 @@ git commit -m "Fix LF"
 git push
 
 echo "Done"
-
