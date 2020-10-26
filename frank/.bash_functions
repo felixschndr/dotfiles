@@ -50,27 +50,42 @@ function cconfig {
     cd ~/
     if [[ $DIR == *"/Prod/"* ]]
     then
-        if [ -d "$DIR/.config/fschneider/prod" ]
+        if [ -d "$DIR/.config/$USER/prod" ]
         then
-            ln -sf $DIR/.config/fschneider/prod/config.abm .
-            ln -sf $DIR/.config/fschneider/prod/config.abm.local.linux config.abm.local
+            ln -sf $DIR/.config/$USER/prod/config.abm .
+            ln -sf $DIR/.config/$USER/prod/config.abm.local.linux config.abm.local
         else
-            ln -sf $DIR/.config/fschneider/cnf_prod/config.abm .
-            ln -sf $DIR/.config/fschneider/cnf_prod/config.abm.local.linux config.abm.local
+            ln -sf $DIR/.config/$USER/cnf_prod/config.abm .
+            ln -sf $DIR/.config/$USER/cnf_prod/config.abm.local.linux config.abm.local
         fi
     elif [[ $DIR == *"/Test/"* ]]
     then
-        if [ -d "$DIR/.config/fschneider/test" ]
+        if [ -d "$DIR/.config/$USER/test" ]
         then
-            ln -sf $DIR/.config/fschneider/test/config.abm .
-            ln -sf $DIR/.config/fschneider/test/config.abm.local.linux config.abm.local
+            ln -sf $DIR/.config/$USER/test/config.abm .
+            ln -sf $DIR/.config/$USER/test/config.abm.local.linux config.abm.local
         else
-            ln -sf $DIR/.config/fschneider/cnf_test/config.abm .
-            ln -sf $DIR/.config/fschneider/cnf_test/config.abm.local.linux config.abm.local
+            ln -sf $DIR/.config/$USER/cnf_test/config.abm .
+            ln -sf $DIR/.config/$USER/cnf_test/config.abm.local.linux config.abm.local
+        fi
+    elif [[ $DIR == *"/AES/"* ]]
+    then
+        echo "Git-Repo, bitte test oder prod eingeben, im Anschluss [ENTER]:"
+        read SWITCH
+        if [[ $SWITCH == "test" ]]
+        then
+            ln -sf $DIR/.config/$USER/test/config.abm .
+            ln -sf $DIR/.config/$USER/test/config.abm.local.linux config.abm.local
+        elif [[ $SWITCH == "prod" ]]
+        then
+            ln -sf $DIR/.config/$USER/prod/config.abm .
+            ln -sf $DIR/.config/$USER/prod/config.abm.local.linux config.abm.local
+        else
+            echo "Falsche Eingabe, Verlinkung hat nicht geklappt."
         fi
     else
-        ln -sf $DIR/.config/fschneider/config.abm .
-        ln -sf $DIR/.config/fschneider/config.abm.local.linux config.abm.local
+        ln -sf $DIR/.config/$USER/config.abm .
+        ln -sf $DIR/.config/$USER/config.abm.local.linux config.abm.local
     fi
     ln -sf $DIR/scan .
     popd
