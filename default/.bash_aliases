@@ -12,4 +12,3 @@ alias sl='la'
 alias rm='rm -R'
 alias status='git status'
 alias update='sudo apt update && sudo apt list --upgradable'
-
