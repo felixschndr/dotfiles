@@ -99,7 +99,7 @@ diff_function(){
     files=$(git status | grep "geändert\|neue\|gelöscht" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
-            if [[ $(git status) == *"Commit vor"* ]] || [[ $(git status) == *"Commits vor"* ]]; then
+            if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
 		if [[ $amount == 1 ]]; then
 		    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurden. Soll er jetzt hochgeladen werden?\e[39m"
