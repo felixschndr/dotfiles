@@ -79,8 +79,10 @@ diff_function(){
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
 		if [[ $amount == 1 ]]; then
 		    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurden. Soll er jetzt hochgeladen werden?\e[39m"
+		    git log origin/master..master | grep -v "Author\|commit\|Date" | sed '/^[[:space:]]*$/d'
 		else
 		    echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[39m"
+		    git log origin/master..master | grep -v "Author\|commit\|Date" | sed '/^[[:space:]]*$/d' | cut -d " " -f5- | nl
 		fi
                 push
                 return
