@@ -1,6 +1,6 @@
 #!/bin/bash
 
-7
+
 print_line(){
     #Zeichnet eine horizontale Linie; Zeichen wird per ${1} übertragen
     COLUMNS=$(tput cols)
