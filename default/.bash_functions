@@ -50,7 +50,7 @@ commit_files(){
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
             if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
-                git commit $file -m ${commit_messages[commit_message]}
+                git commit $file -m "${commit_messages[commit_message]}"
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
                 continue
@@ -66,7 +66,6 @@ commit_files(){
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $file -m "$last_commit_message"
         else #Commit mit dem angegeben Text
-            commit_message=$(echo $commit_message | sed 's/"/\\"/g')
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_message" #Den aktuellen Commit ins Array packen
             git commit $file -m "$commit_message"
         fi
