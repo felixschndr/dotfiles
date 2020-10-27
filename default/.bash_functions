@@ -48,21 +48,24 @@ commit_files(){
         read -e commit_message
 
 
-        last_commit_message=${commit_messages[$(($file_counter - 1))]}
         if [[ -z $commit_message ]]; then #Keine Nachricht angegeben
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
             continue
+
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
             if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja, benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
                 git commit $file -m "${commit_messages[commit_message]}"
+                last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
                 continue
             fi
+
         elif [[ $commit_message == "a" ]]; then #Abbrechen
             echo -e "\e[31mAbbrechen\e[39m"
             return 1
+
         elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
@@ -70,10 +73,14 @@ commit_files(){
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $file -m "$last_commit_message"
+
         else #Commit mit dem angegeben Text
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_message" #Den aktuellen Commit ins Array packen
-            git commit $file -m "$commit_message"
+            last_commit_message=$commit_message
+	    git commit $file -m "$commit_message"
         fi
+
+
         file_counter=$(($file_counter + 1))
         changed=true
     done
