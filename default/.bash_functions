@@ -24,17 +24,20 @@ check_if_repo_exists(){
 
 
 commit_files(){
-    #Die Dateien durchgehen und Files committen
+    #Die Dateien durchgehen und gegebenenfalls committen
     unset commit_messages
     changed=false
     file_counter=1
 
-    for file in $files; do
-        echo -e "\e[96m\e[1m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n"
-        git --no-pager diff --color-words $file | tail -n +5
+
+    for file in $files; do #Gehe alle Files durch
+        echo -e "\e[96m\e[1m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
+        git --no-pager diff --color-words $file | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird
         print_line "-"
+
+
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
-        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben) \e[0m"
+        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben) \e[0m" #Wenn es vorherige Commits gibt werden diese nun angezeigt
         commit_counter=0
         for commit in ${commit_messages[@]} ; do
             commit_counter=$(( $commit_counter + 1 ))
@@ -48,7 +51,7 @@ commit_files(){
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
             continue
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
-            if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja benutze ihn
+            if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja, benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
                 git commit $file -m "${commit_messages[commit_message]}"
             else #Sonst verwerfe ihn
@@ -72,9 +75,13 @@ commit_files(){
         file_counter=$(($file_counter + 1))
         changed=true
     done
-    unset commit_messages
+
+
+    unset commit_messages #Das Array mit den Commitnachrichten wieder leeren
+
 
     print_line "="
+
 
     #Prüfen, ob Commits angegeben wurden
     if [ "$changed" = false ]; then echo -e "\e[31mEs wurden keine Commits angegeben\e[39m"; return 1; fi
@@ -82,9 +89,10 @@ commit_files(){
 
 
 push(){
+    #Hier geht es drum alle Änderungen zu pushehn
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        git push 1>/dev/null && echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen\e[39m"
+        git push 1>/dev/null && echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen!\e[39m"
     else
         echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[39m"
     fi
@@ -94,6 +102,7 @@ push(){
 diff_function(){
     if ! check_if_repo_exists; then return; fi
 
+
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
     files=$(git status | grep "geändert\|neue\|gelöscht" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
@@ -101,7 +110,7 @@ diff_function(){
             if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
 		if [[ $amount == 1 ]]; then
-		    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurden. Soll er jetzt hochgeladen werden?\e[39m"
+		    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[39m"
 		    git log origin/master..master | sed -n 5p
 		else
 		    echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[39m"
@@ -112,11 +121,13 @@ diff_function(){
             fi
             echo -e "\e[32mEs wurden keine Dateien modifiziert\e[39m"
             return;;
-        1) echo -e "\e[96m\e[1m\nEs wurde 1 Datei modifiziert\e[0m";;
+        1) echo -e "\e[96m\e[1m\nEs wurde eine Datei modifiziert\e[0m";;
         *) echo -e "\e[96m\e[1m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
 
+
     if ! commit_files; then return; fi
+
 
     echo -e "\e[32mSollen die Änderungen gepusht werden?\e[39m"
     push
