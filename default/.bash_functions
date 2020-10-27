@@ -82,7 +82,7 @@ diff_function(){
 		    git log origin/master..master | grep -v "Author\|commit\|Date" | sed '/^[[:space:]]*$/d'
 		else
 		    echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[39m"
-		    git log origin/master..master | grep -v "Author\|commit\|Date" | sed '/^[[:space:]]*$/d' | cut -d " " -f5- | nl
+		    git log origin/master..master  | sed -n 5p
 		fi
                 push
                 return
