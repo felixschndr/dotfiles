@@ -92,7 +92,17 @@ push(){
     #Hier geht es drum alle Änderungen zu pushehn
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        git push 1>/dev/null && echo -e "\e[32mDie Commits wurden hochgeladen\e[39m" || echo -e "\e[31mEs gab ein Problem beim Hochladen!\e[39m"
+        output=$(git push 2>&1)
+	if [[ $output == *"completed"* ]]; then
+	    echo -e "\e[32mDie Commits wurden hochgeladen\e[39m"
+	elif [[ $output == *"git pull"* ]]; then
+	    echo -e "\e[33mDas Repository muss erst gemergt werden\e[39m"
+	    git pull
+	    git push
+	    echo -e "\e[32mDie Commits wurden hochgeladen\e[39m"
+	else
+	    echo -e "\e[31mEs gab ein Problem beim Hochladen!\e[39m"
+	fi
     else
         echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[39m"
     fi
