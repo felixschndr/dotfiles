@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+7
 print_line(){
     #Zeichnet eine horizontale Linie; Zeichen wird per ${1} übertragen
     COLUMNS=$(tput cols)
@@ -95,7 +95,7 @@ push(){
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
         output=$(git push 2>&1)
-	if [[ $output == *"completed"* ]]; then
+	if [[ $? == 0 ]]; then
 	    echo -e "\e[32mDie Commits wurden hochgeladen\e[39m"
 	elif [[ $output == *"git pull"* ]]; then
 	    echo -e "\e[33mDas Repository muss erst gemergt werden\e[39m"
