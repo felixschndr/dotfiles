@@ -50,6 +50,7 @@ commit_files(){
 
         if [[ -z $commit_message ]]; then #Keine Nachricht angegeben
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
+	    file_counter=$(($file_counter + 1))
             continue
 
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
@@ -59,6 +60,7 @@ commit_files(){
                 last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
+		file_counter=$(($file_counter + 1))
                 continue
             fi
 
@@ -69,6 +71,7 @@ commit_files(){
         elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[39m"
+		file_counter=$(($file_counter + 1))
                 continue
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
