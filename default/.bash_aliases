@@ -6,9 +6,11 @@ alias ....="cd ../../.."
 alias cp='cp -r'
 alias diff='diff_function'
 alias dc='cd'
-alias la="ls -lAh"
+alias ls="ls -lAh --color=auto"
+alias la="ls"
 alias ll='la'
 alias sl='la'
 alias rm='rm -R'
 alias status='git status'
 alias update='sudo apt update && sudo apt list --upgradable'
+
