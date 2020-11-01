@@ -77,7 +77,7 @@ commit_files(){
     unset commit_messages #Das Array mit den Commitnachrichten wieder leeren
 
 
-    print_line "="
+    echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m\n"
 
 
     #Prüfen, ob Commits angegeben wurden
