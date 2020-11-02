@@ -3,7 +3,7 @@
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias cp='cp -r'
+alias cp='rsync --info=progress2 -r'
 alias diff='diff_function'
 alias dc='cd'
 alias ls="ls -lAh --color=auto"
