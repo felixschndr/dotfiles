@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+alias diff='diff_function'
+
+
 check_if_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
     if [[ $(git status 2>&1) == *"Kein Git-Repo"* ]]; then
@@ -77,11 +80,12 @@ commit_files(){
     unset commit_messages #Das Array mit den Commitnachrichten wieder leeren
 
 
-    echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
-
-
     #Prüfen, ob Commits angegeben wurden
-    if [ "$changed" = false ]; then echo -e "\e[31mEs wurden keine Commits angegeben\e[0m"; return 1; fi
+    if [ "$changed" = false ]; then
+	echo -e "\e[96m\e[1m"; center "Keine Änderungen"; echo -e "\e[0m"
+	echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
+	return 1
+    fi
 }
 
 
@@ -134,10 +138,16 @@ diff_function(){
     esac
 
 
-    if ! commit_files; then return; fi
+    if ! commit_files; then
+	if ! [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
+	    return
+	fi
+    fi
 
 
+    echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
     echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
+
     if [[ $(git status | sed '2!d' | sed 's/[^0-9]*//g') == 1 ]]; then
         git log origin/master..master | sed -n 5p
     else
