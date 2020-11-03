@@ -5,3 +5,4 @@
 for file in $(find /home/.../bashrc/{default,$(hostname)} -type f 2>/dev/null); do
     source $file
 done
+
