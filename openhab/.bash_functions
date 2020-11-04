@@ -40,8 +40,13 @@ ssh_permissions(){
     sudo -u openhab chmod 700 /var/lib/openhab2/.ssh
     sudo -u openhab chmod 644 /var/lib/openhab2/.ssh/id_rsa.pub
     sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_rsa /var/lib/openhab2/.ssh/config
-    echo -e "\e[92mDone\e[39m"
 }
 
 
 
+fix_permissions(){
+    echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
+    sudo openhabian-config
+    ssh_permissions
+    echo -e "\e[92mDone\e[39m"
+}
