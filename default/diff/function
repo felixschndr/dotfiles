@@ -147,7 +147,7 @@ diff_function(){
     if ! check_if_repo_exists; then return; fi
 
 
-    #pull
+    [[ ${1} == *"p"* ]] && pull
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
