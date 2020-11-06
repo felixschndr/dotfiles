@@ -82,9 +82,9 @@ commit_files(){
 
     #Prüfen, ob Commits angegeben wurden
     if [ "$changed" = false ]; then
-	echo -e "\e[96m\e[1m"; center "Keine Änderungen"; echo -e "\e[0m"
-	echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
-	return 1
+        echo -e "\e[96m\e[1m"; center "Keine Änderungen"; echo -e "\e[0m"
+        echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
+        return 1
     fi
 }
 
@@ -111,22 +111,22 @@ push(){
 
 
 pull(){
-    git remote update >/dev/null 
+    git remote update >/dev/null
     if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* ]]; then
-	amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
+	    amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
         else
-	    echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
+	        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
         fi
-	read -e answer
-	if [[ $answer =~ ^[YyJj]$ ]]; then
-	    git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\e[0m"
-	else
-	     echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\e[0m"
-	fi
-     fi
-     return
+        read -e answer
+        if [[ $answer =~ ^[YyJj]$ ]]; then
+            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\e[0m"
+        else
+            echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\e[0m"
+        fi
+    fi
+    return
 }
 
 
@@ -162,9 +162,9 @@ diff_function(){
 
 
     if ! commit_files; then
-	if ! [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
-	    return
-	fi
+        if ! [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
+            return
+        fi
     fi
 
 
