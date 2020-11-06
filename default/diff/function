@@ -134,9 +134,9 @@ pull(){
         fi
         read -e answer
         if [[ $answer =~ ^[YyJj]$ ]]; then
-            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\e[0m"
+            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen\n!\e[0m"
         else
-            echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\e[0m"
+            echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
         fi
     fi
     return
