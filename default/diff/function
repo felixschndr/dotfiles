@@ -162,7 +162,7 @@ diff_function(){
                 else
                     number_of_duplicates=$(( amount - $(git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                     echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
-                    git log origin/master..master | grep -v "Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+                    git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
                 fi
                 push
                 return
@@ -182,7 +182,7 @@ diff_function(){
             if [[ $(git status | sed '2!d' | sed 's/[^0-9]*//g') == 1 ]]; then
                 git log origin/master..master | sed -n 5p
             else
-                git log origin/master..master | grep -v "Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+                git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
             fi
             push
         fi
