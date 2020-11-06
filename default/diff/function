@@ -38,7 +38,7 @@ commit_files(){
 
         if [[ -z $commit_message ]]; then #Keine Nachricht angegeben
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
-            file_counter=$(($file_counter + 1 ))
+	    file_counter=$(($file_counter + 1 ))
             continue
 
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
@@ -48,7 +48,7 @@ commit_files(){
                 last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
-		        file_counter=$(($file_counter + 1 ))
+		file_counter=$(($file_counter + 1 ))
                 continue
             fi
 
@@ -56,10 +56,22 @@ commit_files(){
             echo -e "\e[31mAbbrechen\e[0m"
             return 1
 
+        elif [[ $commit_message == "co" ]]; then #Cechkout HEAD
+            echo -e "\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m"
+	    read -e answer
+	    if [[ $answer =~ ^[YyJj]$ ]]; then
+		echo -e "\e[33mDie Änderungen wurden gelöscht\e[0m"
+		git checkout HEAD $file
+	    else
+		echo -e "\e[32mDie Änderungen wurden nicht gelöscht\e[0m"
+	    fi
+	    file_counter=$(($file_counter + 1 ))
+            continue
+
         elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
-		        file_counter=$(($file_counter + 1))
+		file_counter=$(($file_counter + 1))
                 continue
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
@@ -138,7 +150,7 @@ diff_function(){
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert\|neue\|gelöscht" | cut -d ":" -f2-)
+    files=$(git status | grep "geändert\|neue" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
@@ -160,10 +172,18 @@ diff_function(){
         *) echo -e "\e[96m\e[1m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
 
-
     if ! commit_files; then
-	if ! [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
-	    return
+	if [[ $(git status) == *"Commit vor "* ]] || [[ ! $(git status) == *"Commits vor "* ]]; then
+	    echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
+	    echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
+
+	    if [[ $(git status | sed '2!d' | sed 's/[^0-9]*//g') == 1 ]]; then
+	        git log origin/master..master | sed -n 5p
+	    else
+	        git log origin/master..master | grep -v "Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+	    fi
+	    push
+
 	fi
     fi
 
