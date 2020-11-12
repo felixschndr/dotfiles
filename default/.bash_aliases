@@ -3,7 +3,6 @@
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias cp='rsync --info=progress2 -r'
 alias dc='cd'
 alias ls="ls -lAh --color=auto"
 alias l='ls'
