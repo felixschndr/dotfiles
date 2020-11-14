@@ -15,20 +15,27 @@ complete -F _item_completions itemget itemset
 
 itemget(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
-    while (( "$#" )); do
-        echo -e "Item:\t${1}\nState:\t\c"
-        curl -X GET "http://localhost:8080/rest/items/${1}/state"
-        echo
-        shift
+    for item in $@ ; do
+        echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t\c"
+        curl -X GET "http://localhost:8080/rest/items/$item/state"
+        [[ $# == 1 ]] || echo -e "\n"
     done
+    [[ $# == 1 ]] || return
+    echo -e "\e[36m\n\n${1} wird hier gefunden:\e[39m"
+    search ${1}
 }
 
 
 itemset(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m"   && return 1
     [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[39m" && return 1
-    echo -e "Item:\t${1}\nState:\t${2}"
+    echo -e "\e[36mItem:\e[39m\t\t${1}"
+    echo -e "\e[36mAlter Status:\e[39m\t\c"
+    curl -X GET "http://localhost:8080/rest/items/${1}/state"
+    echo -e "\n\e[36mNeuer Status:\e[39m\t${2}"
     curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state"
+    echo -e "\e[36m\n${1} wird hier gefunden:\e[39m"
+    search ${1}
 }
 
 
@@ -41,7 +48,6 @@ ssh_permissions(){
     sudo -u openhab chmod 644 /var/lib/openhab2/.ssh/id_rsa.pub
     sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_rsa /var/lib/openhab2/.ssh/config
 }
-
 
 
 fix_permissions(){
