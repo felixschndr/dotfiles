@@ -146,8 +146,6 @@ pull(){
 diff_function(){
     if ! check_if_repo_exists; then return; fi
 
-    [[ $@ == *"diff"* ]] && cd "$( dirname "${BASH_SOURCE[0]}")"
-
     [[ $@ == *"p"* ]] && pull
 
 
@@ -189,8 +187,6 @@ diff_function(){
         fi
         push
     fi
-
-    [[ $@ == *"diff"* ]] && cd -
 
     return 0
 
