@@ -56,3 +56,8 @@ fix_permissions(){
     ssh_permissions
     echo -e "\e[92mDone\e[39m"
 }
+
+logsearch(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
+    grep -Tinr "$1" /var/log/openhab2/openhab.log /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+}
