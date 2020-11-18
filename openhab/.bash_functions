@@ -10,7 +10,7 @@ _item_completions(){
 }
 
 
-complete -F _item_completions itemget itemset
+complete -F _item_completions itemget itemset logsearch search
 
 
 itemget(){
