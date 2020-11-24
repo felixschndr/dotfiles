@@ -4,7 +4,7 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias dc='cd'
-alias ls="ls -lAh --color=auto"
+alias ls="ls -lAh --color=always"
 alias l='ls'
 alias la="ls"
 alias ll='ls'
