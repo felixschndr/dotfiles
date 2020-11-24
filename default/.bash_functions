@@ -7,7 +7,7 @@ search_string(){
 
 search_file(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    find . -name "*$1*" | grep . --color=never || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    find . -iname "*$1*" | grep . --color=never || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
 
 search_help(){
