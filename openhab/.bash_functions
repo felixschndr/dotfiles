@@ -21,7 +21,7 @@ itemget(){
         [[ $# == 1 ]] || echo -e "\n"
     done
     [[ $# == 1 ]] || return
-    echo -e "\e[36m\n\n${1} wird hier gefunden:\e[39m"
+    echo -e "\n\n${1}\e[36m wird hier gefunden:\e[39m"
     search ${1}
 }
 
@@ -34,7 +34,7 @@ itemset(){
     curl -X GET "http://localhost:8080/rest/items/${1}/state"
     echo -e "\n\e[36mNeuer Status:\e[39m\t${2}"
     curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state"
-    echo -e "\e[36m\n${1} wird hier gefunden:\e[39m"
+    echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
     search ${1}
 }
 
@@ -53,11 +53,12 @@ ssh_permissions(){
 fix_permissions(){
     echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
     sudo openhabian-config
+    sudo chmod -R a+r items/ sitemaps/ things/ scripts/ rules/ transform/ html/ icons/ logconfig.cfg persistence/ services/ sounds/
     ssh_permissions
     echo -e "\e[92mDone\e[39m"
 }
 
-logsearch(){
+search_log(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
     grep -Tinr "$1" /var/log/openhab2/openhab.log /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
