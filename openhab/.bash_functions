@@ -10,7 +10,7 @@ _item_completions(){
 }
 
 
-complete -F _item_completions itemget itemset logsearch search
+complete -F _item_completions itemget itemset search_log search_string
 
 
 itemget(){
@@ -22,7 +22,9 @@ itemget(){
     done
     [[ $# == 1 ]] || return
     echo -e "\n\n${1}\e[36m wird hier gefunden:\e[39m"
-    search ${1}
+    cd
+    search_string ${1}
+    cd - >/dev/null
 }
 
 
@@ -35,7 +37,9 @@ itemset(){
     echo -e "\n\e[36mNeuer Status:\e[39m\t${2}"
     curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state"
     echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
-    search ${1}
+    cd
+    search_string ${1}
+    cd - >/dev/null
 }
 
 
