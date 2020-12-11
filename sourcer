@@ -2,6 +2,14 @@
 
 # entweder in .bash_profile oder sonst in .bashrc einfügen
 
+# Wenn kein Leerzeichen im Username ist:
 for file in $(find /home/.../bashrc/{default,$(hostname)} -type f 2>/dev/null); do
     source $file
+done
+
+
+# Wenn ein Leerzeichen im Username ist:
+for file in $(find /c/Users/'Felix Schneider'/bashrc/{default,$(hostname)} -type f 2>/dev/null | sed 's/x S/x}S/g'); do
+    file=$(echo $file | sed 's/x}S/x S/g')
+    source "$file"
 done
