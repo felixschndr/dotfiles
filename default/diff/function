@@ -6,7 +6,7 @@ alias diff='diff_function'
 
 check_if_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
-    if [[ $(git status 2>&1) == *"Kein Git-Repo"* ]]; then
+    if [[ $(git status 2>&1) == *"Kein Git-Repo"* || $(git status 2>&1) == *"not a git repository"* ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
         return 1
     fi
@@ -125,7 +125,7 @@ push(){
 
 pull(){
     git remote update >/dev/null
-    if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* ]]; then
+    if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* || || [[ $(git status) == *"behind "* ]]; then
 	    amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
@@ -150,7 +150,7 @@ diff_function(){
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert" | cut -d ":" -f2-)
+    files=$(git status | grep "geändert\|modified" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
@@ -176,7 +176,7 @@ diff_function(){
     commit_files
 
 
-    if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]]; then
+    if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* || [[ $(git status) == *" ahead"* ]]; then
         echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
         echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
 
