@@ -125,7 +125,7 @@ push(){
 
 pull(){
     git remote update >/dev/null
-    if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* || || [[ $(git status) == *"behind "* ]]; then
+    if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* || [[ $(git status) == *"behind "* ]]; then
 	    amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
