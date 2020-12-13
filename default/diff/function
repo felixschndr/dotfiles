@@ -139,6 +139,7 @@ push(){
 
 
 pull(){
+    #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
     if [[ $1 == "-f" ]]; then git remote update >/dev/null 2>/dev/null fi
     git_status=$(git status 2>&1)
 
