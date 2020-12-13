@@ -13,6 +13,18 @@ check_if_repo_exists(){
 }
 
 
+check_for_unmanaged_files(){
+    if [[ $(git status 2>&1) == *"Untracked file"* || $(git status 2>&1) == *"new"* || $(git status 2>&1) == *"deleted"* || $(git status 2>&1) == *"Unversioniert"* || $(git status 2>&1) == *"neue Datei"* || $(git status 2>&1) == *"gelöscht"* ]]; then
+        echo -e "\e[33mEs gibt noch bearbeitete Dateien. Willst Du sie jetzt bearbeiten?\e[0m"
+        read -e answer
+        if [[ $answer =~ ^[YyJj]$ ]]; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+
 commit_files(){
     #Die Dateien durchgehen und gegebenenfalls committen
     unset commit_messages
@@ -125,7 +137,7 @@ push(){
 
 pull(){
     git remote update >/dev/null
-    if [[ $(git status) == *"Commit hinter "* ]] || [[ $(git status) == *"Commits hinter "* ]] || [[ $(git status) == *"behind "* ]]; then
+    if [[ $(git status) == *"Commit hinter "* || $(git status) == *"Commits hinter "* || $(git status) == *"behind "* ]]; then
 	    amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
@@ -144,7 +156,12 @@ pull(){
 
 
 diff_function(){
+    git_status=$(git status 2>&1)
+
     if ! check_if_repo_exists; then return; fi
+
+    if ! check_for_unmanaged_files; then git status && return ; fi
+
 
     [[ $@ == *"p"* ]] && pull
 
@@ -153,7 +170,7 @@ diff_function(){
     files=$(git status | grep "geändert\|modified" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
-            if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]] || [[ $(git status) == *" ahead"* ]]; then
+            if [[ $(git status) == *"Commit vor "* || $(git status) == *"Commits vor "* || $(git status) == *" ahead"* ]]; then
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
                 if [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
@@ -176,7 +193,7 @@ diff_function(){
     commit_files
 
 
-    if [[ $(git status) == *"Commit vor "* ]] || [[ $(git status) == *"Commits vor "* ]] || [[ $(git status) == *" ahead"* ]]; then
+    if [[ $(git status) == *"Commit vor "* || $(git status) == *"Commits vor "* || $(git status) == *" ahead"* ]]; then
         echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
         echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
 
