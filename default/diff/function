@@ -14,8 +14,9 @@ check_if_repo_exists(){
 
 
 check_for_unmanaged_files(){
+    #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
     if [[ "$git_status" == *"Untracked file"* || "$git_status" == *"new"* || "$git_status" == *"deleted"* || "$git_status" == *"Unversioniert"* || "$git_status" == *"neue Datei"* || "$git_status" == *"gelöscht"* ]]; then
-        echo -e "\e[33mEs gibt noch bearbeitete Dateien. Willst Du sie jetzt bearbeiten?\e[0m"
+        echo -e "\e[33mEs gibt noch Dateien, die gelöscht, neu oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         read -e answer
         if [[ $answer =~ ^[YyJj]$ ]]; then
             return 1
