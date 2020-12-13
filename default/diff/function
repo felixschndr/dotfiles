@@ -139,7 +139,7 @@ push(){
 
 
 pull(){
-    [[ $1 == "-f" ]] && git remote update >/dev/null 2>/dev/null
+    if [[ $1 == "-f" ]]; then git remote update >/dev/null 2>/dev/null fi
     git_status=$(git status 2>&1)
 
     if [[ "$git_status" == *"Commit hinter "* || "$git_status" == *"Commits hinter "* || "$git_status" == *"behind "* ]]; then
