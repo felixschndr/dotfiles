@@ -4,7 +4,7 @@
 
 # Wenn kein Leerzeichen im Username ist:
 for file in $(find /home/.../bashrc/{default,$(hostname)} -type f 2>/dev/null); do
-    source $file
+    source "$file"
 done
 
 
