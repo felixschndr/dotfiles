@@ -138,7 +138,7 @@ push(){
 
 
 pull(){
-    git remote update >/dev/null
+    [[ $1 == "-f" ]] && git remote update >/dev/null
     git_status=$(git status 2>&1)
 
     if [[ "$git_status" == *"Commit hinter "* || "$git_status" == *"Commits hinter "* || "$git_status" == *"behind "* ]]; then
@@ -167,7 +167,7 @@ diff_function(){
     if ! check_for_unmanaged_files; then git status && return ; fi
 
 
-    [[ $@ == *"p"* ]] && pull
+    [[ $@ == *"p"* ]] && pull -f || pull
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
