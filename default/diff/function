@@ -36,6 +36,14 @@ commit_files(){
 
     for file in $files; do #Gehe alle Files durch
         echo -e "\e[96m\e[1m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
+        if [[ -z $( git diff $file) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .docx
+            echo -e "\e[33mFür diese Datei ist kein Diff verfügbar, somit wird sie übersprungen\e[0m"
+            continue
+        fi
+        if [[ "$(git --no-pager diff --color-words $file 2>&1)" == *"Permission denied"* && "$file" != *"diff/function"* ]]; then
+            echo -e "\e[31mDie Datei \"$file\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m"
+            continue
+        fi
         git --no-pager diff --color-words $file | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird
         print_line "-"
 
@@ -111,7 +119,6 @@ commit_files(){
     if [ "$changed" = false ]; then
         echo -e "\e[96m\e[1m"; center "Keine Änderungen"; echo -e "\e[0m"
         echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
-        return 1
     fi
 }
 
@@ -196,7 +203,7 @@ diff_function(){
     esac
 
 
-    commit_files
+    if ! commit_files; then return; fi
 
 
     git_status=$(git status 2>&1)
