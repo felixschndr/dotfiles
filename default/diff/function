@@ -182,7 +182,7 @@ diff_function(){
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert\|modified" | cut -d ":" -f3-)
+    files=$(git status | "grep" "geändert\|modified" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             if [[ "$git_status" == *"Commit vor "* || "$git_status" == *"Commits vor "* || "$git_status" == *" ahead"* ]]; then
@@ -191,9 +191,9 @@ diff_function(){
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
                     git log origin/master..master | sed -n 5p
                 else
-                    number_of_duplicates=$(( amount - $(git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                    number_of_duplicates=$(( amount - $(git log origin/master..master | "grep" -v "Merge\|Author\|Date" | "egrep" -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                     echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
-                    git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+                    git log origin/master..master | "grep" -v "Merge\|Author\|Date" | "egrep" -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
                 fi
                 push
                 return
@@ -217,7 +217,7 @@ diff_function(){
         if [[ $(git status | sed '2!d' | sed 's/[^0-9]*//g') == 1 ]]; then
             git log origin/master..master | sed -n 5p
         else
-            git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+            git log origin/master..master | "grep" -v "Merge\|Author\|Date" | "egrep" -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         fi
         push
     fi
