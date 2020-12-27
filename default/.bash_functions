@@ -2,12 +2,12 @@
 
 search_string(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    grep -inr "$1" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    "grep" -inr "$1" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
 
 search_file(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    find . -iname "*$1*" | grep . --color=never || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    find . -iname "*$1*" | "grep" . --color=never || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
 
 search_help(){
