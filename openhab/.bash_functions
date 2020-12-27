@@ -1,10 +1,10 @@
 #!/bin/bash
 
 _item_completions(){
-    items=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null| sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
+    items=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null| sed 's/,/\n/g' | "grep" name | "grep" -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
     local anfang="${COMP_WORDS[$COMP_CWORD]}"
 
-    for item in $( echo $items | sed 's/ /\n/g' | grep -P "^$anfang"); do
+    for item in $( echo $items | sed 's/ /\n/g' | "grep" -P "^$anfang"); do
 	COMPREPLY=("${COMPREPLY[@]}" "$item")
     done
 }
@@ -64,5 +64,5 @@ fix_permissions(){
 
 search_log(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    grep -Tinr "$1" /var/log/openhab2/openhab.log /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    "grep" -Tinr "$1" /var/log/openhab2/openhab.log /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
