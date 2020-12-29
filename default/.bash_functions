@@ -16,6 +16,6 @@ search_help(){
     echo -e "\e[96mFunktion\tBeschreibung\e[39m\n"
     echo -e "search_string\tSucht rekursiv nach einem gegebenen String im aktuellen Verzeichnis"
     echo -e "search_file\tSucht rekursiv nach einer Datei mit dem gegebenen Namen im aktuellen Verzeichnis"
-    echo -e "search_log\tSucht nach einem gegebenen String in den Logs \e[2m(Nur auf OpenHAB verfügbar)\e[0m"
+    [[ $(hostname) == "openhab" ]] && echo -e "search_log\tSucht nach einem gegebenen String in den Logs"
     echo -e "search_help\tZeigt diese Hilfe an"
 }
