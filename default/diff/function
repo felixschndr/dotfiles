@@ -56,7 +56,7 @@ commit_files(){
             (( commit_counter ++ ))
             [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
-        echo -e "Alternativ kann auch folgendes angegeben werden:\n    a      Abbrechen\n    co     Die lokalen Änderungen verwerfen\n    l      Die letzte Commitnachricht verwenden\nDie Datei wird übersprungen, wenn nichts angegeben wird"
+        echo -e "Alternativ kann auch folgendes angegeben werden:\n    a      Abbrechen\n    co     Die lokalen Änderungen verwerfen\n    l      Die letzte Commitnachricht verwenden\nDie Datei wird übersprungen, wenn nichts angegeben wird\n"
         read -e commit_message
 
 
