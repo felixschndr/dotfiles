@@ -50,12 +50,13 @@ commit_files(){
 
 
         echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
-        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben) \e[0m" #Wenn es vorherige Commits gibt werden diese nun angezeigt
+        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben)\e[0m" #Wenn es vorherige Commits gibt werden diese nun angezeigt
         commit_counter=0
         for commit in ${commit_messages[@]} ; do
-            commit_counter=$(( $commit_counter + 1 ))
-            [[ -z ${commit_messages[commit_counter]} ]] || echo -e "     $commit_counter      ${commit_messages[commit_counter]}"
+            (( commit_counter ++ ))
+            [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
+        echo -e "Alternativ kann auch folgendes angegeben werden:\n    a      Abbrechen\n    co     Die lokalen Änderungen verwerfen\n    l      Die letzte Commitnachricht verwenden\nDie Datei wird übersprungen, wenn nichts angegeben wird"
         read -e commit_message
 
 
@@ -75,12 +76,12 @@ commit_files(){
                 continue
             fi
 
-        elif [[ $commit_message == "a" ]]; then #Abbrechen
+        elif [[ $commit_message =~ ^[Aa]$ ]]; then #Abbrechen
             echo -e "\e[31mAbbrechen\e[0m"
             return 1
 
-        elif [[ $commit_message == "co" ]]; then #Cechkout HEAD
-            echo -e "\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m"
+        elif [[ $commit_message == "co" || $commit_message == "CO" ]]; then #Cechkout HEAD
+            echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
             read -e answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 echo -e "\e[33mDie Änderungen wurden gelöscht\e[0m"
@@ -92,7 +93,7 @@ commit_files(){
             continue
 
 
-        elif [[ $commit_message == "l" ]]; then #Der letzte Commit soll verwendet werden
+        elif [[ $commit_message =~ ^[Ll]$ ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
 		        ((file_counter ++))
@@ -160,7 +161,7 @@ pull(){
         fi
         read -e answer
         if [[ $answer =~ ^[YyJj]$ ]]; then
-            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen\n!\e[0m"
+            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\n\e[0m"
         else
             echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
         fi
@@ -180,6 +181,9 @@ diff_function(){
     [[ $@ == *"p"* ]] && pull -f || pull
 
 
+    branch=$(git branch | grep "*" | cut -d" " -f2-)
+
+
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
     files=$(git status | grep "geändert\|modified" | cut -d ":" -f2-)
     case $(echo $files | wc -w ) in
@@ -188,15 +192,15 @@ diff_function(){
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
                 if [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
-                    git log origin/master..master | sed -n 5p
+                    git log origin/$branch..$branch | sed -n 5p
                 else
-                    number_of_duplicates=$(( amount - $(git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                    number_of_duplicates=$(( amount - $(git log origin/$branch..$branch | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                     if [[ $number_of_duplicates == 1 ]]; then
                         echo -e "\e[33mEs gibt noch $amount Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     else
                         echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     fi
-                    git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+                    git log origin/$branch..$branch | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
                 fi
                 push
                 return
@@ -217,10 +221,10 @@ diff_function(){
         echo -e "\e[96m\e[1m"; center "Push"; echo -e "\e[0m"
         echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
 
-        if [[ $(git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
-            git log origin/master..master | sed -n 5p
+        if [[ $(git log origin/$branch..$branch | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
+            git log origin/$branch..$branch | sed -n 5p
         else
-            git log origin/master..master | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+            git log origin/$branch..$branch | grep -v "Merge\|Author\|Date" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         fi
         push
     fi
