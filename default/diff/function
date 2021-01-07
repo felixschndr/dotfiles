@@ -42,8 +42,7 @@ commit_files(){
             continue
         fi
 
-        #TODO: add --staged
-        if [[ -z $( git diff $file ) ]] && [[ ! -z $( git status | grep -i $file | grep -i "(new|neu)" ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
+        if [[ -z $( git diff $file ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
             echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
         fi
 
