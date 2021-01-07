@@ -22,3 +22,9 @@ search_help(){
     [[ $(hostname) == "openhab" ]] && echo -e "search_log\tSucht nach einem gegebenen String in den Logs"
     echo -e "search_help\tZeigt diese Hilfe an"
 }
+
+PS1='\[\e[01;30m\]\t`\
+if [ $? = 0 ]; then echo "\[\e[00;32m\] ✔ "; else echo "\[\e[00;31m\] ✘ "; fi`\
+\u\[\e[01;37m\]:\[\e[01;36m\]$(pwd)\[\e[00m\]`\
+[[ $(git status 2> /dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]] && echo "\[\e[31m\]" || echo "\[\e[32m\]"` \
+$(__git_ps1 "(%s)")\[\e[00m\]\$ '
