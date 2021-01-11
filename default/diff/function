@@ -96,7 +96,7 @@ commit_files(){
 
         elif [[ $commit_message =~ ^[Ll]$ ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
-                echo -e "\e[33mEs gibt keine letzten Commitnachricht, somit die Datei wird übersprungen\e[0m"
+                echo -e "\e[33mEs gibt keine letzte Commitnachricht, somit die Datei wird übersprungen\e[0m"
 		        ((file_counter ++))
                 continue
             fi
