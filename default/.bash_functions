@@ -24,6 +24,10 @@ search_help(){
 }
 
 
+complete_repeat(){ #Füge ein " nach dem Kommando repeat ein
+    COMPREPLY=("\"")
+}
+
 repeat(){
     trap 'echo "" && return 0' SIGINT
     local counter=0
@@ -35,4 +39,4 @@ repeat(){
     done
 }
 
-complete COMPREPLY=("\"") repeat #Füge ein " nach dem Kommando repeat ein
+complete -F complete_repeat repeat
