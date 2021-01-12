@@ -22,3 +22,17 @@ search_help(){
     [[ $(hostname) == "openhab" ]] && echo -e "search_log\tSucht nach einem gegebenen String in den Logs"
     echo -e "search_help\tZeigt diese Hilfe an"
 }
+
+
+repeat(){
+    trap 'echo "" && return 0' SIGINT
+    local counter=0
+    while (true); do
+        ((counter ++))
+        echo -e "\e[96m\e[1m\n"; center "$(date +%T) ($counter)"; echo -e "\e[0m"
+        bash -c "$@"
+        sleep 1
+    done
+}
+
+complete COMPREPLY=("\"") repeat #Füge ein " nach dem Kommando repeat ein
