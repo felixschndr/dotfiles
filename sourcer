@@ -14,3 +14,7 @@ done
 # Das in de crontab einfügen
 */10 * * * * cd /home/$USER/bashrc/ && git pull
 @reboot cd /home/$USER/bashrc/ && git pull
+
+#Falls __git_ps1 nicht gefunden wurde
+curl -o ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+echo 'source ~/.git-prompt.sh' >> ~/.bashrc
