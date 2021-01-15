@@ -14,4 +14,3 @@ alias less='less -IN'
 alias cp='rsync -arh --info=progress2'
 alias b='exec $SHELL'
 alias which='type'
-alias tail="tail -F"
