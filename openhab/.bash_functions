@@ -10,10 +10,10 @@ _item_completions(){
 }
 
 
-complete -F _item_completions itemget itemset search_log search_string
+complete -F _item_completions item_get item_set item_toggle search_log search_string
 
 
-itemget(){
+item_get(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
     for item in $@ ; do
         echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t\c"
@@ -28,7 +28,7 @@ itemget(){
 }
 
 
-itemset(){
+item_set(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m"   && return 1
     [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[39m" && return 1
     echo -e "\e[36mItem:\e[39m\t\t${1}"
@@ -36,6 +36,30 @@ itemset(){
     curl -X GET "http://localhost:8080/rest/items/${1}/state"
     echo -e "\n\e[36mNeuer Status:\e[39m\t${2}"
     curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state"
+    echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
+    cd
+    search_string ${1}
+    cd - >/dev/null
+}
+
+item_toggle(){
+    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
+    alter_status=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
+    echo -e "\e[36mItem:\e[39m\t\t${1}"
+    echo -e "\e[36mAlter Status:\e[39m\t$alter_status"
+    if [[ $alter_status == "ON" || $alter_status == "On" || $alter_status == "on" ]]; then
+        neuer_status="OFF"
+    elif [[ $alter_status == "OFF" || $alter_status == "Off" || $alter_status == "off" ]]; then
+        neuer_status="ON"
+    elif [[ $alter_status == "OPEN" ]]; then
+        neuer_status="CLOSED"
+    elif [[ $alter_status == "CLOSED" ]]; then
+        neuer_status="OPEN"
+    else
+        echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[39m" && return 1
+    fi
+    echo -e "\e[36mNeuer Status:\e[39m\t$neuer_status"
+    curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "$neuer_status" "http://localhost:8080/rest/items/${1}/state"
     echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
     cd
     search_string ${1}
