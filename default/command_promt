@@ -8,7 +8,7 @@ else
 fi`\
 \u\
 \[\e[01;37m\]:\
-\[\e[36m\]$(pwd)\[\e[0m\]\
+\[\e[36m\]\w\[\e[0m\]\
 `if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
     echo "\[\e[31m\]";\
 else\
