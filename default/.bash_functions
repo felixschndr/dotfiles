@@ -25,11 +25,11 @@ search_help(){
 
 
 repeat(){
-    [[ -z ${2} ]] && sleeptime="1" || sleeptime=$(echo ${2} | sed 's/,/./')
+    [[ -z ${2} ]] && sleeptime="1.0" || sleeptime=$(echo ${2} | sed 's/,/./')
     local counter=0
     while (true); do
         ((counter ++))
-        echo -e "\e[96m\e[1m\n"; center "$(date +%T) ($counter)"; echo -e "\e[0m"
+        echo -e "\n\e[96m\e[1m"; center "   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   |   Kommando: \"$@\"   "; echo -e "\e[0m"
         bash -c "$@"
         read -t $sleeptime
     done
