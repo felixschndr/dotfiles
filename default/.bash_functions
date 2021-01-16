@@ -16,27 +16,21 @@ search_file(){
 }
 
 search_help(){
-    echo -e "\e[96mFunktion\tBeschreibung\e[39m\n"
-    echo -e "search_string\tSucht rekursiv nach einem gegebenen String im aktuellen Verzeichnis\n\t\t    oder in einem als zweites Argument übergebenen gegeben Verzeichnis"
-    echo -e "search_file\tSucht rekursiv nach einer Datei mit dem gegebenen Namen im aktuellen Verzeichnis"
-    [[ $(hostname) == "openhab" ]] && echo -e "search_log\tSucht nach einem gegebenen String in den Logs"
-    echo -e "search_help\tZeigt diese Hilfe an"
+    echo -e "\e[96mFunktion\t\tBeschreibung\e[39m\n"
+    echo -e "search_string\t\tSucht rekursiv nach einem gegebenen String im aktuellen Verzeichnis\n\t\t\t    oder in einem als zweites Argument übergebenen gegeben Verzeichnis"
+    echo -e "search_file\t\tSucht rekursiv nach einer Datei mit dem gegebenen Namen im aktuellen Verzeichnis"
+    [[ $(hostname) == "openhab" ]] && echo -e "search_log\t\tSucht nach einem gegebenen String in den Logs"
+    echo -e "search_help\t\tZeigt diese Hilfe an"
 }
 
-
-complete_repeat(){ #Füge ein " nach dem Kommando repeat ein
-    COMPREPLY=("\"")
-}
 
 repeat(){
-    trap 'echo "" && return 0' SIGINT
+    [[ -z ${2} ]] && sleeptime="1" || sleeptime=$(echo ${2} | sed 's/,/./')
     local counter=0
     while (true); do
         ((counter ++))
         echo -e "\e[96m\e[1m\n"; center "$(date +%T) ($counter)"; echo -e "\e[0m"
         bash -c "$@"
-        sleep 1
+        read -t $sleeptime
     done
 }
-
-complete -F complete_repeat repeat
