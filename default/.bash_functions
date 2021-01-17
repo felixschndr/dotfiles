@@ -29,8 +29,8 @@ repeat(){
     local counter=0
     while (true); do
         ((counter ++))
-        echo -e "\n\e[96m\e[1m"; center "   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   |   Kommando: \"$@\"   "; echo -e "\e[0m"
-        bash -c "$@"
+        echo -e "\n\e[96m\e[1m"; center "   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   |   Kommando: ${1}   "; echo -e "\e[0m"
+        bash -c "${1}"
         read -t $sleeptime
     done
 }
