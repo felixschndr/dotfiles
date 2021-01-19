@@ -48,7 +48,14 @@ commit_files(){
             echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
         fi
 
-        git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird
+        if [[ -z $(git diff --summary "$file") ]]; then #Wurden die Rechte der Datei gleichbehalten?
+            git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird; unified gibt den Kontext an
+        else
+            echo -e "\e[33m"
+            git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE '.+[0-9]' #Zeigt Rechteänderungen an
+            echo -e "\e[0m\n\n"
+            git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiten, da der Rechtewechsel auch im diff enthalten ist
+        fi
         print_line "-"
 
 
