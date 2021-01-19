@@ -145,7 +145,7 @@ push(){
         elif [[ $output == *"git pull"* ]]; then
             echo -e "\e[33mDas Repository muss erst gemergt werden\e[0m"
             sleep 1
-            git pull
+            git pull --rebase
             git push
             echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
         else
@@ -171,7 +171,7 @@ pull(){
         fi
         read -e answer
         if [[ $answer =~ ^[YyJj]$ ]]; then
-            git pull && echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\n\e[0m"
+            git pull --rebase && echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m" || echo -e "\e[31mEs gab ein Problem beim Herunterladen!\n\e[0m"
         else
             echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
         fi
