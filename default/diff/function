@@ -53,7 +53,7 @@ commit_files(){
         else
             echo -e "\e[33m"
             git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE '.+[0-9]' #Zeigt Rechteänderungen an
-            echo -e "\e[0m\n\n"
+            echo -e "\e[0m\n"
             git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiten, da der Rechtewechsel auch im diff enthalten ist
         fi
         print_line "-"
