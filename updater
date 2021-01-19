@@ -8,3 +8,4 @@ git pull 2>/dev/null >/dev/null || echo -e "\e[31m\e[1mEs gab ein Problem beim U
 cd - >/dev/null #Move back
 
 exit 0
+
