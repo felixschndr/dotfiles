@@ -143,9 +143,9 @@ push(){
         if [[ $? == 0 ]]; then
             echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
         elif [[ $output == *"git pull"* ]]; then
-            echo -e "\e[33mDas Repository muss erst gemergt werden\e[0m"
+            echo -e "\n\e[33mDas Repository muss erst gemergt werden\e[0m"
             sleep 1
-            git pull --rebase
+            git pull --rebase 2>/dev/null >/dev/null
             git push
             echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
         else
