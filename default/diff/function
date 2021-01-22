@@ -209,7 +209,7 @@ diff_function(){
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
                     git log origin/$branch..$branch | sed -n 5p
                 else
-                    number_of_duplicates=$(( amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                    number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                     if [[ $number_of_duplicates == 1 ]]; then
                         echo -e "\e[33mEs gibt noch $amount Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     else
