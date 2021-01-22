@@ -1,24 +1,24 @@
 #!/bin/bash
 
-PS1='\[\e[1;30m\]\t\[\e[0m\]\
-`if [ $? = 0 ]; then\
-    echo "\[\e[32m\] ✔ ";\
-else
-    echo "\[\e[31m\] ✘ ";\
-fi`\
-\u\
-\[\e[01;37m\]:\
-\[\e[36m\]\w\[\e[0m\]\
-`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
-    echo "\[\e[31m\]";\
-else\
-    echo "\[\e[32m\]";\
-fi`\
-$(__git_ps1 " (%s)") \
-\[\e[37m\]\$ \
-\[\e[0m\]'
+# PS1='\[\e[1;30m\]\t\[\e[0m\]\
+# `if [ $? = 0 ]; then\
+#     echo "\[\e[32m\] ✔ ";\
+# else
+#     echo "\[\e[31m\] ✘ ";\
+# fi`\
+# \u\
+# \[\e[01;37m\]:\
+# \[\e[36m\]\w\[\e[0m\]\
+# `if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
+#     echo "\[\e[31m\]";\
+# else\
+#     echo "\[\e[32m\]";\
+# fi`\
+# $(__git_ps1 " (%s)") \
+# \[\e[37m\]\$ \
+# \[\e[0m\]'
 
-[[ $(($RANDOM%2)) == "0" ]] && \
+# [[ $(($RANDOM%2)) == "0" ]] && \
 PS1='\[\e[1;30m\]\t\[\e[0m\]\
 `if [ $? = 0 ]; then\
     echo "\[\e[32m\] ✔ ";\
