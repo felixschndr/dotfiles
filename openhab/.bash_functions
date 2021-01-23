@@ -88,5 +88,5 @@ fix_permissions(){
 
 search_log(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    grep -T "${1}" /var/log/openhab2/openhab.log /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    grep -in "${1}" --color=always /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
 }
