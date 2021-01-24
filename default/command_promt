@@ -1,38 +1,50 @@
 #!/bin/bash
 
-# PS1='\[\e[1;30m\]\t\[\e[0m\]\
-# `if [ $? = 0 ]; then\
-#     echo "\[\e[32m\] ✔ ";\
-# else
-#     echo "\[\e[31m\] ✘ ";\
-# fi`\
-# \u\
-# \[\e[01;37m\]:\
-# \[\e[36m\]\w\[\e[0m\]\
-# `if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
-#     echo "\[\e[31m\]";\
-# else\
-#     echo "\[\e[32m\]";\
-# fi`\
-# $(__git_ps1 " (%s)") \
-# \[\e[37m\]\$ \
-# \[\e[0m\]'
 
-# [[ $(($RANDOM%2)) == "0" ]] && \
-PS1='\[\e[1;30m\]\t\[\e[0m\]\
-`if [ $? = 0 ]; then\
-    echo "\[\e[32m\] ✔ ";\
+# Erstmal eine Leerzeile für mehr Platz
+PS1="\n"
+
+# Linie am Anfang
+PS1="$PS1\[\e[1;30m\]\342\224\214\342\224\200"
+
+# Uhrzeit
+PS1="$PS1\[\e[0m\]\t"
+
+# ]-[
+PS1="$PS1\[\e[1;30m\]]-[\[\e[0m"
+
+# Zeichen für Returncode
+PS1="$PS1`if [ $? = 0 ]; then\
+    echo "\[\e[32m\]✔ ";\
 else
-    echo "\[\e[31m\] ✘ ";\
-fi`\
-\u@\H\
-\[\e[01;37m\]:\
-\[\e[36m\]$(pwd)\[\e[0m\]\
-`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
+    echo "\[\e[31m\]❌";\
+fi`"
+
+# ]-[
+PS1="$PS1\[\e[1;30m\]]-[\[\e[0m"
+
+# User und Hostname
+PS1="$PS1\u@\H"
+
+# ]-[
+PS1="$PS1\[\e[1;30m\]]-[\[\e[0m"
+
+# Pfad
+PS1="$PS1\[\e[36m\]$(pwd)\[\e[0m\]"
+
+# Git Pfad und Farbe
+PS1="$PS1`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
     echo "\[\e[31m\]";\
 else\
     echo "\[\e[32m\]";\
 fi`\
-$(__git_ps1 " (%s)") \
-\n\[\e[37m\]\$ \
-\[\e[0m\]'
+$(__git_ps1 " (%s)")"
+
+# Klammer zu nach dem Pfad
+PS1="$PS1\[\e[1;30m\]]"
+
+# Nächste Zeile
+PS1="$PS1\n"
+
+# Untere Linie
+PS1="$PS1\342\224\224\342\224\200\342\224\200> \[\e[0m\]"
