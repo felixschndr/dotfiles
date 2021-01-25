@@ -235,7 +235,7 @@ diff_function(){
 
     git_status=$(git status 2>&1)
 
-    if [[ "$git_status" =~ (Commit vor|Commits vor| ahead) ]]; then
+    if [[ "$git_status" =~ (Commit vor |Commits vor| ahead) ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
