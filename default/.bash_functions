@@ -1,5 +1,15 @@
 #!/bin/bash
 
+git_url(){
+    if [[ "$(git status 2>&1)" =~ (Kein Git-Repo|not a git repository) ]]; then
+        echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
+        return 1
+    fi
+    echo -ne "Repository URL: \e[96m"
+    git config --get remote.origin.url | sed 's/git@github.com:/https:\/\/www.github.com\//' | sed 's/\.git//'
+    echo -ne "\e[0m"
+}
+
 search_string(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return 1
     if [[ $# == 1 ]]; then
