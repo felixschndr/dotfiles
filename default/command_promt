@@ -8,7 +8,7 @@ DEFAULT="\[\e[0m\]"
 GRUEN="\[\e[32m\]"
 ROT="\[\e[31m\]"
 PINK="\[\e[35m\]"
-CYAN="\[\e[36m\]"
+CYAN="\[\e[1;36m\]"
 ##############################
 
 
@@ -41,21 +41,20 @@ PS1="$PS1$GRUEN\u$PINK@$GRUEN\H"
 PS1="$PS1$GRAU]-[$DEFAULT"
 
 # Pfad
-PS1="$PS1$CYAN$(pwd)$DEFAULT"
+PS1="$PS1$CYAN"'$(pwd)'"$DEFAULT"
 
-# Git Pfad und Farbe
-PS1="$PS1`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
-    echo "$ROT";\
+# Git Farbe
+PS1="$PS1"'`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+    echo "\[\e[31m\]";\
 else\
-    echo "$GRUEN";\
-fi`\
-$(__git_ps1 " (%s)")"
+    echo "\[\e[32m\]";\
+fi`'
 
-# Klammer zu nach dem Pfad
-PS1="$PS1$GRAU]"
+# Git Status
+PS1="$PS1"'$(__git_ps1 " (%s)")'
 
-# Nächste Zeile
-PS1="$PS1\n"
+# Klammer zu nach dem Pfad und in die nächste Zeile
+PS1="$PS1$GRAU]\n"
 
 # Untere Linie
 PS1="$PS1\342\224\224\342\224\200\342\224\200> $DEFAULT"
