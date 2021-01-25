@@ -44,7 +44,7 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 PS1="$PS1$CYAN$(pwd)$DEFAULT"
 
 # Git Pfad und Farbe
-PS1="$PS1`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new) ]]; then\
+PS1="$PS1`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "$ROT";\
 else\
     echo "$GRUEN";\
