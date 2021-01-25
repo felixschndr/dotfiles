@@ -38,7 +38,7 @@ commit_files(){
     for file in $files; do #Gehe alle Files durch
 
         file=$(echo $file | sed 's/}/ /g')
-        echo -e "\e[96m\e[1m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n\n" #Dateinamen mittig und fett anzeigen
+        echo -e "\e[1;96m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n\n" #Dateinamen mittig und fett anzeigen
         if [[ "$(git diff "$file" 2>&1)" == *"Permission denied"* && "$file" != *"diff/function"* ]]; then
             echo -e "\e[31mDie Datei \"$file\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m\n"
             ((file_counter ++))
@@ -64,7 +64,7 @@ commit_files(){
         print_line "-"
 
 
-        echo -e "\e[96m\e[1mWie soll die Commit-Nachricht lauten?\e[0m"
+        echo -e "\e[1;96mWie soll die Commit-Nachricht lauten?\e[0m"
         [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben)\e[0m" #Wenn es vorherige Commits gibt werden diese nun angezeigt
         commit_counter=0
         for commit in ${commit_messages[@]} ; do
@@ -99,10 +99,10 @@ commit_files(){
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
             read -e answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
-                echo -e "\e[33mDie Änderungen wurden gelöscht\e[0m"
-                git checkout HEAD "$file"
+                echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
+                git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
             else
-                echo -e "\e[32mDie Änderungen wurden nicht gelöscht\e[0m"
+                echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
             fi
             ((file_counter ++))
             continue
@@ -134,7 +134,7 @@ commit_files(){
 
     #Prüfen, ob Commits angegeben wurden
     if [ "$changed" = false ]; then
-        echo -e "\e[96m\e[1m"; center "Keine Änderungen"; echo -e "\n\e[0m"
+        echo -e "\e[1;96m"; center "Keine Änderungen"; echo -e "\n\e[0m"
         echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
     fi
 }
@@ -225,8 +225,8 @@ diff_function(){
             fi
             echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
             return;;
-        1) echo -e "\e[96m\e[1m\nEs wurde eine Datei modifiziert\e[0m";;
-        *) echo -e "\e[96m\e[1m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
+        1) echo -e "\e[1;96m\nEs wurde eine Datei modifiziert\e[0m";;
+        *) echo -e "\e[1;96m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
 
 
@@ -236,7 +236,7 @@ diff_function(){
     git_status=$(git status 2>&1)
 
     if [[ "$git_status" =~ (Commit vor|Commits vor| ahead) ]]; then
-        echo -e "\e[96m\e[1m"; center "Push"; echo -e "\n\e[0m"
+        echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m"
