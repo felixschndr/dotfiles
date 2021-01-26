@@ -2,13 +2,23 @@
 
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[39m" && return 1
-    echo -e "Datei:\t\t${1}"
-    echo -e "Größe:\t\t$(du -h ${1} | cut -f1)"
-    echo -e "Anzahl Zeilen:\t$(cat ${1} | wc -l)"
-    echo -e "Modifiziert:\t$(find ${1} -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
-    echo -e "Rechte:\t\t$(find ${1} -printf "%M (%m)")"
-    echo -e "Besitzer:\t$(find ${1} -printf "%u")"
-    echo -e "Gruppe:\t\t$(find ${1} -printf "%g")"
+    local counter=0
+    local anzahl=$#
+	for file in $@; do
+		((counter++))
+		[[ -d $file ]] && echo -e "\e[31m$file ist ein Ordner\e[39m" && continue
+		[[ ! -f $file ]] && echo -e "\e[31mDie Datei $file exisitiert nicht\e[39m" && continue
+    	echo -e "Datei:\t\t$file"
+    	echo -e "Größe:\t\t$(du -h $file | cut -f1)"
+    	echo -e "Anzahl Zeilen:\t$(cat $file | wc -l)"
+    	echo -e "Modifiziert:\t$(find $file -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
+    	echo -e "Rechte:\t\t$(find $file -printf "%M (%m)")"
+    	echo -e "Besitzer:\t$(find $file -printf "%u")"
+    	echo -e "Gruppe:\t\t$(find $file -printf "%g")"
+    	if (( $( bc -l <<< "$anzahl>$counter" ) > 0)); then
+    		 echo -e "\n\n"
+   		fi
+    done
 }
 
 git_url(){
