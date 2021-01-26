@@ -1,5 +1,16 @@
 #!/bin/bash
 
+file_info(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[39m" && return 1
+    echo -e "Datei:\t\t${1}"
+    echo -e "Größe:\t\t$(du -h ${1} | cut -f1)"
+    echo -e "Anzahl Zeilen:\t$(cat ${1} | wc -l)"
+    echo -e "Modifiziert:\t$(find ${1} -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
+    echo -e "Rechte:\t\t$(find ${1} -printf "%M (%m)")"
+    echo -e "Besitzer:\t$(find ${1} -printf "%u")"
+    echo -e "Gruppe:\t\t$(find ${1} -printf "%g")"
+}
+
 git_url(){
     if [[ "$(git status 2>&1)" =~ (Kein Git-Repo|not a git repository) ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
