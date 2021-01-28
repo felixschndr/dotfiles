@@ -2,19 +2,22 @@
 
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[39m" && return 1
+    [[ ${1} == "." ]] && files=$(find . -type f) || files="$@"
     local counter=0
-    local anzahl=$#
-	for file in $@; do
+    local anzahl=$(echo $files | wc -w)
+	for file in $files; do
 		((counter++))
 		[[ -d $file ]] && echo -e "\e[31m$file ist ein Ordner\e[39m" && continue
 		[[ ! -f $file ]] && echo -e "\e[31mDie Datei $file exisitiert nicht\e[39m" && continue
-    	echo -e "Datei:\t\t$file"
+    	echo -e "Dateiname:\t$(basename $file)"
     	echo -e "Größe:\t\t$(du -h $file | cut -f1)"
     	echo -e "Anzahl Zeilen:\t$(cat $file | wc -l)"
     	echo -e "Modifiziert:\t$(find $file -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
     	echo -e "Rechte:\t\t$(find $file -printf "%M (%m)")"
     	echo -e "Besitzer:\t$(find $file -printf "%u")"
     	echo -e "Gruppe:\t\t$(find $file -printf "%g")"
+    	[[ $(file $file) == *"CRLF"* ]] && endings="\e[31mCRLF\e[0m" || endings="LF"
+    	echo -e "Zeilenenden:\t$endings"
     	if (( $( bc -l <<< "$anzahl>$counter" ) > 0)); then
     		 echo -e "\n\n"
    		fi
