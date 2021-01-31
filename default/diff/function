@@ -45,7 +45,7 @@ commit_files(){
         fi
 
         if [[ -z $( git diff "$file" ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
-            if [[ $(echo $git_status | grep "$file") =~ (neue Datei|new file) ]]; then
+            if [[ $(git status | grep "$file") =~ (neue Datei|new file) ]]; then
                 echo -e "\e[32mFür die Datei \"$file\" ist kein Diff verfügbar, da sie neu ist\e[0m"
             else
                 echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
