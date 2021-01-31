@@ -115,7 +115,7 @@ commit_files(){
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
-        elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist zu kurz
+        elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
             echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
             ((file_counter ++))
             continue
