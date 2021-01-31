@@ -11,7 +11,8 @@ file_info(){
 		[[ ! -f $file ]] && echo -e "\e[31mDie Datei \"$file\" exisitiert nicht\e[39m" && continue
     	dateiname=$(basename $file)
         echo -e "Dateiname:\t$dateiname"
-        echo -e "Absoluter Pfad:\t$(realpath $file)"
+        kompletter_pfad=$(realpath $file)
+        echo -e "Absoluter Pfad:\t$kompletter_pfad"
     	echo -e "Größe:\t\t$(du -h $file | cut -f1)"
     	echo -e "Anzahl Zeilen:\t$(cat $file | wc -l)"
     	echo -e "Modifiziert:\t$(find $file -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
@@ -20,12 +21,14 @@ file_info(){
     	echo -e "Rechte:\t\t$(find $file -printf "%M (%m)" | cut -c 2-)"
     	[[ "$dateiname" =~ ^\..{1,} ]] && versteckt="Ja" ||  versteckt="Nein"
         echo -e "Versteckt:\t$versteckt"
-        [[ $(file $file) == *"CRLF"* ]] && zeilenenden="\e[31mCRLF\e[0m" || zeilenenden="LF"
+        if [[ $(file $file) == *"CRLF"* ]]; then
+            [[ "${kompletter_pfad##*.}" == "sh" ]] && zeilenenden="\e[31mCRLF\e[0m" || zeilenenden="CRLF"
+        else
+            zeilenenden="LF"
+        fi
     	echo -e "Zeilenenden:\t$zeilenenden"
-        if [ "$anzahl" -gt "$counter" ]; then
-            echo -e "\n\n"
-   		fi
-    done
+        [ "$anzahl" -gt "$counter" ] && echo -e "\n\n"
+        done
 }
 
 git_url(){
