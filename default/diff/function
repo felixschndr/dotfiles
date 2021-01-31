@@ -15,7 +15,6 @@ check_if_repo_exists(){
 
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
-    # if [[ "$git_status" == *"Untracked file"* || "$git_status" == *"deleted"* || "$git_status" == *"Unversioniert"* || "$git_status" == *"neue Datei"* || "$git_status" == *"gelöscht"* ]]; then
     if [[ "$git_status" == *"Untracked file"* || "$git_status" == *"deleted"* || "$git_status" == *"Unversioniert"* || "$git_status" == *"gelöscht"* ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht, neu oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         read -e answer
@@ -107,7 +106,6 @@ commit_files(){
             ((file_counter ++))
             continue
 
-
         elif [[ $commit_message =~ ^[Ll]$ ]]; then #Der letzte Commit soll verwendet werden
             if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs gibt keine letzte Commitnachricht, somit die Datei wird übersprungen\e[0m"
@@ -116,6 +114,11 @@ commit_files(){
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+
+        elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist zu kurz
+            echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+            ((file_counter ++))
+            continue
 
         else #Commit mit dem angegeben Text
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_message" #Den aktuellen Commit ins Array packen
