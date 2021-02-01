@@ -10,12 +10,12 @@ file_info(){
 		[[ -d $file ]] && echo -e "\e[31m\"$file\" ist ein Ordner\e[39m" && continue
 		[[ ! -f $file ]] && echo -e "\e[31mDie Datei \"$file\" exisitiert nicht\e[39m" && continue
     	dateiname=$(basename $file)
-        echo -e "Dateiname:\t$dateiname"
+        echo -e "\e[1;96mDateiname:\t$dateiname\e[0m"
         kompletter_pfad=$(realpath $file)
         echo -e "Absoluter Pfad:\t$kompletter_pfad"
     	echo -e "Größe:\t\t$(du -h $file | cut -f1)"
-    	echo -e "Anzahl Zeilen:\t$(cat $file | wc -l)"
-    	echo -e "Modifiziert:\t$(find $file -printf "%CH:%CM:%.2CS %Cd.%Cm.%CY")"
+    	echo -e "Anzahl Zeilen:\t$(cat $file | wc -l | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
+    	echo -e "Modifiziert:\t$(find $file -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
     	echo -e "Besitzer:\t$(find $file -printf "%u")"
     	echo -e "Gruppe:\t\t$(find $file -printf "%g")"
     	echo -e "Rechte:\t\t$(find $file -printf "%M (%m)" | cut -c 2-)"
@@ -28,7 +28,8 @@ file_info(){
         fi
     	echo -e "Zeilenenden:\t$zeilenenden"
         [ "$anzahl" -gt "$counter" ] && echo -e "\n\n"
-        done
+    done
+    return 0
 }
 
 git_url(){
