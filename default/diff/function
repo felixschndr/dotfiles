@@ -50,12 +50,12 @@ commit_files(){
             fi
         fi
 
-        if [[ -z $(git diff --summary "$file") ]]; then #Wurden die Rechte der Datei gleichbehalten?
+        if [[ -z $(git diff --summary "$file") ]]; then #Blieben die Rechte der Datei gleich?
             git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird; unified gibt den Kontext an
-        else
-            echo -e "\e[33m"
-            git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE '.+[0-9]' #Zeigt Rechteänderungen an
-            echo -e "\e[0m\n"
+        else #Rechteänderungen anzeigen
+            echo -ne "\e[33m"
+            git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE --color=never '.+[0-9]' #Zeigt Rechteänderungen an
+            echo -e "\e[0m"
             git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiten, da der Rechtewechsel auch im diff enthalten ist
         fi
         print_line "-"
