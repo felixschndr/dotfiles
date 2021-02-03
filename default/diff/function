@@ -16,11 +16,9 @@ check_if_repo_exists(){
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
     if [[ "$git_status" == *"Untracked file"* || "$git_status" == *"deleted"* || "$git_status" == *"Unversioniert"* || "$git_status" == *"gelöscht"* ]]; then
-        echo -e "\e[33mEs gibt noch Dateien, die gelöscht, neu oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
+        echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         read -e answer
-        if [[ $answer =~ ^[YyJj]$ ]]; then
-            return 1
-        fi
+        [[ $answer =~ ^[YyJj]$ ]] && return 1
     fi
     return 0
 }
@@ -100,6 +98,7 @@ commit_files(){
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
                 git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
+                [[ $(file $file) == *"CRLF"* ]] && to_lf "$file"
             else
                 echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
             fi
@@ -170,7 +169,7 @@ push(){
 
 pull(){
     #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
-    [[ $1 == "-f" ]] && git remote update >/dev/null 2>/dev/null
+    [[ $1 == "p" ]] && git remote update >/dev/null 2>/dev/null #Nur Wenn diff mit "p" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
     git_status=$(git status 2>&1)
 
     if [[ "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
@@ -192,14 +191,17 @@ pull(){
 
 
 diff_function(){
+
+    [[ ${1} == "diff" ]] && cd $(dirname "$(readlink -f "$BASH_SOURCE")")
+
     git_status=$(git status 2>&1)
 
     if ! check_if_repo_exists; then return; fi
 
-    if ! check_for_unmanaged_files; then git status && return ; fi
+    if ! check_for_unmanaged_files; then git status && return; fi
 
 
-    [[ $@ == *"p"* ]] && pull -f || pull
+    [[ $@ == *"p"* ]] && pull p || pull
 
 
     branch=$(git branch | grep "*" | cut -d" " -f2-)
@@ -209,7 +211,9 @@ diff_function(){
     files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g')
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
+            echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
             if [[ "$git_status" =~ (Commit vor|Commits vor| ahead) ]]; then
+                echo #Nur Leerzeile einfügen
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
                 if [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
@@ -226,7 +230,6 @@ diff_function(){
                 push
                 return
             fi
-            echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
             return;;
         1) echo -e "\e[1;96m\nEs wurde eine Datei modifiziert\e[0m";;
         *) echo -e "\e[1;96m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
@@ -254,3 +257,5 @@ diff_function(){
     return 0
 
 }
+
+complete -W "diff pull" diff
