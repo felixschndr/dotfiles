@@ -1,14 +1,14 @@
 #!/bin/bash
 
 file_info(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[39m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
     [[ ${1} == "." ]] && files=$(find . -type f) || files="$@"
     local counter=0
     local anzahl=$(echo $files | wc -w)
 	for file in $files; do
 		((counter++))
-		[[ -d $file ]] && echo -e "\e[31m\"$file\" ist ein Ordner\e[39m" && continue
-		[[ ! -f $file ]] && echo -e "\e[31mDie Datei \"$file\" exisitiert nicht\e[39m" && continue
+		[[ -d $file ]] && echo -e "\e[31m\"$file\" ist ein Ordner\e[0m" && continue
+		[[ ! -f $file ]] && echo -e "\e[31mDie Datei \"$file\" exisitiert nicht\e[0m" && continue
     	dateiname=$(basename $file)
         echo -e "\e[1;96mDateiname:\t$dateiname\e[0m"
         kompletter_pfad=$(realpath $file)
@@ -43,22 +43,22 @@ git_url(){
 }
 
 search_string(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
     if [[ $# == 1 ]]; then
-        grep -inrs --color=auto "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+        grep -inrs --color=auto "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     else
-        grep -inrs --color=auto "${1}" "${2}" || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+        grep -inrs --color=auto "${1}" "${2}" || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
 }
 
 search_file(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
     #Grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
-    find . -iname "*${1}*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    find . -iname "*${1}*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
 }
 
 search_help(){
-    echo -e "\e[96mFunktion\t\tBeschreibung\e[39m\n"
+    echo -e "\e[96mFunktion\t\tBeschreibung\e[0m\n"
     echo -e "search_string\t\tSucht rekursiv nach einem gegebenen String im aktuellen Verzeichnis\n\t\t\t    oder in einem als zweites Argument übergebenen gegeben Verzeichnis"
     echo -e "search_file\t\tSucht rekursiv nach einer Datei mit dem gegebenen Namen im aktuellen Verzeichnis"
     [[ $(hostname) == "openhab" ]] && echo -e "search_log\t\tSucht nach einem gegebenen String in den Logs"
@@ -66,12 +66,9 @@ search_help(){
 }
 
 to_lf(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
     for file in $@; do
-        if [[ $(file $file) == *"CRLF"* ]]; then
-            zeilenenden="\e[31mCRLF"
-        else
-            zeilenenden="\e[32mLF"
-        fi
+        [[ $(file $file) == *"CRLF"* ]] && zeilenenden="\e[31mCRLF" zeilenenden="\e[32mLF"
         echo -e "Ändere die Zeilenenden zu LF von \e[96;1m$file\e[0m\n    War davor: $zeilenenden\e[0m"
         tr -d '\015' <$file >"$file""_new"
         mv "$file""_new" $file
