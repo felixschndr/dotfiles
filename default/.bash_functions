@@ -65,6 +65,18 @@ search_help(){
     echo -e "search_help\t\tZeigt diese Hilfe an"
 }
 
+to_lf(){
+    for file in $@; do
+        if [[ $(file $file) == *"CRLF"* ]]; then
+            zeilenenden="\e[31mCRLF"
+        else
+            zeilenenden="\e[32mLF"
+        fi
+        echo -e "Ändere die Zeilenenden zu LF von \e[96;1m$file\e[0m\n    War davor: $zeilenenden\e[0m"
+        tr -d '\015' <$file >"$file""_new"
+        mv "$file""_new" $file
+    done
+}
 
 repeat(){
     [[ -z ${2} ]] && sleeptime="1.0" || sleeptime=$(echo ${2} | sed 's/,/./')
@@ -74,7 +86,7 @@ repeat(){
 
         heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   |   Kommando: ${1}   "
         [ "${#heading}" -gt "$(tput cols)" ] && heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   "
-        echo -e "\n\e[96m\e[1m"; center "$heading"; echo -e "\e[0m"
+        echo -e "\n\e[96;1m"; center "$heading"; echo -e "\e[0m"
 
         bash -c "${1}"
         read -t $sleeptime
