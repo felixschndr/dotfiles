@@ -98,7 +98,7 @@ commit_files(){
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
                 git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
-                [[ $(file $file) == *"CRLF"* ]] && to_lf "$file"
+                [[ $(file $file) == *"CRLF"* ]] && echo && to_lf "$file"
             else
                 echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
             fi
