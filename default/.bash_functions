@@ -68,7 +68,7 @@ search_help(){
 to_lf(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
     for file in $@; do
-        [[ $(file $file) == *"CRLF"* ]] && zeilenenden="\e[31mCRLF" zeilenenden="\e[32mLF"
+        [[ "$(file $file)" == *"CRLF"* ]] && zeilenenden="\e[31mCRLF" || zeilenenden="\e[32mLF"
         echo -e "Ändere die Zeilenenden zu LF von \e[96;1m$file\e[0m\n    War davor: $zeilenenden\e[0m"
         tr -d '\015' <$file >"$file""_new"
         mv "$file""_new" $file
