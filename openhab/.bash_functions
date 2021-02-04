@@ -79,11 +79,13 @@ ssh_permissions(){
 
 
 fix_permissions(){
+    cd ~
     echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
     sudo openhabian-config
     sudo chmod -R a+r items/ sitemaps/ things/ scripts/ rules/ transform/ html/ icons/ logconfig.cfg persistence/ services/ sounds/
     ssh_permissions
     echo -e "\e[92mDone\e[39m"
+    cd - >/dev/null
 }
 
 search_log(){
