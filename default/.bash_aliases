@@ -14,3 +14,4 @@ alias less='less -IN'
 alias cp='rsync -arh --info=progress2'
 alias b='exec $SHELL'
 alias which='type'
+alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
