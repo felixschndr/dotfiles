@@ -213,7 +213,7 @@ diff_function(){
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
             if [[ "$git_status" =~ (Commit vor|Commits vor| ahead) ]]; then
-                echo #Nur Leerzeile einfügen
+                echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
                 if [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
