@@ -16,35 +16,40 @@ complete -F _item_completions item_get item_set item_toggle search_log search_st
 item_get(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
     for item in $@ ; do
-        echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t\c"
-        curl -X GET "http://localhost:8080/rest/items/$item/state"
-        [[ $# == 1 ]] || echo -e "\n"
+        status=$(curl -X GET "http://localhost:8080/rest/items/$item/state" 2>/dev/null)
+        [[ "$status" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"$item\" existiert nicht\e[39m" && return 1
+        echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t$status"
     done
-    [[ $# == 1 ]] || return
-    echo -e "\n\n${1}\e[36m wird hier gefunden:\e[39m"
-    cd
-    search_string ${1}
-    cd - >/dev/null
+
+    [[ $# == 1 ]] && item_suche ${1}
 }
 
 
 item_set(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m"   && return 1
     [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[39m" && return 1
+    [ $# -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[39m" && return 1
+
+    alter_status=$(curl -X GET "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
+    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[39m" && return 1
+
     echo -e "\e[36mItem:\e[39m\t\t${1}"
-    echo -e "\e[36mAlter Status:\e[39m\t\c"
-    curl -X GET "http://localhost:8080/rest/items/${1}/state"
-    echo -e "\n\e[36mNeuer Status:\e[39m\t${2}"
-    curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state"
-    echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
-    cd
-    search_string ${1}
-    cd - >/dev/null
+    echo -e "\e[36mAlter Status:\e[39m\t$alter_status"
+
+    neuer_status_setzen=$(curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${2}" "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
+    [[ "$neuer_status_setzen" == *"State could not be parsed"* ]] && echo -e "\e[31mDer neue Status wird nicht von dem Item akzeptiert\e[39m" && return 1
+    echo -e "\e[36mNeuer Status:\e[39m\t${2}"
+
+    item_suche ${1}
 }
 
 item_toggle(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
+    [ $# -gt 1 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[39m" && return 1
+
     alter_status=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
+    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[39m" && return 1
+
     echo -e "\e[36mItem:\e[39m\t\t${1}"
     echo -e "\e[36mAlter Status:\e[39m\t$alter_status"
     if [[ $alter_status == "ON" || $alter_status == "On" || $alter_status == "on" ]]; then
@@ -58,10 +63,17 @@ item_toggle(){
     else
         echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[39m" && return 1
     fi
+
+    neuer_status_setzen=$(curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "$neuer_status" "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
+    [[ "$neuer_status_setzen" == *"State could not be parsed"* ]] && echo -e "\e[31mDer neue Status wird nicht von dem Item akzeptiert\e[39m" && return 1
     echo -e "\e[36mNeuer Status:\e[39m\t$neuer_status"
-    curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "$neuer_status" "http://localhost:8080/rest/items/${1}/state"
+
+    item_suche ${1}
+}
+
+item_suche(){
     echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
-    cd
+    cd /etc/openhab2
     search_string ${1}
     cd - >/dev/null
 }
