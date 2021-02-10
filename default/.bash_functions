@@ -42,8 +42,29 @@ git_url(){
     echo -ne "\e[0m"
 }
 
+sa(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Name angegeben\e[0m"             && return 1
+    [[ -f ${1} ]] && echo -e "\e[31mDie Datei exisitiert bereits\e[0m"             && return 1
+    [ $# -gt 2 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
+    filename="${1}"
+    touch $filename
+    chmod +x $filename
+    [[ "$filename" == *".sh" ]] && echo -e "#!/bin/bash\n\n" >> $filename
+    nano +4 $filename #Nano Curser ans untere Ende setzen
+    echo -e "\e[32mSoll das Script ausgeführt werden?\e[0m"
+    read -e answer
+    if [[ $answer =~ ^[YyJj]$ ]]; then
+        echo -e "\e[1;96m"; center "$filename"; echo -e "\n\e[0m"
+        ./$filename
+    else
+        echo -e "\e[33mDas Script wird nicht ausgeführt\e[0m"
+        return 1
+    fi
+}
+
 search_string(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m"      && return 1
+    [ $# -gt 3 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
     if [[ $# == 1 ]]; then
         grep -inrs --color=auto "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     else
@@ -52,7 +73,8 @@ search_string(){
 }
 
 search_file(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m"      && return 1
+    [ $# -gt 2 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
     #Grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
     find . -iname "*${1}*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
 }
@@ -76,6 +98,7 @@ to_lf(){
 }
 
 repeat(){
+    [ $# -gt 3 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
     [[ -z ${2} ]] && sleeptime="1.0" || sleeptime=$(echo ${2} | sed 's/,/./')
     local counter=0
     while (true); do
