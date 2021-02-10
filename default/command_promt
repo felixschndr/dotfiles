@@ -57,4 +57,4 @@ PS1="$PS1"'$(__git_ps1 " (%s)")'
 PS1="$PS1$GRAU]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
 
 # Untere Linie
-PS1="$PS1\342\224\224\342\224\200\342\224\200> $DEFAULT"
+PS1="$PS1$GRAU\342\224\224\342\224\200\342\224\200> $DEFAULT"
