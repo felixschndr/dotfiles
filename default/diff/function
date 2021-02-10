@@ -201,7 +201,7 @@ diff_function(){
     if ! check_for_unmanaged_files; then git status && return; fi
 
 
-    [[ $@ == *"p"* ]] && pull p || pull
+    [[ $@ =~ (p|diff) ]] && pull p || pull
 
 
     branch=$(git branch | grep "*" | cut -d" " -f2-)
