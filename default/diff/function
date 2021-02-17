@@ -92,7 +92,7 @@ commit_files(){
             echo -e "\e[31mAbbrechen\e[0m"
             return 1
 
-        elif [[ $commit_message == "co" || $commit_message == "CO" ]]; then #Cechkout HEAD
+        elif [[ $commit_message =~ (co|Co|cO|CO) ; then #Cechkout HEAD
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
             read -e answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
