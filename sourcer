@@ -6,7 +6,7 @@ repo_location="/home/.../bashrc/"
 #"$repo_location""updater"
 
 # SED für den Fall, dass ein Leerzeichen im Verzeichnis (z.B. beim Username) ist
-for file in $(find "$repo_location"{default,$(hostname)} -type f 2>/dev/null | sed 's/ /}/g'); do
+for file in $(find "$repo_location"/{default,$(hostname)} -type f 2>/dev/null | sed 's/ /}/g'); do
     file=$(echo $file | sed 's/}/ /g')
     source "$file"
 done
