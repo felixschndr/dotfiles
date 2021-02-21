@@ -78,6 +78,25 @@ item_suche(){
     cd - >/dev/null
 }
 
+alias log='log_function'
+
+log_function(){
+    tail -n 1000 -f /var/log/openhab2/events.log | sed --unbuffered \
+    -e 's/\(UNINITIALIZED\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(UNKNOWN\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(OFFLINE\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(ONLINE\)/\o033[32m\1\o033[0m/' \
+    -e 's/\(Offline\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(Online\)/\o033[32m\1\o033[0m/' \
+    -e 's/\(offline\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(online\)/\o033[32m\1\o033[0m/' \
+    \
+    -e 's/\(WARN\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(ERROR\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(Error\)/\o033[31m\1\o033[0m/' \
+    -e 's/\(INFO\)/\o033[32m\1\o033[0m/'
+}
+
 
 ssh_permissions(){
     chmod 700 ~/.ssh
