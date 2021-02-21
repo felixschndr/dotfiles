@@ -15,3 +15,10 @@ alias cp='rsync -arh --info=progress2'
 alias b='exec $SHELL'
 alias which='type'
 alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
+
+#ls Farben
+    #Alle Farben dunkel statt hell
+    #LS_COLORS="$(echo "$LS_COLORS" | sed 's/01;//g')"
+
+    #Nur die Farbe von ausführbaren Programmen ersetzen
+    LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')"
