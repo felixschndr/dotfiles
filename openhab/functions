@@ -90,10 +90,10 @@ ssh_permissions(){
 
 
 fix_permissions(){
-    cd ~
+    cd /etc/openhab2/
     echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
     sudo openhabian-config
-    sudo chmod -R 777 items/ sitemaps/ things/ scripts/ rules/ transform/ html/ icons/ logconfig.cfg persistence/ services/ sounds/
+    sudo chmod -R 770 .
     ssh_permissions
     echo -e "\e[92mDone\e[39m"
     cd - >/dev/null
