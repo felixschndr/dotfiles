@@ -145,13 +145,17 @@ commit_files(){
 push(){
     #Hier geht es drum alle Änderungen zu pushen
     read -e answer
+    echo ""
     if [[ $answer =~ ^[YyJj]$ ]]; then
         output=$(git push 2>&1)
         if [[ $? == 0 ]]; then
-            echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
+            if [[ $output == *up-to-date* ]]; then
+                echo -e "\e[33mAlle aktuellen Commits wurden schon hochgeladen. \e[32mJetzt ist alles aktuell\e[0m"
+            else
+                echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
+            fi
         elif [[ $output == *"git pull"* ]]; then
             echo -e "\n\e[33mDas Repository muss erst gemergt werden\e[0m"
-            sleep 1
             git pull --rebase 2>/dev/null >/dev/null
             git push
             echo -e "\e[32mDie Commits wurden hochgeladen\e[0m"
