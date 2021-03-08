@@ -1,12 +1,11 @@
 #!/bin/bash
 
 
-
 ########### Farben ###########
 GRAU="\[\e[1;30m\]"
 DEFAULT="\[\e[0m\]"
-GRUEN="\[\e[32m\]"
-ROT="\[\e[31m\]"
+GRUEN="\[\e[1;32m\]"
+ROT="\[\e[1;31m\]"
 PINK="\[\e[35m\]"
 CYAN="\[\e[1;36m\]"
 ##############################
@@ -26,9 +25,9 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 
 # Zeichen für Returncode
 PS1="$PS1"'`if [ $? = 0 ]; then\
-    echo "\[\e[32m\]:)";\
+    echo "\[\e[1;32m\]:)";\
 else
-    echo "\[\e[31m\]:(";\
+    echo "\[\e[1;31m\]:(";\
 fi`'
 
 # ]-[
@@ -44,11 +43,11 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 PS1="$PS1$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
 
 # Git Farbe
-PS1="$PS1"'`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+PS1="$PS1""$(if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
 else\
-    echo "\[\e[32m\]";\
-fi`'
+    echo "$GRUEN";\
+fi)"
 
 # Git Status
 PS1="$PS1"'$(__git_ps1 " (%s)")'
