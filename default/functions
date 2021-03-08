@@ -109,9 +109,12 @@ search_help(){
 
 stopwatch(){
     [ $# -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
-    local start=$(date +%s,%N); local _s1=$(echo $start | cut -d',' -f1); local _s2=$(echo $start | cut -d',' -f2)
-    bash -c "$(echo $@ | sed 's/"/\\"/g')"
-    local end=$(date +%s,%N); local _e1=$(echo $end | cut -d',' -f1); local _e2=$(echo $end | cut -d',' -f2)
+    local argumente="$(echo $@ | sed 's/"/\\"/g')"
+    local start=$(date +%s,%N)
+    bash -c "$argumente"
+    local end=$(date +%s,%N)
+    local _s1=$(echo $start | cut -d',' -f1); local _s2=$(echo $start | cut -d',' -f2)
+    local _e1=$(echo $end | cut -d',' -f1);   local _e2=$(echo $end | cut -d',' -f2)
     local dauer="0""$(bc <<< "scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")"
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @$dauer +%M:%S.%3N) gedauert"
 }
