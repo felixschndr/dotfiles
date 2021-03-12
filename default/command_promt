@@ -46,11 +46,11 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 PS1="$PS1$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
 
 # Git Farbe
-PS1="$PS1""$(if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+PS1="$PS1"'`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
 else\
-    echo "$GRUEN";\
-fi)"
+    echo "\[\e[32m\]";\
+fi`'
 
 # Git Status
 PS1="$PS1"'$(__git_ps1 " (%s)")'
