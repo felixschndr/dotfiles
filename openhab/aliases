@@ -5,4 +5,4 @@ alias helper='ssh pi@helper'
 alias influx='influx -database openhab_db'
 
 
-log='/var/log/openhab2/events.log'
+log_openhab='/var/log/openhab2/events.log'
