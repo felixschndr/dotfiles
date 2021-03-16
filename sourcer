@@ -11,7 +11,7 @@ for file in $(find "$repo_location"/{default,$(hostname)} -type f 2>/dev/null | 
     source "$file"
 done
 
-# In de crontab einfügen
+# In den crontab einfügen
 */10 * * * * cd /home/$USER/bashrc/ && git pull
 @reboot cd /home/$USER/bashrc/ && git pull
 
