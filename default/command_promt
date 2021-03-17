@@ -30,7 +30,7 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 PS1="$PS1"'`if [ $? = 0 ]; then\
     echo "\[\e[1;32m\]:)";\
 else
-    echo "\[\e[1;31m\]:(";\
+    echo "\[\e[31m\]:(";\
 fi`'
 
 # ]-[
