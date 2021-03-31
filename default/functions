@@ -38,7 +38,7 @@ git_url(){
         return 1
     fi
     echo -ne "Repository URL: \e[96m"
-    git config --get remote.origin.url | sed 's/\.git//' | sed 's/git@github.com:/https:\/\/www.github.com\//'
+    git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g'
     echo -ne "\e[0m"
 }
 
