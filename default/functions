@@ -1,5 +1,13 @@
 #!/bin/bash
 
+cl(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Pfad angegeben\e[0m"           && return 1
+    [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+    cd "${1}"
+    ls
+}
+
+
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
     [[ ${1} == "." ]] && files=$(find . -type f) || files="$@"
