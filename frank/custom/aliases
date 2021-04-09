@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+alias vlc='vlc 2>/dev/null'
+alias evince='evince 2>/dev/null'
+alias dolphin='dolphin 2>/dev/null'
