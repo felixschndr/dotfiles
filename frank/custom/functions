@@ -1,0 +1,24 @@
+#!/bin/bash
+
+build()
+{
+    echo -e "\e[1;36mPaket wird gebaut"
+    local start_time=`date +%s`
+    if [[ $(dpkg-buildpackage -us -uc 2>&1) == *"kann nicht zum Lesen geöffnet werden"* ]]; then
+        cd $(git rev-parse --show-toplevel) || return 1
+        dpkg-buildpackage -us -uc
+    fi
+    [[ $? == 1 ]] && return 1
+    mv ../abm-*.deb .
+    find ../abm-* -maxdepth 1 -type f -exec rm {} \;
+    debian/rules clean >/dev/null
+    local end_time=`date +%s`
+    sudo dpkg -i $(ls -1t *.deb | head -1 | egrep -o "abm-.{1,}deb")
+    echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$(($end_time - $start_time)) +%M:%S) gedauert"
+    echo -e "Soll eine Verbindung zum SFTP-Server aufgebaut werden?\e[0m"
+    read -e answer
+    if [[ $answer =~ ^[YyJj]$ ]]; then
+        sftp abm@packages.abm-local.de
+    fi
+}
+
