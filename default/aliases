@@ -16,6 +16,7 @@ alias b='exec $SHELL'
 alias which='type'
 alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias tf='tail -f -n 1000'
+alias tmux_help='curl -s "https://gist.githubusercontent.com/henrik/1967800/raw/f580aa23cbc5cbf1bd96dee1c903784c0e32eca2/tmux_cheatsheet.markdown" | "less" -I'
 
 log_auth="/var/log/auth.log"
 
