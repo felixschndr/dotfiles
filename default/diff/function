@@ -31,11 +31,10 @@ commit_files(){
     changed=false
     file_counter=1
 
-
     for file in $files; do #Gehe alle Files durch
 
         file=$(echo $file | sed 's/}/ /g')
-        echo -e "\e[1;96m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n\n" #Dateinamen mittig und fett anzeigen
+        echo -e "\e[1;96m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
         if [[ "$(git diff "$file" 2>&1)" == *"Permission denied"* && "$file" != *"diff/function"* ]]; then
             echo -e "\e[31mDie Datei \"$file\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m\n"
             ((file_counter ++))
@@ -50,6 +49,12 @@ commit_files(){
             fi
         fi
 
+        if [[ "$files_that_need_checkout" == *"$file"* ]]; then
+            echo -e "\e[33mDiese lokalen Änderungen müssen gelöscht werden, da sonst die Änderungen aus dem Repository nicht heruntergeladen werden können\e[0\n"
+        else
+            echo ""
+        fi
+
         if [[ -z $(git diff --summary "$file") ]]; then #Blieben die Rechte der Datei gleich?
             git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird; unified gibt den Kontext an
         else #Rechteänderungen anzeigen
@@ -58,8 +63,8 @@ commit_files(){
             echo -e "\e[0m"
             git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiten, da der Rechtewechsel auch im diff enthalten ist
         fi
-        print_line "-"
 
+        print_line "-"
 
         echo -e "\e[1;96mWie soll die Commit-Nachricht lauten?\e[0m"
         [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben)\e[0m" #Wenn es vorherige Commits gibt werden diese nun angezeigt
@@ -178,21 +183,27 @@ pull(){
 
     if [[ "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
 	    amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
+
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
         else
 	        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
         fi
+        git log ..origin/$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed -e 's/^[[:space:]]*/ - /'
         read -e answer
+
         if [[ $answer =~ ^[YyJj]$ ]]; then
             local pull_result="$(git pull --rebase 2>&1)"
             local return_code=$?
             if [[ "$pull_result" == *"stash"* ]]; then
                 echo -ne "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können! \e[0m"
                 echo -e "Dateien, die überschrieben werden würden:"
-                git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /'
-                echo ""
-                return 1
+                git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /' | tee /tmp/files_that_need_checkout
+                files_that_need_checkout=$(cat /tmp/files_that_need_checkout)
+                rm /tmp/files_that_need_checkout
+
+                echo -ne "\e[33m"; print_line "="; echo -ne "\e[0m"
+
             elif [[ $return_code == 0 ]]; then
                 echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m"
             else
@@ -215,6 +226,8 @@ diff_function(){
 
     if ! check_if_repo_exists; then return; fi
 
+    branch=$(git branch | grep "*" | cut -d" " -f2-)
+
     if ! check_for_unmanaged_files; then git status && return; fi
 
 
@@ -223,9 +236,6 @@ diff_function(){
     else
         if ! pull; then return; fi
     fi
-
-
-    branch=$(git branch | grep "*" | cut -d" " -f2-)
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
@@ -252,8 +262,8 @@ diff_function(){
                 return
             fi
             return;;
-        1) echo -e "\e[1;96m\nEs wurde eine Datei modifiziert\e[0m";;
-        *) echo -e "\e[1;96m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
+        1) echo -e "\e[1;96mEs wurde eine Datei modifiziert\e[0m";;
+        *) echo -e "\e[1;96mEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
 
     git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ */ - /g' #Am Anfang alle Dateien auflisten, die bearbeitet wurden
