@@ -246,6 +246,8 @@ diff_function(){
         *) echo -e "\e[1;96m\nEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
     esac
 
+    git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ */ - /g' #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+
 
     if ! commit_files; then return; fi
 
