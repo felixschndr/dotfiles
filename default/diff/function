@@ -173,7 +173,7 @@ push(){
 
 pull(){
     #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
-    [[ $1 == "p" ]] && git remote update >/dev/null 2>/dev/null #Nur Wenn diff mit "p" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
+    [[ $1 == "force" ]] && git remote update >/dev/null 2>/dev/null #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
     git_status=$(git status 2>&1)
 
     if [[ "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
@@ -185,13 +185,19 @@ pull(){
         fi
         read -e answer
         if [[ $answer =~ ^[YyJj]$ ]]; then
-            local pull_result=$(git pull --rebase 2>&1)
-            if [[ $? == 0 ]]; then
+            local pull_result="$(git pull --rebase 2>&1)"
+            local return_code=$?
+            if [[ "$pull_result" == *"stash"* ]]; then
+                echo -ne "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können! \e[0m"
+                echo -e "Dateien, die überschrieben werden würden:"
+                git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /'
+                echo ""
+                return 1
+            elif [[ $return_code == 0 ]]; then
                 echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m"
-            elif [[ $pull_result == *"stash"* ]]; then
-                echo -e "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können!\n\e[0m"
             else
                 echo -e "\e[31mEs gab ein Problem beim Herunterladen!\n\e[0m"
+                return 1
             fi
         else
             echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
@@ -212,7 +218,11 @@ diff_function(){
     if ! check_for_unmanaged_files; then git status && return; fi
 
 
-    [[ $@ =~ (p|diff) ]] && pull p || pull
+    if [[ "$1" =~ ^(p|diff)$ ]]; then
+        if ! pull "force"; then return; fi
+    else
+        if ! pull; then return; fi
+    fi
 
 
     branch=$(git branch | grep "*" | cut -d" " -f2-)
