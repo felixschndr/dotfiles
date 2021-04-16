@@ -5,4 +5,4 @@ alias vlc='vlc 2>/dev/null'
 alias evince='evince 2>/dev/null'
 alias dolphin='dolphin 2>/dev/null'
 
-export PAGER="most" Für farbige manpages
+export PAGER="most" #Für farbige manpages
