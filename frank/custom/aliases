@@ -8,3 +8,4 @@ alias c='code .'
 
 
 export PAGER="most" #Für farbige manpages
+cd ~/repos
