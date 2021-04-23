@@ -33,6 +33,10 @@ ssh_intern(){ #Baut eine SSH-Verbindung zu einem Kollegen auf, egal ob er im Hom
     connection_without_vpn=$([[ -f .error_withoutvpn ]] && cat .error_withoutvpn && rm .error_withoutvpn)
        connection_with_vpn=$([[ -f .error_withvpn ]]    && cat .error_withvpn    && rm .error_withvpn)
 
+    if [[ $connection_with_vpn == *"(publickey)"* || $connection_without_vpn == *"(publickey)"* ]]; then
+        echo -e "\e[31mDer Host \"$hostname\" akzeptiert den Public Key nicht!" && return 1
+    fi
+
     if [[ $connection_with_vpn =~ (Connection closed by remote host|Connection timed out) ]]; then
         if [[ $connection_without_vpn =~ (Connection closed by remote host|Connection timed out) ]]; then
             echo -e "\e[31mDer Host \"$hostname\" ist nicht erreichbar!" && return 1
