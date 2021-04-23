@@ -70,11 +70,13 @@ sa(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Name angegeben\e[0m"             && return 1
     [[ -f ${1} ]] && echo -e "\e[31mDie Datei exisitiert bereits\e[0m"             && return 1
     [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
+
     filename="${1}"
     touch $filename
     chmod +x $filename
-    [[ "$filename" == *".sh" ]] && echo -e "#!/bin/bash\n\n" >> $filename
-    nano +4 $filename #Nano Curser ans untere Ende setzen
+    echo -e "#!/bin/bash\n\n" >> $filename
+    [[ $(command -v code) != "" ]] && code $filename || nano +4 $filename
+
     echo -e "\e[32mSoll das Script ausgeführt werden?\e[0m"
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
