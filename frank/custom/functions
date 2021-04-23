@@ -23,6 +23,9 @@ build(){
 
 
 ssh_intern(){ #Baut eine SSH-Verbindung zu einem Kollegen auf, egal ob er im Homeoffice ist oder nicht
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Host angegeben\e[0m"             && return 1
+    [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
+
     wikipage="https://wiki.abm-local.de/pages/viewpage.action?pageId=29361074"
     [[ "$1" =~ ^(o|-o|--o)$ ]] && xdg-open $wikipage && return 0
 
