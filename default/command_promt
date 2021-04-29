@@ -7,7 +7,7 @@ HISTTIMEFORMAT="%F %T "
 ########### Farben ###########
 GRAU="\[\e[1;30m\]"
 DEFAULT="\[\e[0m\]"
-GRUEN="\[\e[1;32m\]"
+GRUEN="\[\e[32m\]"
 ROT="\[\e[1;31m\]"
 PINK="\[\e[35m\]"
 CYAN="\[\e[1;36m\]"
@@ -28,7 +28,7 @@ PS1="$PS1$GRAU]-[$DEFAULT"
 
 # Zeichen für Returncode
 PS1="$PS1"'`if [ $? = 0 ]; then\
-    echo "\[\e[1;32m\]:)";\
+    echo "\[\e[32m\]:)";\
 else
     echo "\[\e[31m\]:(";\
 fi`'
