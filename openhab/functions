@@ -21,7 +21,7 @@ item_get(){
         echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t$status"
     done
 
-    [[ $# == 1 ]] && item_suche ${1}
+    # [[ $# == 1 ]] && item_suche ${1}
 }
 
 
@@ -40,7 +40,7 @@ item_set(){
     [[ "$neuer_status_setzen" == *"State could not be parsed"* ]] && echo -e "\e[31mDer neue Status wird nicht von dem Item akzeptiert\e[39m" && return 1
     echo -e "\e[36mNeuer Status:\e[39m\t${2}"
 
-    item_suche ${1}
+    # item_suche ${1}
 }
 
 item_toggle(){
@@ -68,7 +68,7 @@ item_toggle(){
     [[ "$neuer_status_setzen" == *"State could not be parsed"* ]] && echo -e "\e[31mDer neue Status wird nicht von dem Item akzeptiert\e[39m" && return 1
     echo -e "\e[36mNeuer Status:\e[39m\t$neuer_status"
 
-    item_suche ${1}
+    # item_suche ${1}
 }
 
 item_suche(){
