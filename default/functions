@@ -111,12 +111,13 @@ search_string(){
 
 search_file(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m"      && return 1
-    [ $# -gt 2 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
     #Grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
     if [[ $# == 1 ]]; then
         find . -iname "*${1}*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     else
-        find "${2}" -iname "*${1}*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+        local suchbegriff=${1}
+        shift
+        find "$@" -iname "*$suchbegriff*" | grep -i "$suchbegriff" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
 }
 
