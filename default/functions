@@ -45,10 +45,20 @@ git_url(){
         echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
         return 1
     fi
+
+    session_typ="lokal"
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        session_typ=ssh
+    else
+        case $(ps -o comm= -p $PPID) in
+            sshd|*/sshd) session_typ=ssh;;
+        esac
+    fi
     local url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
 
     [[ -z $url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
     echo -e "Repository URL: \e[96m$url\e[0m"
+    [[ $session_typ != "ssh" ]] && xdg-open "$url"
 }
 
 repeat(){
