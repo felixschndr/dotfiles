@@ -306,7 +306,7 @@ diff_function(){
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g') #umbennant geht nicht
+    files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g') #umbenannt geht nicht
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
