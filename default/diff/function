@@ -334,10 +334,10 @@ diff_function(){
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
-            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m"
+            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | sed -n 5p
         else
-            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
+            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         fi
         push
