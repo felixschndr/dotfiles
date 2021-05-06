@@ -73,7 +73,12 @@ commit_files(){
             (( commit_counter ++ ))
             [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
-        echo -e "\nAlternativ kann auch folgendes angegeben werden:\n    - A     Abbrechen\n    - CO    Die lokalen Änderungen verwerfen\n    - L     Die letzte Commitnachricht verwenden\n\e[1;30mDie Datei wird übersprungen, wenn nichts angegeben wird\n\e[0m"
+        echo -e "\nAlternativ kann auch folgendes angegeben werden:"\
+        "\n    - A     Alle Dateien committen"\
+        "\n    - CO    Die lokalen Änderungen verwerfen"\
+        "\n    - L     Die letzte Commitnachricht verwenden"\
+        "\n    - S     Stop"\
+        "\n\e[1;30mDie Datei wird übersprungen, wenn nichts angegeben wird\n\e[0m"
         read -e commit_message
 
 
@@ -93,9 +98,20 @@ commit_files(){
                 continue
             fi
 
-        elif [[ $commit_message =~ ^[Aa]$ ]]; then #Abbrechen
-            echo -e "\e[31mAbbrechen\e[0m"
-            return 1
+        elif [[ $commit_message =~ ^[Aa]$ ]]; then #Alle Files committen
+            echo -e "\n\e[96mWie soll die Commtnachricht für alle Dateien heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
+            read -e answer
+            if [[ $answer =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
+                echo -e "\e[31mStop\e[0m"
+                return 1
+            elif [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+                echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+                return 1
+            fi
+            git add .
+            git commit -s -m "$answer"
+            changed=true
+            break 2
 
         elif [[ $commit_message =~ ^(co|Co|cO|CO)$ ]]; then #Cechkout HEAD
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
@@ -118,6 +134,10 @@ commit_files(){
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+
+        elif [[ $commit_message =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
+            echo -e "\e[31mStop\e[0m"
+            return 1
 
         elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
             echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
