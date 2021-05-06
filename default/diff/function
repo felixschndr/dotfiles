@@ -212,7 +212,7 @@ push(){
                 continue
             fi
             git commit --amend -s -m "$answer"
-            echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m \e[2m(\"U\" zum erneuten Umbennen des letzten Commits)\e[0m"
+            echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m \e[2m(\"U\" zum erneuten Umbenennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
             continue
         elif [[ $answer =~ ^[YyJj]$ ]]; then
@@ -316,7 +316,7 @@ diff_function(){
                 if [[ -z $amount ]]; then
                     echo -ne "\e[33mEs gibt noch Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                 elif [[ $amount == 1 ]]; then
-                    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
+                    echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m \e[2m(\"U\" zum Umbenennen des letzten Commits)\e[0m"
                     git log origin/$branch..$branch | sed -n 5p
                 else
                     number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
@@ -327,7 +327,7 @@ diff_function(){
                     else
                         echo -ne "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     fi
-                    echo -e "\e[2m (\"U\" zum Umbennen des letzten Commits)\e[0m"
+                    echo -e "\e[2m (\"U\" zum Umbenennen des letzten Commits)\e[0m"
                     git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
                 fi
                 push
@@ -350,10 +350,10 @@ diff_function(){
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
-            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
+            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m \e[2m(\"U\" zum Umbenennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | sed -n 5p
         else
-            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
+            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m \e[2m(\"U\" zum Umbenennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         fi
         push
