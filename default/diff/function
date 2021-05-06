@@ -15,7 +15,7 @@ check_if_repo_exists(){
 
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
-    if [[ "$git_status" == *"Untracked file"* || "$git_status" == *"deleted"* || "$git_status" == *"Unversioniert"* || "$git_status" == *"gelöscht"* ]]; then
+    if [[ "$git_status" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         read -e answer
         [[ $answer =~ ^[YyJj]$ ]] && return 1
@@ -41,11 +41,15 @@ commit_files(){
             continue
         fi
 
+        git_diff_empty=false
         if [[ -z $( git diff "$file" ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
-            if [[ $(git status | grep "$file") =~ (neue Datei|new file) ]]; then
-                echo -e "\e[32mFür die Datei \"$file\" ist kein Diff verfügbar, da sie neu ist\e[0m"
-            else
-                echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
+            local git_diff_empty=true
+            if [[ -z $(git diff --cached "$file" ) ]]; then
+                if [[ $(git status | grep "$file") =~ (neue Datei|new file) ]]; then
+                    echo -e "\e[32mFür die Datei \"$file\" ist kein Diff verfügbar, da sie neu ist\e[0m"
+                else
+                    echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
+                fi
             fi
         fi
 
@@ -56,12 +60,21 @@ commit_files(){
         fi
 
         if [[ -z $(git diff --summary "$file") ]]; then #Blieben die Rechte der Datei gleich?
-            git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #ohne pager, dass alles direkt ausgedruckt wird; unified gibt den Kontext an
+            if [[ $git_diff_empty == "true" ]]; then
+                git --no-pager diff --cached --color=always --unified=5 "$file" | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+            else
+                git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+            fi
         else #Rechteänderungen anzeigen
             echo -ne "\e[33m"
             git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE --color=never '.+[0-9]' #Zeigt Rechteänderungen an
             echo -e "\e[0m"
-            git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiten, da der Rechtewechsel auch im diff enthalten ist
+            echo $git_diff_empty
+            if [[ $git_diff_empty == "true" ]]; then
+                git --no-pager diff --cached --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+            else
+                git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+            fi
         fi
 
         print_line "-"
@@ -223,6 +236,7 @@ push(){
                 echo -e "\e[31mEs gab ein Problem beim Hochladen!\e[0m"
             fi
         else
+            pushed=true
             echo -e "\e[33mDie Änderungen werden nicht hochgeladen\e[0m"
         fi
     done
@@ -292,14 +306,16 @@ diff_function(){
 
 
     #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
-    files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g')
+    files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g') #umbennant geht nicht
     case $(echo $files | wc -w ) in
         0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
             echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
-            if [[ "$git_status" =~ (Commit vor|Commits vor| ahead) ]]; then
+            if [[ "$git_status" =~ (Commit vor |Commits vor | ahead) ]]; then
                 echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
                 amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
-                if [[ $amount == 1 ]]; then
+                if [[ -z $amount ]]; then
+                    echo -ne "\e[33mEs gibt noch Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                elif [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m \e[2m(\"U\" zum Umbennen des letzten Commits)\e[0m"
                     git log origin/$branch..$branch | sed -n 5p
                 else
