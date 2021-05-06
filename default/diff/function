@@ -199,7 +199,7 @@ push(){
                 continue
             fi
             git commit --amend -s -m "$answer"
-            echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
+            echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m \e[2m(\"U\" zum erneuten Umbennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
             continue
         elif [[ $answer =~ ^[YyJj]$ ]]; then
