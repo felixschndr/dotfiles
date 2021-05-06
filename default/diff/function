@@ -73,9 +73,9 @@ commit_files(){
             (( commit_counter ++ ))
             [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
-        echo -e "\nAlternativ kann auch folgendes angegeben werden:"\
-        "\n    - A     Alle Dateien committen"\
-        "\n    - CO    Die lokalen Änderungen verwerfen"\
+        echo -e "\nAlternativ kann auch folgendes angegeben werden:"
+        [[ $(echo $files | wc -w) != 1 ]] && echo -e "    - A     Alle Dateien committen"
+        echo -e "    - CO    Die lokalen Änderungen verwerfen"\
         "\n    - L     Die letzte Commitnachricht verwenden"\
         "\n    - S     Stop"\
         "\n\e[1;30mDie Datei wird übersprungen, wenn nichts angegeben wird\n\e[0m"
