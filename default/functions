@@ -85,14 +85,23 @@ sa(){
     filename="${1}"
     touch $filename
     chmod +x $filename
-    echo -e "#!/bin/bash\n\n" >> $filename
-    [[ $(command -v code) != "" ]] && code $filename || nano +4 $filename
+    if [[ $filename == *".sh" ]]; then
+        echo -e "#!/bin/bash\n\n" >> $filename
+    elif [[ $filename == *".py" ]]; then
+        echo -e "#!/usr/bin/python3\n# -*- coding: utf-8 -*-\n\n" >> $filename
+    fi
+    [[ $(command -v code) != "" ]] && code $filename || nano +8 $filename
 
     echo -e "\e[32mSoll das Script ausgeführt werden?\e[0m"
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        echo -e "\e[1;96m"; center "$filename"; echo -e "\n\e[0m"
-        ./$filename
+        if [[ -f $filename ]]; then
+            echo -e "\e[1;96m"; center "$filename"; echo -e "\n\e[0m"
+            ./$filename
+        else
+            echo -e "\e[31mDas Script existiert nicht mehr!\e[0m"
+            return 1
+        fi
     else
         echo -e "\e[33mDas Script wird nicht ausgeführt\e[0m"
         return 1
