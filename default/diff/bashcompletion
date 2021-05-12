@@ -22,6 +22,11 @@ _diff()
         COMPREPLY[$((${#COMPREPLY[@]} + 1 ))]="pull"
         return
     fi
+    local anfang="${COMP_WORDS[$COMP_CWORD]}"
+    for kdsys in $( echo $ausgewaehlte_server | sed 's/ /\n/g' | grep -P "^$anfang" ); do
+        COMPREPLY=("${COMPREPLY[@]}" "$kdsys")
+    done
+return
 
     # COMPREPLY="$COMPREPLY"" diff pull"
 
