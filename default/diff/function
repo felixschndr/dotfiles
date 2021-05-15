@@ -17,6 +17,7 @@ check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
     if [[ "$git_status" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
+        unmanaged_files=true
         read -e answer
         [[ $answer =~ ^[YyJj]$ ]] && return 1
     fi
@@ -87,7 +88,7 @@ commit_files(){
             [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
         echo -e "\nAlternativ kann auch folgendes angegeben werden:"
-        [[ $(echo $files | wc -w) != 1 ]] && echo -e "    - A     Alle Dateien committen"
+        [[ $(echo $files | wc -w) != 1 || $unmanaged_files == true ]] && echo -e "    - A     Alle Dateien committen"
         echo -e "    - CO    Die lokalen Änderungen verwerfen"\
         "\n    - L     Die letzte Commitnachricht verwenden"\
         "\n    - S     Stop"
