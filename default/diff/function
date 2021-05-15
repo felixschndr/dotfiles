@@ -363,6 +363,6 @@ diff_function(){
 
 }
 
-# complete -W "diff pull" diff
 
 
+complete -F _longopt -W "diff pull" diff
