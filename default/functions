@@ -58,7 +58,7 @@ git_url(){
 
     [[ -z $url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
     echo -e "Repository URL: \e[96m$url\e[0m"
-    [[ $session_typ != "ssh" ]] && xdg-open "$url"
+    [[ $session_typ != "ssh" && $(command -v "xdg-open") != "" ]] && xdg-open "$url"
 }
 
 repeat(){
