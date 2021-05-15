@@ -95,20 +95,20 @@
 
 # mkdir -p {my,other}/path/to/{a,b,c}
 
-function _cd() {
-    COMPREPLY=( diff pull );
-}
-complete -o nospace -F _cd diff
-
-function _cd2() {
-    local cur opts;
-    cur="${COMP_WORDS[COMP_CWORD]}";
-    _cd;
-    opts="${COMPREPLY[@]}";        # here we combine options
-    COMPREPLY=($(compgen -W "${opts}" -- ${cur})); # here is the secret sauce
-}
-
-complete -f diff
-complete -F _cd2 diff
-
-complete -p diff
+#function _cd() {
+#    COMPREPLY=( diff pull );
+#}
+#complete -o nospace -F _cd diff
+#
+#function _cd2() {
+#    local cur opts;
+#    cur="${COMP_WORDS[COMP_CWORD]}";
+#    _cd;
+#    opts="${COMPREPLY[@]}";        # here we combine options
+#    COMPREPLY=($(compgen -W "${opts}" -- ${cur})); # here is the secret sauce
+#}
+#
+#complete -f diff
+#complete -F _cd2 diff
+#
+#complete -p diff
