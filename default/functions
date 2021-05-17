@@ -55,10 +55,11 @@ git_url(){
         esac
     fi
     local url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
+    local open_url="$url""/-/tree/""$(git branch | grep "*" | cut -d" " -f2-)"
 
     [[ -z $url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
     echo -e "Repository URL: \e[96m$url\e[0m"
-    [[ $session_typ != "ssh" && $(command -v "xdg-open") != "" ]] && xdg-open "$url"
+    [[ $session_typ != "ssh" && $(command -v "xdg-open") != "" ]] && xdg-open "$open_url"
 }
 
 repeat(){
