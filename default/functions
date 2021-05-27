@@ -55,7 +55,9 @@ git_url(){
         esac
     fi
     local url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
-    local open_url="$url""/-/tree/""$(git branch | grep "*" | cut -d" " -f2-)"
+    local branch=$(git branch | grep "*" | cut -d" " -f2-)
+    local open_url="$url"
+    [[ $branch =~ (master|main) ]] || open_url+="/-/tree/"$branch
 
     [[ -z $url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
     echo -e "Repository URL: \e[96m$url\e[0m"
@@ -160,4 +162,22 @@ to_lf(){
         tr -d '\015' <$file >"$file""_new"
         mv "$file""_new" $file
     done
+}
+
+which(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m"       && return 1
+    [ $# -gt 2 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+    type $1
+    filelocation=$(bash -c "which $1")
+    # echo $filelocation
+    if [[ $(file -L  $filelocation) =~ (ASCII|script) ]]; then
+        echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
+        read -e answer
+        if [[ $answer =~ ^[YyJj]$ ]]; then
+            less $filelocation
+        fi
+    else
+        echo -e "\nEs handelt sich um eine Binärdatei"
+    fi
+    return 0
 }
