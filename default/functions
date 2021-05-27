@@ -70,7 +70,7 @@ repeat(){
         ((counter ++))
 
         heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   |   Kommando: ${1}   "
-        [ "${#heading}" -gt "$(tput cols)" ] && heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   "
+        [ "${#heading}" -ge "$(tput cols)" ] && heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   "
         echo -e "\n\e[96;1m"; center "$heading"; echo -e "\e[0m"
 
         bash -c "${1}"
