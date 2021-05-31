@@ -3,10 +3,7 @@
 build(){
     echo -e "\e[1;36mPaket wird gebaut\e[0m"
     local start_time=`date +%s`
-    if [[ $(dpkg-buildpackage -us -uc 2>&1) == *"kann nicht zum Lesen geöffnet werden"* ]]; then
-        cd $(git rev-parse --show-toplevel) || return 1
-        dpkg-buildpackage -us -uc
-    fi
+    dpkg-buildpackage -us -uc
     [[ $? == 1 ]] && return 1
     mv ../abm-*.deb .
     find ../abm-* -maxdepth 1 -type f -exec rm {} \;
