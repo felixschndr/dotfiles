@@ -170,14 +170,16 @@ which(){
     type $1
     filelocation=$(bash -c "which $1")
     # echo $filelocation
-    if [[ $(file -L  $filelocation) =~ (ASCII|script) ]]; then
-        echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
-        read -e answer
-        if [[ $answer =~ ^[YyJj]$ ]]; then
-            less $filelocation
+    if [[ -n $filelocation ]]; then
+        if [[ $(file -L  $filelocation) =~ (ASCII|script) ]]; then
+            echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
+            read -e answer
+            if [[ $answer =~ ^[YyJj]$ ]]; then
+                less $filelocation
+            fi
+        else
+            echo -e "\nEs handelt sich um eine Binärdatei"
         fi
-    else
-        echo -e "\nEs handelt sich um eine Binärdatei"
     fi
     return 0
 }
