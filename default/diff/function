@@ -123,8 +123,7 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            git add .
-            git commit -s -m "$answer"
+            git commit -a -s -m "$answer"
             changed=true
             break 2
 
