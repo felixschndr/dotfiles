@@ -18,45 +18,47 @@ CYAN="\[\e[1;36m\]"
 PS1="\n"
 
 # Linie am Anfang
-PS1="$PS1$GRAU\342\224\214\342\224\200"
+PS1+="$GRAU\342\224\214\342\224\200"
 
 # Uhrzeit
-PS1="$PS1[$DEFAULT\t"
+PS1+="[$DEFAULT\t"
 
 # ]-[
-PS1="$PS1$GRAU]-[$DEFAULT"
+PS1+="$GRAU]-[$DEFAULT"
 
 # Zeichen für Returncode
-PS1="$PS1"'`if [ $? = 0 ]; then\
+PS1+='`if [ $? = 0 ]; then\
     echo "\[\e[32m\]:)";\
 else
     echo "\[\e[31m\]:(";\
 fi`'
 
 # ]-[
-PS1="$PS1$GRAU]-[$DEFAULT"
+PS1+="$GRAU]-[$DEFAULT"
 
 # User und Hostname
-PS1="$PS1$GRUEN\u$PINK@$GRUEN\H"
+PS1+="$GRUEN\u$PINK@$GRUEN\H"
 
 # ]-[
-PS1="$PS1$GRAU]-[$DEFAULT"
+PS1+="$GRAU]-[$DEFAULT"
 
 # Pfad, es wird noch ein "/" angehängt, wenn der aktuelle Pfad != "/" ist
-PS1="$PS1$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
+PS1+="$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
 
 # Git Farbe
-PS1="$PS1"'`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+PS1+='`if [[ ! ( "$(svn info 2>&1)" == *"keine Arbeitskopie" ) ]]; then\
+    echo "\[\e[32m\] (svn)";\
+elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
 else\
     echo "\[\e[32m\]";\
 fi`'
-
+# __git_ps1 " (%s)"
 # Git Status
-PS1="$PS1"'$(__git_ps1 " (%s)")'
+PS1+=""'$(__git_ps1 " (%s)")'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
-PS1="$PS1$GRAU]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
+PS1+="$GRAU]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
 
 # Untere Linie
-PS1="$PS1$GRAU\342\224\224\342\224\200\342\224\200> $DEFAULT"
+PS1+="$GRAU\342\224\224\342\224\200\342\224\200> $DEFAULT"
