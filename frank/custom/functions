@@ -9,12 +9,13 @@ build(){
     find ../abm-* -maxdepth 1 -type f -exec rm {} \;
     debian/rules clean >/dev/null
     local end_time=`date +%s`
-    sudo dpkg -i $(ls -1t *.deb | head -1 | egrep -o "abm-.{1,}deb")
+    local deb_package=$(ls -1t *.deb | head -1 | egrep -o "abm-.{1,}deb")
+    sudo dpkg -i $deb_package
     echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$(($end_time - $start_time)) +%M:%S) gedauert"
-    echo -e "Soll eine Verbindung zum SFTP-Server aufgebaut werden?\e[0m"
+    echo -e "Soll das Paket hochgeladen werden?\e[0m"
     read -e answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
-        sftp abm@packages.abm-local.de:/incoming
+       upload "$deb_package"
     fi
 }
 
@@ -46,4 +47,15 @@ ssh_intern(){ #Baut eine SSH-Verbindung zu einem Kollegen auf, egal ob er im Hom
         fi
     fi
     return 0
+}
+
+upload(){
+    if [[ -z ${1} ]]; then
+        sftp abm@packages.abm-local.de:/incoming
+    else
+        sftp abm@packages.abm-local.de:/incoming <<EOF
+put $1
+exit
+EOF
+    fi
 }
