@@ -188,7 +188,9 @@ which(){
                 less $filelocation
             fi
         else
-            echo -e "\nEs handelt sich um eine Binärdatei"
+            if [[ $(type $1) != *"Alias"* ]]; then #Nicht anzeigen, wenn es sich um einen Alias handelt
+                echo -e "\nEs handelt sich um eine Binärdatei"
+            fi
         fi
     fi
     return 0
