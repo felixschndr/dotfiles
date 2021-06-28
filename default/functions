@@ -177,14 +177,14 @@ to_lf(){
 upgrade(){
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
     sudo apt upgrade
-    if [[ $? != 0 ]]; then
-        return
-    fi
+    [[ $? == 0 ]] || return
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
-    if [[ -f "/etc/openhab2/scripts/RPi4/Updates.sh" ]]; then
-        echo -e "\e[1;96mDas OpenHAB-Updates-Script wird aufgerufen\e[0m"
-        bash -c "/etc/openhab2/scripts/RPi4/Updates.sh"
-        echo -e "\e[32mDas OpenHAB-Updates-Script ist fertig\e[0m"
+    if [[ $(hostname) == "openhab" ]]; then
+        OHIP="localhost"
+        item="System_Updates"
+        state="0"
+        curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "$state" "http://$OHIP:8080/rest/items/$item/state"
+        echo -e "\e[1;96mDie Anzahl der Updates wurde aktualisiert\e[0m"
     fi
 }
 
