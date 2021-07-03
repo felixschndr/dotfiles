@@ -81,7 +81,7 @@ item_suche(){
 alias log='log_function'
 
 log_function(){
-    tail -n 1000 -f /var/log/openhab2/events.log | sed --unbuffered \
+    tail -n 2000 -f /var/log/openhab2/events.log | sed --unbuffered \
     -e 's/\(UNINITIALIZED\)/\o033[31m\1\o033[0m/' \
     -e 's/\(UNKNOWN\)/\o033[31m\1\o033[0m/' \
     -e 's/\(OFFLINE\)/\o033[31m\1\o033[0m/' \
