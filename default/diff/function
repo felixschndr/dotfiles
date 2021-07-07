@@ -359,7 +359,20 @@ diff_function(){
             *) echo -e "\e[1;96mEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
         esac
 
-        git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ */ - /g' #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+        longest_filename=0
+        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2-); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+            [[ $(echo $filename | wc -c) -gt $longest_filename ]] && longest_filename=$(echo $filename | wc -c)
+        done
+
+        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2-); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+            local filename_length=$(echo $filename | wc -c)
+            echo -ne " - "$filename
+            local amount_of_spaces=$((longest_filename - filename_length))
+            for((i=0; i<=$amount_of_spaces; ++i)); do echo -n " "; done
+            echo -e "|"$(git diff --stat $filename | cut -d "|" -f2- | head -n 1 | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
+        done
+
+
     fi
 
 
