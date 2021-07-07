@@ -88,12 +88,13 @@ commit_files(){
             [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
         done
         echo -e "\nAlternativ kann auch folgendes angegeben werden:"
-        [[ $(echo $files | wc -w) != 1 || $unmanaged_files == true ]] && echo -e "    - A     Alle Dateien committen"
-        echo -e "    - CO    Die lokalen Änderungen verwerfen"\
-        "\n    - L     Die letzte Commitnachricht verwenden"\
-        "\n    - S     Stop"
-        [[ $changed == "true" ]] && echo -e "    - U     Letzte Comitnachricht umbenennen"
-        echo -e "\e[1;30mDie Datei wird übersprungen, wenn nichts angegeben wird\n\e[0m"
+        [[ $(echo $files | wc -w) != 1 || $unmanaged_files == true ]] && echo -e "    - A    Alle Dateien committen"
+        echo -e "    - C    Die lokalen Änderungen verwerfen"\
+        "\n    - L    Die letzte Commitnachricht verwenden"
+        [[ $changed == "true" ]] && echo -e "- R    Letzten Commit rückgängig machen"
+        echo -e "    - S    Stop"
+        [[ $changed == "true" ]] && echo -e "    - U    Letzte Comitnachricht umbenennen"
+        echo -e "\e[1;30mWenn nichts angegeben wird, wird die Datei übersprungen\n\e[0m"
         read -e commit_message
 
 
@@ -127,7 +128,7 @@ commit_files(){
             changed=true
             break 2
 
-        elif [[ $commit_message =~ ^(co|Co|cO|CO)$ ]]; then #Cechkout HEAD
+        elif [[ $commit_message =~ ^[Cc]$ ]]; then #Checkout HEAD
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
             read -e answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
@@ -165,6 +166,14 @@ commit_files(){
             fi
             commit_messages[${#commit_messages[@]}]="$answer" #Die neue Nachricht überschreibt die alte
             git commit --amend -s -m "$answer"
+            return 1
+
+        elif [[ $commit_message =~ ^[Rr]$ ]]; then #Letzen Commit rückgängig machen
+            local commit_message=$(git log | head -n 10 | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed 's/^ *//g')
+            local date=$(git log --date=format:'%d.%m.' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            local time=$(git log --date=format:'%H:%M:%S' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time"
+            git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
             return 1
 
         elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
@@ -214,7 +223,13 @@ push(){
             git commit --amend -s -m "$answer"
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m \e[2m(\"U\" zum erneuten Umbenennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
-            continue
+        elif [[ $answer =~ ^[Rr]$ ]]; then #Letzen Commit rückgängig machen
+            local commit_message=$(git log | head -n 10 | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed 's/^ *//g')
+            local date=$(git log --date=format:'%d.%m.' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            local time=$(git log --date=format:'%H:%M:%S' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time"
+            git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
+            return
         elif [[ $answer =~ ^[YyJj]$ ]]; then
             pushed=true
             output=$(git push 2>&1)
@@ -369,7 +384,9 @@ diff_function(){
             echo -ne " - "$filename
             local amount_of_spaces=$((longest_filename - filename_length))
             for((i=0; i<=$amount_of_spaces; ++i)); do echo -n " "; done
-            echo -e "|"$(git diff --stat $filename | cut -d "|" -f2- | head -n 1 | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
+            local changed=$(git diff --stat $filename | cut -d "|" -f2- | head -n 1 )
+            [[ -z $changed ]] && changed=$(git diff --stat --staged $filename | cut -d "|" -f2- | head -n 1 )
+            echo -e "| "$(echo $changed | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
         done
 
 
@@ -385,10 +402,10 @@ diff_function(){
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
-            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m \e[2m(\"U\" zum Umbenennen des letzten Commits)\e[0m"
+            echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m" # \e[2m(\"U\" zum Umbenennen des letzten Commits & \"R\" zum Rückgängig machen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | sed -n 5p
         else
-            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m \e[2m(\"U\" zum Umbenennen des letzten Commits)\e[0m"
+            echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m" # \e[2m(\"U\" zum Umbenennen des letzten Commits & \"R\" zum Rückgängig machen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         fi
         push
