@@ -176,7 +176,7 @@ to_lf(){
 
 upgrade(){
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
-    sudo apt upgrade
+    sudo apt upgrade $1 #Falls -y angegeben wurde
     [[ $? == 0 ]] || return
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
     if [[ $(hostname) == "openhab" ]]; then
