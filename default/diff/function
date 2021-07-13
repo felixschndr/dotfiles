@@ -43,9 +43,9 @@ commit_files(){
         fi
 
         git_diff_empty=false
-        if [[ -z $( git diff "$file" ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
-            local git_diff_empty=true
-            if [[ -z $(git diff --cached "$file" ) ]]; then
+        if [[ -z $( git diff "$file" 2>/dev/null ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
+            git_diff_empty=true
+            if [[ -z $(git diff --cached "$file" 2>/dev/null ) ]]; then
                 if [[ $(git status | grep "$file") =~ (neue Datei|new file) ]]; then
                     echo -e "\e[32mFür die Datei \"$file\" ist kein Diff verfügbar, da sie neu ist\e[0m"
                 else
@@ -60,11 +60,11 @@ commit_files(){
             echo ""
         fi
 
-        if [[ -z $(git diff --summary "$file") ]]; then #Blieben die Rechte der Datei gleich?
+        if [[ -z $(git diff --summary "$file" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
             if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color=always --unified=5 "$file" | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --cached --color=always --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color=always --unified=5 "$file" | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color=always --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         else #Rechteänderungen anzeigen
             echo -ne "\e[33m"
@@ -72,9 +72,9 @@ commit_files(){
             echo -e "\e[0m"
             echo $git_diff_empty
             if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --cached --color=always --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color=always --unified=5 "$file" | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color=always --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         fi
 
@@ -374,7 +374,7 @@ diff_function(){
             *) echo -e "\e[1;96mEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
         esac
 
-        longest_filename=0
+        local longest_filename=0
         for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2-); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
             [[ $(echo $filename | wc -c) -gt $longest_filename ]] && longest_filename=$(echo $filename | wc -c)
         done
@@ -384,8 +384,8 @@ diff_function(){
             echo -ne " - "$filename
             local amount_of_spaces=$((longest_filename - filename_length))
             for((i=0; i<=$amount_of_spaces; ++i)); do echo -n " "; done
-            local changed=$(git diff --stat $filename | cut -d "|" -f2- | head -n 1 )
-            [[ -z $changed ]] && changed=$(git diff --stat --staged $filename | cut -d "|" -f2- | head -n 1 )
+            local changed=$(git diff --stat $filename 2>/dev/null | cut -d "|" -f2- | head -n 1 ) #2>/dev/null um (CR)LF warning auszublenden
+            [[ -z $changed ]] && changed=$(git diff --stat --staged $filename 2>/dev/null | cut -d "|" -f2- | head -n 1 )
             echo -e "| "$(echo $changed | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
         done
 
