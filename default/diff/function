@@ -257,6 +257,8 @@ push(){
         read -e answer
         echo ""
         if [[ $answer =~ ^[Uu]$ ]]; then
+            ask_for_commit_type
+            commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
             if [[ $answer =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
@@ -266,7 +268,7 @@ push(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 continue
             fi
-            git commit --amend -s -m "$answer"
+            git commit --amend -s -m "$commit_type""$answer"
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m \e[2m(\"U\" zum erneuten Umbenennen des letzten Commits)\e[0m"
             git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
         elif [[ $answer =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
@@ -396,18 +398,18 @@ diff_function(){
                     echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
                     amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
                     if [[ -z $amount ]]; then
-                        echo -ne "\e[33mEs gibt noch Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                        echo -e "\e[33mEs gibt noch Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     elif [[ $amount == 1 ]]; then
                         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
                         git log origin/$branch..$branch | sed -n 5p
                     else
                         number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                         if [[ $number_of_duplicates == 0 ]]; then
-                            echo -ne "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                            echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                         elif [[ $number_of_duplicates == 1 ]]; then
-                            echo -ne "\e[33mEs gibt noch $amount Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                            echo -e "\e[33mEs gibt noch $amount Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                         else
-                            echo -ne "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                            echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                         fi
                         git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
                     fi
