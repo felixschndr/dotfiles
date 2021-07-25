@@ -20,7 +20,7 @@ diffcommit(){ #Zeigt Änderungen eines Git Commits an
 
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
-    [[ ${1} == "." ]] && files=$(find . -type f) || files="$@"
+    [[ ${1} == "." ]] && files=$(find . -type f -not -path "*/\.git/*") || files="$@"
     local counter=0
     local anzahl=$(echo $files | wc -w)
 	for file in $files; do
@@ -165,14 +165,24 @@ stopwatch(){
 
 to_lf(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
-    # Alle files to lf: find . -type f | grep -v "git" |  xargs file | grep "CRLF"
-    for file in $@; do
+    if [[ "$1" == "alle" ]]; then
+        files=$(find . -type f -not -path "*/\.git/*" | xargs file | grep "CRLF" | cut -d " " -f1 | cut -d ":" -f1)
+        [[ -z $files ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
+        echo -e "\e[96mSollen die folgenden Dateien zu LF konvertiert werden?\e[0m\n$(echo $files | sed 's/ /\n/g' | nl)\n"
+        read -e answer
+        [[ ! $answer =~ (Y|y|J|j) ]] && return
+    else
+        files=$@
+    fi
+    for file in $files; do
         [[ "$(file $file)" == *"CRLF"* ]] && zeilenenden="\e[31mCRLF" || zeilenenden="\e[32mLF"
         echo -e "Ändere die Zeilenenden zu LF von \e[96;1m$file\e[0m\n    War davor: $zeilenenden\e[0m"
         tr -d '\015' <$file >"$file""_new"
         mv "$file""_new" $file
     done
 }
+
+complete -F _longopt -W "alle" to_lf
 
 upgrade(){
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
