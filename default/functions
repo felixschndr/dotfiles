@@ -60,7 +60,7 @@ git_url(){
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
         session_typ=ssh
     else
-        case $(ps -o comm= -p $PPID) in
+        case $(ps -o comm= -p $PPID 2>/dev/null) in
             sshd|*/sshd) session_typ=ssh;;
         esac
     fi
