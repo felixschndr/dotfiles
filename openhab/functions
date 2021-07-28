@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+echoTTS(){
+    echo -e "\e[96mWas soll gesagt werden?\e[0m"
+    read -e answer
+    [[ -z "$answer" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && return 1
+    echo
+    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send Sprachassistent_EchoDot_TTS \"${answer}\""
+}
+
+
 _item_completions(){
     items=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null | sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
     local anfang="${COMP_WORDS[$COMP_CWORD]}"
@@ -74,12 +84,14 @@ item_toggle(){
     # item_suche ${1}
 }
 
+
 item_suche(){
     echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
     cd /etc/openhab2
     search_string ${1}
     cd - >/dev/null
 }
+
 
 alias log='log_function'
 
