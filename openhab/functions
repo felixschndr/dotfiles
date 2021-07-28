@@ -24,11 +24,11 @@ complete -F _item_completions item_get item_set item_toggle search_log search_st
 
 
 item_get(){
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
+    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
     for item in $@ ; do
         status=$(curl -X GET "http://localhost:8080/rest/items/$item/state" 2>/dev/null)
-        [[ "$status" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"$item\" existiert nicht\e[39m" && return 1
-        echo -e "\e[36mItem:\e[39m\t$item\n\e[36mStatus:\e[39m\t$status"
+        [[ "$status" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"$item\" existiert nicht\e[0m" && return 1
+        echo -e "\e[36mItem:\e[0m\t$item\n\e[36mStatus:\e[0m\t$status"
     done
 
     # [[ $# == 1 ]] && item_suche ${1}
@@ -36,34 +36,34 @@ item_get(){
 
 
 item_set(){
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m"            && return 1
-    [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[39m"          && return 1
-    [ $# -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[39m" && return 1
+    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m"            && return 1
+    [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[0m"          && return 1
+    [ $# -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     alter_status=$(curl -X GET "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
-    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[39m" && return 1
+    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
 
-    echo -e "\e[36mItem:\e[39m\t\t${1}"
-    echo -e "\e[36mAlter Status:\e[39m\t$alter_status"
+    echo -e "\e[36mItem:\e[0m\t\t${1}"
+    echo -e "\e[36mAlter Status:\e[0m\t$alter_status"
 
 
     neuer_status_setzen=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}")
     [[ "$neuer_status_setzen" == *"not valid"* ]] && echo -e "\e[31m$neuer_status_setzen\e[0m" && return 1
-    echo -e "\e[36mNeuer Status:\e[39m\t${2}\e[0m"
+    echo -e "\e[36mNeuer Status:\e[0m\t${2}\e[0m"
     echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
 
     # item_suche ${1}
 }
 
 item_toggle(){
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[39m" && return 1
-    [ $# -gt 1 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[39m" && return 1
+    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
+    [ $# -gt 1 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     alter_status=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
-    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[39m" && return 1
+    [[ "$alter_status" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
 
-    echo -e "\e[36mItem:\e[39m\t\t${1}"
-    echo -e "\e[36mAlter Status:\e[39m\t$alter_status"
+    echo -e "\e[36mItem:\e[0m\t\t${1}"
+    echo -e "\e[36mAlter Status:\e[0m\t$alter_status"
     if [[ $alter_status == "ON" || $alter_status == "On" || $alter_status == "on" ]]; then
         neuer_status="OFF"
     elif [[ $alter_status == "OFF" || $alter_status == "Off" || $alter_status == "off" ]]; then
@@ -73,12 +73,12 @@ item_toggle(){
     elif [[ $alter_status == "CLOSED" ]]; then
         neuer_status="OPEN"
     else
-        echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[39m" && return 1
+        echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[0m" && return 1
     fi
 
     neuer_status_setzen=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${neuer_status}")
     [[ "$neuer_status_setzen" == *"not valid"* ]] && echo -e "\e[31m$neuer_status_setzen\e[0m" && return 1
-    echo -e "\e[36mNeuer Status:\e[39m\t${neuer_status}\e[0m"
+    echo -e "\e[36mNeuer Status:\e[0m\t${neuer_status}\e[0m"
     echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
 
     # item_suche ${1}
@@ -86,7 +86,7 @@ item_toggle(){
 
 
 item_suche(){
-    echo -e "\n${1}\e[36m wird hier gefunden:\e[39m"
+    echo -e "\n${1}\e[36m wird hier gefunden:\e[0m"
     cd /etc/openhab2
     search_string ${1}
     cd - >/dev/null
@@ -129,11 +129,11 @@ fix_permissions(){
     sudo openhabian-config
     sudo chmod -R 770 .
     ssh_permissions
-    echo -e "\e[92mDone\e[39m"
+    echo -e "\e[92mDone\e[0m"
     cd - >/dev/null
 }
 
 search_log(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[39m" && return
-    grep -in "${1}" --color=always /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[39m"
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return
+    grep -in "${1}" --color=always /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
 }
