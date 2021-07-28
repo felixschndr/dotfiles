@@ -4,9 +4,9 @@
 echoTTS(){
     echo -e "\e[96mWas soll gesagt werden?\e[0m"
     read -e answer
-    [[ -z "$answer" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && return 1
-    echo
+    [[ -z "$answer" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && exit 1
     sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send Sprachassistent_EchoDot_TTS \"${answer}\""
+    exit
 }
 
 
