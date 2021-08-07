@@ -34,10 +34,12 @@ ask_for_commit_type(){
     "\n    5. DOCS\t\t\e[2mUpdate der Dokumentation\e[0m" \
     "\n    6. STYLE\t\t\e[2mÄnderung an der Ausgabe oder dem Erscheinungsbild\e[0m" \
     "\n    7. REFACTOR\t\t\e[2mUmschreiben von Code ohne neue Features\e[0m" \
-    "\n    8. OTHER\t\t\e[2mAlles andere\e[0m\n"
+    "\n    8. TYPO\t\t\e[2mBeheben von Rechtschreibfehler\e[0m" \
+    "\n    9. OTHER\t\t\e[2mAlles andere\e[0m\n"
 
     read -e commit_type_input
     local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
+    [[ -z $commit_type_input ]] && commit_type_input=8 #keinen leeren Typ akzeptieren
     local amount_of_commit_types=$(echo $commit_type_input | wc -w)
     local commit_type_counter=0
     local commit_type="{"
@@ -52,12 +54,14 @@ ask_for_commit_type(){
             5) type_input="DOCS" ;;
             6) type_input="STYLE" ;;
             7) type_input="REFACTOR" ;;
+            8) type_input="TYPO" ;;
             *) type_input="OTHER" ;;
         esac
         commit_type+=$type_input
         [[ $commit_type_counter != $amount_of_commit_types ]] && commit_type+=" & "
     done
     commit_type+="}"
+
     echo -e "--> $commit_type\n"
 
     echo $commit_type > /tmp/.diffcommit
