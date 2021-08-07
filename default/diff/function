@@ -37,7 +37,7 @@ ask_for_commit_type(){
     "\n    8. OTHER\t\t\e[2mAlles andere\e[0m\n"
 
     read -e commit_type_input
-    local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort)
+    local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
     local amount_of_commit_types=$(echo $commit_type_input | wc -w)
     local commit_type_counter=0
     local commit_type="{"
@@ -58,6 +58,7 @@ ask_for_commit_type(){
         [[ $commit_type_counter != $amount_of_commit_types ]] && commit_type+=" & "
     done
     commit_type+="}"
+    echo -e "--> $commit_type\n"
 
     echo $commit_type > /tmp/.diffcommit
 }
@@ -146,7 +147,6 @@ commit_files(){
         [[ $changed == "true" ]] && echo -e "    - R    Letzten Commit rückgängig machen"
         echo -e "    - S    Stop"
         [[ $changed == "true" ]] && echo -e "    - U    Letzte Comitnachricht umbenennen"
-        echo -e "\e[1;30mWenn nichts angegeben wird, wird die Datei übersprungen\n\e[0m"
         read -e commit_message
 
 
