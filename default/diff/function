@@ -39,7 +39,7 @@ ask_for_commit_type(){
 
     read -e commit_type_input
     local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
-    [[ -z $commit_type_input ]] && commit_type_input=8 #keinen leeren Typ akzeptieren
+    [[ -z $commit_type_input ]] && commit_type_input=9 #keinen leeren Typ akzeptieren
     local amount_of_commit_types=$(echo $commit_type_input | wc -w)
     local commit_type_counter=0
     local commit_type="{"
