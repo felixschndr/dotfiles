@@ -104,9 +104,9 @@ commit_files(){
 
         if [[ -z $(git diff --summary "$file" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
             if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color=always --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --cached --color-words --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color=always --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color-words --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         else #Rechteänderungen anzeigen
             echo -ne "\e[33m"
@@ -114,9 +114,9 @@ commit_files(){
             echo -e "\e[0m"
             echo $git_diff_empty
             if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color=always --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --cached --color-words --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color=always --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color-words --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         fi
 
