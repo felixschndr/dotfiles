@@ -1,6 +1,7 @@
 #!/bin/bash
 
-alias ..="cd .."; alias ...="cd ../.."; alias ....="cd ../../.."; alias .....="cd ../../../.."
+alias ..="cd .."; alias ...="cd ../.."; alias ....="cd ../../.."
+alias .....="cd ../../../.."; alias ......="cd ../../../../.."
 alias dc='cd'
 alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"; alias l='ls'; alias ll='ls'; alias lll='ls'; alias sl='ls'; alias la="ls -A"
 alias rm='rm -R'
@@ -21,9 +22,4 @@ log_auth="/var/log/auth.log"
 
 complete -d cd #Damit werden files ausgeblendet bei der Vervollständigung
 
-#ls Farben
-    #Alle Farben dunkel statt hell
-    #LS_COLORS="$(echo "$LS_COLORS" | sed 's/01;//g')"
-
-    #Nur die Farbe von ausführbaren Programmen ersetzen
-    LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')"
+LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
