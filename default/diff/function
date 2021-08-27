@@ -336,17 +336,18 @@ pull(){
 
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
+            git log ..origin/$branch --pretty="%cd | %h | %s" --date=format:"%d.%m. | %H:%M:%S"
         else
 	        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
+            git log ..origin/$branch --pretty="| %cd | %h | %s" --date=format:"%d.%m. | %H:%M:%S" | tac | nl
         fi
-        git log ..origin/$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed -e 's/^[[:space:]]*/ - /'
         read -e answer
 
         if [[ $answer =~ ^[YyJj]$ ]]; then
             local pull_result="$(git pull --rebase 2>&1)"
             local return_code=$?
             if [[ "$pull_result" == *"stash"* ]]; then
-                echo -ne "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können! \e[0m"
+                echo -e "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können! \e[0m"
                 echo -e "Dateien, die überschrieben werden würden:"
                 git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /' | tee /tmp/files_that_need_checkout
                 files_that_need_checkout=$(cat /tmp/files_that_need_checkout)
@@ -363,6 +364,8 @@ pull(){
         else
             echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
         fi
+    else
+        echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
     fi
     return
 }
