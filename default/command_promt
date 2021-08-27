@@ -1,64 +1,16 @@
 #!/bin/bash
 
-# Zeitstempel in der Bashhistory anzeigen
-HISTTIMEFORMAT="%F %T "
+complete -d cd #Damit werden files ausgeblendet bei der Vervollständigung
+shopt -s cdspell #Korrigiert kleine Typos bei Pfaden nach dem Abschicken
+shopt -s autocd #In dir wechseln ohne cd
 
 
-########### Farben ###########
-GRAU="\[\e[1;30m\]"
-DEFAULT="\[\e[0m\]"
-GRUEN="\[\e[32m\]"
-ROT="\[\e[1;31m\]"
-PINK="\[\e[35m\]"
-CYAN="\[\e[1;36m\]"
-##############################
+LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
 
 
-# Erstmal eine Leerzeile für mehr Platz
-PS1="\n"
-
-# Linie am Anfang
-PS1+="$GRAU\342\224\214\342\224\200"
-
-# Uhrzeit
-PS1+="[$DEFAULT\t"
-
-# ]-[
-PS1+="$GRAU]-[$DEFAULT"
-
-# Zeichen für Returncode
-PS1+='`if [ $? = 0 ]; then\
-    echo "\[\e[32m\]:)";\
-else
-    echo "\[\e[31m\]:(";\
-fi`'
-
-# ]-[
-PS1+="$GRAU]-[$DEFAULT"
-
-# User und Hostname
-PS1+="$GRUEN\u$PINK@$GRUEN\H"
-
-# ]-[
-PS1+="$GRAU]-[$DEFAULT"
-
-# Pfad, es wird noch ein "/" angehängt, wenn der aktuelle Pfad != "/" ist
-PS1+="$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
-
-# Git Farbe
-PS1+='`if [[ "$(svn info 2>&1)" == *"Revision"* ]]; then\
-    echo "\[\e[32m\] (svn)";\
-elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
-    echo "\[\e[31m\]";\
-else\
-    echo "\[\e[32m\]";\
-fi`'
-# __git_ps1 " (%s)"
-# Git Status
-PS1+=""'$(__git_ps1 " (%s)")'
-
-# Klammer zu nach dem Pfad und in die nächste Zeile
-PS1+="$GRAU]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
-
-# Untere Linie
-PS1+="$GRAU\342\224\224\342\224\200\342\224\200> $DEFAULT"
+HISTCONTROL=ignoreboth #schreibe nicht in die history was doppelt ist oder mit einem Leerzeichen anfängt
+HISTIGNORE="clear:ll:* --help:man" #Kommandos, die nicht in die History aufgenommen werden
+export HISTTIMEFORMAT="%d.%m. %H:%M:%S - " #Format der History anpassen
+HISTSIZE=10000 #Kommandos, die im Memory gespeichert bleiben
+HISTFILESIZE=30000 #Kommandos, die in .bash_history gespeichert bleiben
+shopt -s histappend #Kommandos werden an die History angehängt statt die History zu überschreiben
