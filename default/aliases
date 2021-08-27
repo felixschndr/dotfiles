@@ -17,9 +17,6 @@ alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias tf='tail -f -n 1000'
 alias tmux='tmux -u' #Setzt encoding für ö,ü und ä
 alias tmux_help='curl -s "https://gist.githubusercontent.com/henrik/1967800/raw/f580aa23cbc5cbf1bd96dee1c903784c0e32eca2/tmux_cheatsheet.markdown" | "less" -I'
+alias df="df -h"
 
 log_auth="/var/log/auth.log"
-
-complete -d cd #Damit werden files ausgeblendet bei der Vervollständigung
-
-LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
