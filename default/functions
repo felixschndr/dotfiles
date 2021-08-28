@@ -212,9 +212,9 @@ which(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m"       && return 1
     [ $# -gt 2 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
     type $1
-    filelocation=$(bash -c "which $1")
-    # echo $filelocation
-    if [[ -n $filelocation ]]; then
+    local isFunction=$(type $1)
+    local filelocation=$(bash -c "which $1")
+    if [[ ( ! $isFunction == *"ist eine Funktion"* ) && -n $filelocation ]]; then
         if [[ $(file -L  $filelocation) =~ (ASCII|script) ]]; then
             echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
             read -e answer
