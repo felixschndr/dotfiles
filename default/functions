@@ -173,6 +173,20 @@ stopwatch(){
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @$dauer +%M:%S.%3N) gedauert"
 }
 
+tmux_help(){
+    echo -e "\e[1;36m"; center "TMUX Hilfe"; echo -e "\n\e[0m" \
+    "\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
+    "\nTeilen:" \
+    "\n    - Horizontal:      <\e[1;36m%\e[0m>" \
+    "\n    - Vertikal:        <\e[1;36m\"\e[0m>\n" \
+    "\nPanes:" \
+    "\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
+    "\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
+    "\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
+    "\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
+    "\nEinfügen: <\e[1;36mShift\e[0m> + <\e[1;36mMittlere Maustaste\e[0m>"
+}
+
 to_lf(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
     if [[ "$1" == "alle" ]]; then
