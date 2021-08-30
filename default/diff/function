@@ -344,7 +344,7 @@ pull(){
 
         if [[ $amount == 1 ]]; then
             echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
-            git log ..origin/$branch --pretty="%cd | %h | %s" --date=format:"%d.%m. | %H:%M:%S"
+            git log ..origin/$branch --pretty="    %cd | %h | %s" --date=format:"%d.%m. | %H:%M:%S" | cat
         else
 	        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
             git log ..origin/$branch --pretty="| %cd | %h | %s" --date=format:"%d.%m. | %H:%M:%S" | tac | nl
