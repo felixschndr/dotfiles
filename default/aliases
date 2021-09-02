@@ -17,5 +17,6 @@ alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias tf='tail -f -n 1000'
 alias tmux='tmux -u' #Setzt encoding für ö,ü und ä
 alias df="df -h"
+alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 
 log_auth="/var/log/auth.log"
