@@ -299,12 +299,12 @@ push(){
                 git commit $git_signature_argument --amend -s -m "$commit_type $answer"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
-            git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | nl
+            git log origin/$branch..$branch --pretty="%s" | awk '!x[$0]++' | nl
 
         elif [[ $answer =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
-            local commit_message=$(git log | head -n 10 | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed 's/^ *//g')
-            local date=$(git log --date=format:'%d.%m.' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
-            local time=$(git log --date=format:'%H:%M:%S' | head -n 10 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            local commit_message=$(git log -n 1 --pretty="%s")
+            local date=$(git log -n 1 --pretty="%ad" --date=format:'%A, den %d.%m.')
+            local time=$(git log -n 1 --pretty="%ad" --date=format:'%H:%M:%S')
             local hash=$(git rev-parse --short HEAD)
             echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time\n         Hash: $hash"
             git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
