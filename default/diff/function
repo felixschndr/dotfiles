@@ -136,7 +136,7 @@ commit_files(){
             ((file_counter ++))
             continue
         elif [[ $commit_type == "{INITIAL}"* ]]; then #Bei INITIAL Standardnachricht verwenden
-            commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type Add $file to repository"
+            commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type Add $(basename $file) to repository"
             last_commit_message="${commit_messages[${#commit_messages[@]}]}" #Letztes Element aus Array ist die neuste Nachricht
 	        git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
             changed=true
@@ -285,7 +285,7 @@ push(){
                 echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
                 continue
             elif [[ $commit_type == "{INITIAL}"* ]]; then #Bei INITIAL Standardnachricht verwenden
-                git commit $git_signature_argument --amend -s -m "$commit_type Add $file to repository"
+                git commit $git_signature_argument --amend -s -m "$commit_type Add $(basename $file) to repository"
             else
                 echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
                 read -e answer
