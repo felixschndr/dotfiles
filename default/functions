@@ -53,9 +53,13 @@ file_info(){
 git_log(){
     if ! check_if_repo_exists; then return 1; fi
 
-    git --no-pager log -n 30 --reverse --pretty="| %cd | %h | "  --date=format:"%d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
-    git --no-pager log -n 30 --reverse --pretty="" --shortstat > /tmp/.statsofcommits
-    git --no-pager log -n 30 --reverse --pretty=" %s" > /tmp/.messagesofcommits
+    [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
+
+    local commitcount=30
+    git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | "  --date=format:"%d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
+    git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
+    git --no-pager log -n $commitcount --reverse --pretty="" --shortstat > /tmp/.statsofcommits
+    git --no-pager log -n $commitcount --reverse --pretty=" %s" > /tmp/.messagesofcommits
 
     IFS=$'\n'
 
@@ -88,8 +92,9 @@ git_log(){
     linecounter=0
     cat /tmp/.hashandtime | while read -r line; do #Ausgabe der ganzen Infos
         ((linecounter++))
+        local commitauthor=$(sed -n ${linecounter}p /tmp/.commitauthor)
         echo -n $line
-
+        [[ $repo == "abm" ]] && echo -n "$commitauthor | "
         local statsline=$(sed -n ${linecounter}p /tmp/.statsofcommits)
         local files_changed=$(echo $statsline | grep -Eo '[0-9]+' | head -1)
         local insertions=0
@@ -102,7 +107,7 @@ git_log(){
         echo -e " |"$(sed -n ${linecounter}p /tmp/.messagesofcommits)
     done
 
-    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits}
+    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor}
 
     while true; do
         echo -e "\n\e[96;1m"

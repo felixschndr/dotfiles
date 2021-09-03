@@ -188,6 +188,7 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
+            echo "git commit $git_signature_argument -a -s -m "$commit_type $answer""
             git commit $git_signature_argument -a -s -m "$commit_type $answer"
             changed=true
             break 2
@@ -348,6 +349,7 @@ pull(){
     fi
 
     amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
+    [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
     if [[ $amount == 1 ]]; then
         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
@@ -358,6 +360,7 @@ pull(){
         git --no-pager log ..origin/$branch --pretty="| %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" --reverse | nl > /tmp/.hashandtime
     fi
     git --no-pager log ..origin/$branch --pretty="" --shortstat --reverse > /tmp/.statsofcommits
+    git --no-pager log ..origin/$branch --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
     git --no-pager log ..origin/$branch --pretty=" %s" --reverse > /tmp/.messagesofcommits
 
     IFS=$'\n'
@@ -391,8 +394,9 @@ pull(){
     linecounter=0
     cat /tmp/.hashandtime | while read -r line; do #Ausgabe der ganzen Infos
         ((linecounter++))
+        local commitauthor=$(sed -n ${linecounter}p /tmp/.commitauthor)
         echo -n $line
-
+        [[ $repo == "abm" ]] && echo -n "$commitauthor | "
         local statsline=$(sed -n ${linecounter}p /tmp/.statsofcommits)
         local files_changed=$(echo $statsline | grep -Eo '[0-9]+' | head -1)
         local insertions=0
@@ -405,7 +409,7 @@ pull(){
         echo -e " |"$(sed -n ${linecounter}p /tmp/.messagesofcommits)
     done
 
-    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits}
+    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor}
 
     read -e answer
 
