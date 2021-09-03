@@ -9,6 +9,7 @@ alias diff='diff_function'
 
 check_if_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
+    git_status=$(git status 2>&1)
     if [[ "$git_status" == *"Kein Git-Repo"* || "$git_status" == *"not a git repository"* ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
         return 1
@@ -49,7 +50,6 @@ ask_for_commit_type(){
     for type_input in $commit_type_input; do
         ((commit_type_counter++))
         case $type_input in
-            S|s|A|a) return 1 ;;
             1) type_input="INITIAL" ;;
             2) type_input="FEAT" ;;
             3) type_input="ENHANCEMENT" ;;
@@ -58,7 +58,7 @@ ask_for_commit_type(){
             6) type_input="STYLE" ;;
             7) type_input="REFACTOR" ;;
             8) type_input="TYPO" ;;
-            *) type_input="OTHER" ;;
+            *) commit_type+="OTHER"; break;;
         esac
         commit_type+=$type_input
         [[ $commit_type_counter != $amount_of_commit_types ]] && commit_type+=" & "
@@ -351,14 +351,14 @@ pull(){
 
     if [[ $amount == 1 ]]; then
         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
-        git --no-pager log ..origin/$branch --pretty="    %cd | %h | "  --date=format:"%d.%m. | %H:%M:%S" > /tmp/.hashandtime
+        git --no-pager log ..origin/$branch --pretty="    %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" > /tmp/.hashandtime
 
     else
         echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
-        git --no-pager log ..origin/$branch --pretty="| %cd | %h | "  --date=format:"%d.%m. | %H:%M:%S" | tac | nl > /tmp/.hashandtime
+        git --no-pager log ..origin/$branch --pretty="| %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" --reverse | nl > /tmp/.hashandtime
     fi
-    git --no-pager log ..origin/$branch --pretty="" --shortstat | tac > /tmp/.statsofcommits
-    git --no-pager log ..origin/$branch --pretty=" %s" | tac > /tmp/.messagesofcommits
+    git --no-pager log ..origin/$branch --pretty="" --shortstat --reverse > /tmp/.statsofcommits
+    git --no-pager log ..origin/$branch --pretty=" %s" --reverse > /tmp/.messagesofcommits
 
     IFS=$'\n'
 
@@ -487,7 +487,7 @@ diff_function(){
                         echo -e "\e[33mEs gibt noch Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     elif [[ $amount == 1 ]]; then
                         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
-                        git log origin/$branch..$branch --pretty="    %h | %s" | cat
+                        git --no-pager log origin/$branch..$branch --pretty="    %h | %s"
                     else
                         number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                         if [[ $number_of_duplicates == 0 ]]; then
@@ -497,7 +497,7 @@ diff_function(){
                         else
                             echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                         fi
-                        git log origin/$branch..$branch --pretty="| %h | %s" | tac | nl
+                        git --no-pager log origin/$branch..$branch --pretty="| %h | %s" --reverse | nl
                     fi
                     push
                     return
@@ -536,10 +536,10 @@ diff_function(){
 
         if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m" # \e[2m(\"U\" zum Umbenennen des letzten Commits & \"R\" zum Rückgängig machen des letzten Commits)\e[0m"
-            git log origin/$branch..$branch --pretty="    %h | %s" | cat
+            git --no-pager log origin/$branch..$branch --pretty="    %h | %s"
         else
             echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m" # \e[2m(\"U\" zum Umbenennen des letzten Commits & \"R\" zum Rückgängig machen des letzten Commits)\e[0m"
-            git log origin/$branch..$branch --pretty="| %h | %s" | tac | nl
+            git --no-pager log origin/$branch..$branch --pretty="| %h | %s" --reverse | nl
         fi
         push
     fi
