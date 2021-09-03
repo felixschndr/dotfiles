@@ -361,7 +361,21 @@ pull(){
     fi
     git --no-pager log ..origin/$branch --pretty="" --shortstat --reverse > /tmp/.statsofcommits
     git --no-pager log ..origin/$branch --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
+    git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
     git --no-pager log ..origin/$branch --pretty=" %s" --reverse > /tmp/.messagesofcommits
+
+    #Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
+    #"files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
+    while read -r line; do
+        local newline
+        if [[ $line == *changed* ]]; then
+            newline=$(echo $line | cut -d " " -f2-)
+        else
+            local hash=$(echo $line | sed 's/§//')
+            newline="$(git diff $hash^ $hash --stat | grep "changed,")"
+        fi
+        sed -i "s/$line/$newline/" /tmp/.statsofcommits
+    done < /tmp/.statsofcommits
 
     IFS=$'\n'
 
@@ -409,7 +423,7 @@ pull(){
         echo -e " |"$(sed -n ${linecounter}p /tmp/.messagesofcommits)
     done
 
-    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor}
+    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor,.mergestats}
 
     read -e answer
 
