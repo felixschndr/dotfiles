@@ -56,7 +56,7 @@ git_log(){
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
     local commitcount=30
-    git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | "  --date=format:"%d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
+    git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | "  --date=format:"%a | %d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
     git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
     git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
     git --no-pager log -n $commitcount --reverse --pretty=" %s" > /tmp/.messagesofcommits
