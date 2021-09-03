@@ -235,9 +235,9 @@ commit_files(){
             return 1
 
         elif [[ $commit_message =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
-            local commit_message=$(git log | head -n 10 | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | sed 's/^ *//g')
-            local date=$(git log --date=format:'%d.%m.' | head -n 4 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
-            local time=$(git log --date=format:'%H:%M:%S' | head -n 4 | grep ^Date | cut -d ":" -f2- | sed 's/^ *//g')
+            local commit_message=$(git log -n 1 --pretty="%s")
+            local date=$(git log -n 1 --pretty="%ad" --date=format:'%A, den %d.%m.')
+            local time=$(git log -n 1 --pretty="%ad" --date=format:'%H:%M:%S')
             local hash=$(git rev-parse --short HEAD)
             echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time\n         Hash: $hash"
             git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
@@ -506,7 +506,7 @@ diff_function(){
                         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
                         git --no-pager log origin/$branch..$branch --pretty="    %h | %s"
                     else
-                        number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                        number_of_duplicates=$(( $amount - $(git log origin/$branch..$branch --pretty="%s"| awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                         if [[ $number_of_duplicates == 0 ]]; then
                             echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                         elif [[ $number_of_duplicates == 1 ]]; then
@@ -551,7 +551,7 @@ diff_function(){
     if [[ "$git_status" =~ (Commit vor |Commits vor| ahead) ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
-        if [[ $(git log origin/$branch..$branch | grep -v "^Merge\|^Author\|^Date\|Signed-off-by" | egrep -v [a-z0-9]{40} | sed '/^[[:space:]]*$/d' | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
+        if [[ $(git log origin/$branch..$branch --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m" # \e[2m(\"U\" zum Umbenennen des letzten Commits & \"R\" zum Rückgängig machen des letzten Commits)\e[0m"
             git --no-pager log origin/$branch..$branch --pretty="    %h | %s"
         else
