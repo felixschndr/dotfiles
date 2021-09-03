@@ -251,6 +251,7 @@ commit_files(){
         else #Commit mit dem angegeben Text
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type $commit_message" #Den aktuellen Commit ins Array packen
             last_commit_message="$commit_type $commit_message"
+	        echo "git commit $git_signature_argument -s "$file" -m "$last_commit_message""
 	        git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
@@ -359,9 +360,8 @@ pull(){
         echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
         git --no-pager log ..origin/$branch --pretty="| %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" --reverse | nl > /tmp/.hashandtime
     fi
-    git --no-pager log ..origin/$branch --pretty="" --shortstat --reverse > /tmp/.statsofcommits
     git --no-pager log ..origin/$branch --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
-    git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
+    git --no-pager log ..origin/$branch --reverse --pretty="%h§" -n $amount --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
     git --no-pager log ..origin/$branch --pretty=" %s" --reverse > /tmp/.messagesofcommits
 
     #Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
