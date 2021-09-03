@@ -251,7 +251,6 @@ commit_files(){
         else #Commit mit dem angegeben Text
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type $commit_message" #Den aktuellen Commit ins Array packen
             last_commit_message="$commit_type $commit_message"
-	        echo "git commit $git_signature_argument -s "$file" -m "$last_commit_message""
 	        git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
