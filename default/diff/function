@@ -411,6 +411,7 @@ pull(){
 
     if [[ ! $answer =~ ^[YyJj]$ ]]; then
         echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
+        return
     fi
 
     local pull_result="$(git pull --rebase 2>&1)"
@@ -421,9 +422,7 @@ pull(){
         git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /' | tee /tmp/.files_that_need_checkout
         files_that_need_checkout=$(cat /tmp/.files_that_need_checkout)
         rm /tmp/.files_that_need_checkout
-
         echo -ne "\e[33m"; print_line "="; echo -ne "\e[0m"
-
     elif [[ $return_code == 0 ]]; then
         echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m"
     else
