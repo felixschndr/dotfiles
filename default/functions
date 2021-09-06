@@ -59,7 +59,11 @@ git_log(){
 
     [[ ${1} =~ ^[0-9]{1,}$ ]] && commitcount=${1}
 
-    git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | "  --date=format:"%a | %d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
+    if [[ $commitcount == 1 ]]; then
+        git --no-pager log -n $commitcount --reverse --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" > /tmp/.hashandtime
+    else
+        git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
+    fi
     git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
     git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
     git --no-pager log -n $commitcount --reverse --pretty=" %s" > /tmp/.messagesofcommits
