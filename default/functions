@@ -50,6 +50,29 @@ file_info(){
     return 0
 }
 
+git_delete_old_branches(){
+    git config --global fetch.prune true #Merkt wenn Branches in origin gelöscht wurden
+    git fetch
+    if [[ ! $(git branch | grep "*") =~ (master|main) ]]; then
+        git checkout $(git branch | grep "master\|main" | awk '{print $2}') #Checkout master oder main
+    fi
+    local branches_to_delete=$(git branch -vv | grep "entfernt]" | awk '{print $1}')
+    if [[ -z $branches_to_delete ]]; then
+        echo -e "\e[32mEs gibt keine Branches, die gelöscht werden müssen\e[0m"
+        return
+    fi
+    echo -e "\e[33mBranches, die entfernt werden:\e[0m"
+    for branch in $branches_to_delete; do
+        echo -e "    - $branch"
+    done
+    echo -e "\nSoll fortgefahren werden?"
+    read -e answer
+    [[ ! $answer =~ (Y|y|J|j) ]] && echo -e "\e[32mDie Aktion wird abgebrochen\e[0m" && return
+    for branch in $branches_to_delete; do
+        git branch -d $branch
+    done
+}
+
 git_log(){
     if ! check_if_repo_exists; then return 1; fi
 
