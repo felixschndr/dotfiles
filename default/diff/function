@@ -70,6 +70,7 @@ ask_for_commit_type(){
     echo $commit_type > /tmp/.diffcommit
 }
 
+
 commit_files(){
     #Die Dateien durchgehen und gegebenenfalls committen
     git_status=$(git status 2>&1)
@@ -344,7 +345,7 @@ pull(){
     git_status=$(git status 2>&1)
 
     if [[ ! "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
-        echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
+        [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
         return
     fi
 
@@ -465,10 +466,10 @@ diff_function(){
 
 
     if [[ "$1" =~ ^(p|pull|diff)$ ]]; then
-        if ! pull "force"; then return; fi
+        pull "force"
         shift
     else
-        if ! pull; then return; fi
+        pull
     fi
 
     if [[ -n "$1" ]]; then
