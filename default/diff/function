@@ -518,7 +518,7 @@ diff_function(){
                     git --no-pager log origin/$branch.. --pretty="| %h | %s" --reverse | nl
                 fi
                 push
-                return
+                return;;
             1) echo -e "\e[1;96mEs wurde eine Datei modifiziert\e[0m";;
             *) echo -e "\e[1;96mEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
         esac
