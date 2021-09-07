@@ -189,7 +189,6 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            echo "git commit $git_signature_argument -a -s -m "$commit_type $answer""
             git commit $git_signature_argument -a -s -m "$commit_type $answer"
             changed=true
             break 2
@@ -252,6 +251,7 @@ commit_files(){
         else #Commit mit dem angegeben Text
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type $commit_message" #Den aktuellen Commit ins Array packen
             last_commit_message="$commit_type $commit_message"
+            echo "git commit $git_signature_argument -s "$file" -m "$commit_type $answer""
 	        git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
@@ -499,7 +499,7 @@ diff_function(){
             0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
                 echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
                 amount=$(git log origin/$branch.. --pretty="%h" | wc -l) #Zählt ungepushte Commits
-                if [[ $amount != 0 ]]; then
+                if [[ $amount == 0 ]]; then
                     return
                 fi
                 echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
