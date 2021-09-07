@@ -31,8 +31,6 @@ item_get(){
         [[ "$status" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"$item\" existiert nicht\e[0m" && return 1
         echo -e "\e[36mItem:\e[0m\t$item\n\e[36mStatus:\e[0m\t$status"
     done
-
-    # [[ $# == 1 ]] && item_suche ${1}
 }
 
 
@@ -52,9 +50,8 @@ item_set(){
     [[ "$neuer_status_setzen" == *"not valid"* ]] && echo -e "\e[31m$neuer_status_setzen\e[0m" && return 1
     echo -e "\e[36mNeuer Status:\e[0m\t${2}\e[0m"
     echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
-
-    # item_suche ${1}
 }
+
 
 item_toggle(){
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
@@ -81,16 +78,6 @@ item_toggle(){
     [[ "$neuer_status_setzen" == *"not valid"* ]] && echo -e "\e[31m$neuer_status_setzen\e[0m" && return 1
     echo -e "\e[36mNeuer Status:\e[0m\t${neuer_status}\e[0m"
     echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
-
-    # item_suche ${1}
-}
-
-
-item_suche(){
-    echo -e "\n${1}\e[36m wird hier gefunden:\e[0m"
-    cd /etc/openhab2
-    search_string ${1}
-    cd - >/dev/null
 }
 
 
@@ -133,6 +120,7 @@ fix_permissions(){
     echo -e "\e[92mDone\e[0m"
     cd - >/dev/null
 }
+
 
 search_log(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return
