@@ -1,5 +1,11 @@
 #!/bin/bash
 
+battery(){
+    echo -ne "Status:\e[96;1m"
+    acpi | grep "Battery 0" | cut -d ":" -f2-
+    echo -ne "\e[0m"
+}
+
 build(){
     echo -e "\e[1;36mPaket wird gebaut\e[0m"
     local start_time=`date +%s`
