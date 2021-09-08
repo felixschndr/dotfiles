@@ -93,8 +93,15 @@ git_log(){
 
     IFS=$'\n'
 
-    #Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
-    #"files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
+    local linecounter=0
+    local max_files_changed=0
+    local max_insertions=0
+    local max_deletions=0
+
+    # Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
+    # "files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
+    # &
+    # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
     while read -r line; do
         local newline
         if [[ $line == *changed* ]]; then
@@ -104,27 +111,18 @@ git_log(){
             newline="$(git diff $hash^ $hash --stat | grep "changed,")"
         fi
         sed -i "s/$line/$newline/" /tmp/.statsofcommits
-    done < /tmp/.statsofcommits
 
-    local linecounter=0
-    local max_files_changed=0
-    local max_insertions=0
-    local max_deletions=0
-
-    while read -r line; do #Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
         ((linecounter++))
-        local statsline=$(sed -n ${linecounter}p /tmp/.statsofcommits)
-        local files_changed=$(echo $statsline | grep -Eo '[0-9]+' | head -1)
+        local files_changed=$(echo $newline | grep -Eo '[0-9]+' | head -1)
         local insertions=0
-        [[ $statsline == *"insertion"* ]] && insertions=$(echo $statsline | grep -Eo '[0-9]+' | sed -n 2p)
+        [[ $newline == *"insertion"* ]] && insertions=$(echo $newline | grep -Eo '[0-9]+' | sed -n 2p)
         local deletions=0
-        [[ $statsline == *"deletion"* ]] && deletions=$(echo $statsline | grep -Eo '[0-9]+' | tail -1)
+        [[ $newline == *"deletion"* ]] && deletions=$(echo $newline | grep -Eo '[0-9]+' | tail -1)
 
         [[ $files_changed -gt $max_files_changed ]] && max_files_changed=$files_changed
         [[ $insertions    -gt $max_insertions    ]] && max_insertions=$insertions
         [[ $deletions     -gt $max_deletions     ]] && max_deletions=$deletions
     done < /tmp/.statsofcommits
-
 
     local len_of_max_files_changed=$(echo $max_files_changed | wc -c)
     local len_of_max_insertions=$(echo $max_insertions | wc -c)
