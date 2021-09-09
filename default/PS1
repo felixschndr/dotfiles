@@ -33,10 +33,10 @@ fi`'
 # ]-[
 PS1+="$GRAU]-[$DEFAULT"
 
-# User und Hostname
+# Username und '@'
 PS1+="$GRUEN\u$PINK@"
 
-# PS1+='`if [[ -z $SSH_CLIENT || ( [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* ]] && [[ $(hostname) == "openhab" ]] ) ]]; then\
+# Farbe für den Hostnamen generieren (|| hat nicht funktioniert, deswegen elif)
 PS1+='`if [[ -z $SSH_CLIENT ]]; then\
     echo "\[\e[32m\]";\
 elif [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* ]] && [[ $(hostname) == "openhab" ]]; then\
@@ -45,6 +45,7 @@ else\
     echo "\[\e[31m\]";\
 fi`'
 
+# Hostname
 PS1+="\H"
 
 # ]-[
@@ -61,8 +62,8 @@ elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter
 else\
     echo "\[\e[32m\]";\
 fi`'
-# __git_ps1 " (%s)"
-# Git Status
+
+# Git Branch, wenn es sich um ein Git Verzeichnis handelt
 PS1+=""'$(__git_ps1 " (%s)")'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
