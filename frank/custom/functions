@@ -25,36 +25,6 @@ build(){
     fi
 }
 
-
-ssh_intern(){ #Baut eine SSH-Verbindung zu einem Kollegen auf, egal ob er im Homeoffice ist oder nicht
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Host angegeben\e[0m"             && return 1
-    [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m"   && return 1
-
-    wikipage="https://wiki.abm-local.de/pages/viewpage.action?pageId=29361074"
-    [[ "$1" =~ ^(o|-o|--o)$ ]] && xdg-open $wikipage && return 0
-
-    cd /tmp/
-    hostname="$1"
-    ssh -o ConnectTimeout=2 "$hostname" 2>.error_withoutvpn
-    ssh -o ConnectTimeout=2 "$hostname"".vpn.abm-local.de" 2>.error_withvpn
-
-    connection_without_vpn=$([[ -f .error_withoutvpn ]] && cat .error_withoutvpn && rm .error_withoutvpn)
-       connection_with_vpn=$([[ -f .error_withvpn ]]    && cat .error_withvpn    && rm .error_withvpn)
-
-    cd - >/dev/null
-
-    if [[ $connection_with_vpn == *"(publickey)"* || $connection_without_vpn == *"(publickey)"* ]]; then
-        echo -e "\e[31mDer Host \"$hostname\" akzeptiert den Public Key nicht!" && return 1
-    fi
-
-    if [[ $connection_with_vpn =~ (Connection closed by remote host|Connection timed out) ]]; then
-        if [[ $connection_without_vpn =~ (Connection closed by remote host|Connection timed out) ]]; then
-            echo -e "\e[31mDer Host \"$hostname\" ist nicht erreichbar!" && return 1
-        fi
-    fi
-    return 0
-}
-
 upload(){
     if [[ -z ${1} ]]; then
         sftp abm@packages.abm-local.de:/incoming
