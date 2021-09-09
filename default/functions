@@ -1,23 +1,5 @@
 #!/bin/bash
 
-cl(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Pfad angegeben\e[0m"           && return 1
-    [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-    cd "${1}"
-    ls
-}
-
-diffcommit(){ #Zeigt Änderungen eines Git Commits an
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Commit Hash angegeben\e[0m"    && return 1
-    [ $# -gt 1 ]  && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-    if [[ "$(git status 2>&1)" =~ (Kein Git-Repo|not a git repository) ]]; then
-        echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
-        return 1
-    fi
-    git diff ${1}~ ${1}
-}
-
-
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
     [[ ${1} == "." ]] && files=$(find . -type f -not -path "*/\.git/*") || files="$@"
@@ -268,14 +250,6 @@ search_file(){
         shift
         find "$@" -iname "*$suchbegriff*" | grep -i "$suchbegriff" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
-}
-
-search_help(){
-    echo -e "\e[96mFunktion\t\tBeschreibung\e[0m\n"
-    echo -e "search_string\t\tSucht rekursiv nach einem gegebenen String im aktuellen Verzeichnis\n\t\t\t    oder in einem als zweites Argument übergebenen gegeben Verzeichnis"
-    echo -e "search_file\t\tSucht rekursiv nach einer Datei mit dem gegebenen Namen im aktuellen Verzeichnis\n\t\t\t    oder in einem als zweites Argument übergebenen gegeben Verzeichnis"
-    [[ $(hostname) == "openhab" ]] && echo -e "search_log\t\tSucht nach einem gegebenen String in den Logs"
-    echo -e "search_help\t\tZeigt diese Hilfe an"
 }
 
 stopwatch(){
