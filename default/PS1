@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Zeitstempel in der Bashhistory anzeigen
-HISTTIMEFORMAT="%F %T "
-
 
 ########### Farben ###########
 GRAU="\[\e[1;30m\]"
@@ -37,7 +34,18 @@ fi`'
 PS1+="$GRAU]-[$DEFAULT"
 
 # User und Hostname
-PS1+="$GRUEN\u$PINK@$GRUEN\H"
+PS1+="$GRUEN\u$PINK@"
+
+# PS1+='`if [[ -z $SSH_CLIENT || ( [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* ]] && [[ $(hostname) == "openhab" ]] ) ]]; then\
+PS1+='`if [[ -z $SSH_CLIENT ]]; then\
+    echo "\[\e[32m\]";\
+elif [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* ]] && [[ $(hostname) == "openhab" ]]; then\
+    echo "\[\e[32m\]";\
+else\
+    echo "\[\e[31m\]";\
+fi`'
+
+PS1+="\H"
 
 # ]-[
 PS1+="$GRAU]-[$DEFAULT"
