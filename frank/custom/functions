@@ -2,7 +2,7 @@
 
 battery(){
     echo -ne "Status:\e[96;1m"
-    acpi | grep "Battery 0" | cut -d ":" -f2-
+    acpi | grep "Battery 0" | cut -d ":" -f2- | sed 's/, rate information unavailable//'
     echo -ne "\e[0m"
 }
 
