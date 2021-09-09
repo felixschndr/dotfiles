@@ -377,6 +377,9 @@ pull(){
     # &
     # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
     while read -r line; do
+        ((linecounter++))
+        echo -ne "Log wird geparsed ($linecounter/$amount)\r"
+
         local newline
         if [[ $line == *changed* ]]; then
             newline=$(echo $line | cut -d " " -f2-)
@@ -386,7 +389,6 @@ pull(){
         fi
         sed -i "s/$line/$newline/" /tmp/.statsofcommits
 
-        ((linecounter++))
         local files_changed=$(echo $newline | grep -Eo '[0-9]+' | head -1)
         local insertions=0
         [[ $newline == *"insertion"* ]] && insertions=$(echo $newline | grep -Eo '[0-9]+' | sed -n 2p)
@@ -398,6 +400,7 @@ pull(){
         [[ $deletions     -gt $max_deletions     ]] && max_deletions=$deletions
     done < /tmp/.statsofcommits
 
+    echo -ne "                                               \r" #"Log wird geparsed" überschreiben
 
     local len_of_max_files_changed=$(echo $max_files_changed | wc -c)
     local len_of_max_insertions=$(echo $max_insertions | wc -c)
