@@ -10,7 +10,7 @@ alias diff='diff_function'
 check_if_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
     git_status=$(git status 2>&1)
-    if [[ "$git_status" == *"Kein Git-Repo"* || "$git_status" == *"not a git repository"* ]]; then
+    if [[ "$git_status" =~ (Kein Git-Repo|not a git repository) ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
         return 1
     fi
