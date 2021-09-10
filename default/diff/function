@@ -286,8 +286,6 @@ push(){
             if [[ $commit_type == "skip"* ]]; then
                 echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
                 continue
-            elif [[ $commit_type == "{INITIAL}"* ]]; then #Bei INITIAL Standardnachricht verwenden
-                git commit $git_signature_argument --amend -s -m "$commit_type Add $(basename $file) to repository"
             else
                 echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
                 read -e answer
