@@ -39,7 +39,7 @@ PS1+="$GRUEN\u$PINK@"
 # Farbe für den Hostnamen generieren (|| hat nicht funktioniert, deswegen elif)
 PS1+='`if [[ -z $SSH_CLIENT ]]; then\
     echo "\[\e[32m\]";\
-elif [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* ]] && [[ $(hostname) == "openhab" ]]; then\
+elif [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* && $SSH_CLIENT != "192.168.178.28"* ]] && [[ $(hostname) == "openhab" ]]; then\
     echo "\[\e[32m\]";\
 else\
     echo "\[\e[31m\]";\
