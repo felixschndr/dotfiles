@@ -55,7 +55,7 @@ PS1+="$GRAU]-[$DEFAULT"
 PS1+="$CYAN"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"$DEFAULT"
 
 # Git Farbe
-PS1+='`if [[ "$(svn info 2>&1)" != *"E155007:"* ]]; then\
+PS1+='`if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
     echo "\[\e[32m\] (svn)";\
 elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
