@@ -6,6 +6,7 @@ alias evince='evince 2>/dev/null'
 alias dolphin='dolphin 2>/dev/null'
 alias c='code .'
 alias cu='update-customers-git'
+alias cronus_connect='sshfs fschneider@cronus:/home/fschneider/repos/ cronus/ 2>/dev/null && cd /home/fschneider/cronus/ && code .'
 
 
 export PAGER="most" #Für farbige manpages
