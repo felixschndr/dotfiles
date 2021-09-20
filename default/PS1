@@ -59,6 +59,8 @@ PS1+='`if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
     echo "\[\e[32m\] (svn)";\
 elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
+elif [[ -n $(git --no-pager log origin/master..HEAD --pretty="%h" 2>/dev/null) ]]; then\
+    echo "\[\e[31m\]";\
 else\
     echo "\[\e[32m\]";\
 fi`'
