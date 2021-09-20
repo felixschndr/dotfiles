@@ -38,7 +38,7 @@ ask_for_commit_type(){
     "\n    5. DOCS\t\t\e[2mUpdate der Dokumentation\e[0m" \
     "\n    6. STYLE\t\t\e[2mÄnderung an der Ausgabe oder dem Erscheinungsbild\e[0m" \
     "\n    7. REFACTOR\t\t\e[2mUmschreiben von Code ohne neue Features\e[0m" \
-    "\n    8. TYPO\t\t\e[2mBeheben von Rechtschreibfehler\e[0m" \
+    "\n    8. TYPO\t\t\e[2mBeheben von Rechtschreibfehlern\e[0m" \
     "\n    9. OTHER\t\t\e[2mAlles andere\e[0m\n"
 
     read -e commit_type_input
