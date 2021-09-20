@@ -303,7 +303,7 @@ push(){
                 git commit $git_signature_argument --amend -s -m "$commit_type $answer"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
-            git log origin/$branch.. --pretty="%s" | awk '!x[$0]++' | nl
+            git --no-pager log origin/master..HEAD --pretty="| %h | %s" --reverse | nl
 
         elif [[ $answer =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
             local commit_message=$(git log -n 1 --pretty="%s")
@@ -503,16 +503,16 @@ diff_function(){
         case $(echo $files | wc -w ) in
             0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
                 echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
-                amount=$(git log origin/$branch.. --pretty="%h" | wc -l) #Zählt ungepushte Commits
+                amount=$(git --no-pager log origin/master..HEAD --pretty="%h" | wc -l) #Zählt ungepushte Commits
                 if [[ $amount == 0 ]]; then
                     return
                 fi
                 echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
                 if [[ $amount == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
-                    git --no-pager log origin/$branch.. --pretty="    %h | %s"
+                    git --no-pager log origin/master..HEAD --pretty="    %h | %s"
                 else
-                    number_of_duplicates=$(( $amount - $(git log origin/$branch.. --pretty="%s"| awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                    number_of_duplicates=$(( $amount - $(git --no-pager log origin/master..HEAD --pretty="%s"| awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
                     if [[ $number_of_duplicates == 0 ]]; then
                         echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     elif [[ $number_of_duplicates == 1 ]]; then
@@ -520,7 +520,7 @@ diff_function(){
                     else
                         echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     fi
-                    git --no-pager log origin/$branch.. --pretty="| %h | %s" --reverse | nl
+                    git --no-pager log origin/master..HEAD --pretty="| %h | %s" --reverse | nl
                 fi
                 push
                 return;;
@@ -555,12 +555,12 @@ diff_function(){
     if [[ "$git_status" =~ (Commit vor |Commits vor| ahead) || $changed = true ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
-        if [[ $(git log origin/$branch.. --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
+        if [[ $(git --no-pager log origin/master..HEAD --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m"
-            git --no-pager log origin/$branch.. --pretty="    %h | %s"
+            git --no-pager log origin/master..HEAD --pretty="    %h | %s"
         else
             echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
-            git --no-pager log origin/$branch.. --pretty="| %h | %s" --reverse | nl
+            git --no-pager log origin/master..HEAD --pretty="| %h | %s" --reverse | nl
         fi
         push
     fi
