@@ -22,7 +22,7 @@ check_for_unmanaged_files(){
     if [[ "$git_status" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         unmanaged_files=true
-        read -e answer
+        read -e -n1 answer
         [[ $answer =~ ^[YyJj]$ ]] && return 1
     fi
     return 0
@@ -194,7 +194,7 @@ commit_files(){
 
         elif [[ $commit_message =~ ^[Cc]$ ]]; then #Checkout HEAD
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
-            read -e answer
+            read -e -n1 answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
                 git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
@@ -430,7 +430,7 @@ pull(){
 
     rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor,.mergestats}
 
-    read -e answer
+    read -e -n1 answer
 
     if [[ ! $answer =~ ^[YyJj]$ ]]; then
         echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"

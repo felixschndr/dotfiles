@@ -19,7 +19,7 @@ build(){
     sudo dpkg -i $deb_package
     echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$(($end_time - $start_time)) +%M:%S) gedauert"
     echo -e "Soll das Paket hochgeladen werden?\e[0m"
-    read -e answer
+    read -e -n1 answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
        upload "$deb_package"
     fi

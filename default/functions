@@ -187,7 +187,7 @@ sa(){
     [[ $(command -v code) != "" ]] && code $filename || nano +8 $filename
 
     echo -e "\e[32mSoll das Script ausgeführt werden?\e[0m"
-    read -e answer
+    read -e -n1 answer
     if [[ $answer =~ ^[YyJj]$ ]]; then
         if [[ -f $filename ]]; then
             echo -e "\e[1;96m"; center "$filename"; echo -e "\n\e[0m"
@@ -218,7 +218,7 @@ search_file(){
     if [[ $# == 1 ]]; then
         if [[ -n $(find . -maxdepth 1 -type d -iname "customers") && $(hostname) == "frank" ]]; then #Ausnahme für frank
             echo -e "\e[33mSoll auch im customers-Ordner gesucht werden?\e[0m"
-            read -e answer
+            read -e -n1 answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
             else
@@ -266,7 +266,7 @@ to_lf(){
         files=$(find . -type f -not -path "*/\.git/*" | xargs file | grep "CRLF" | cut -d " " -f1 | cut -d ":" -f1)
         [[ -z $files ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
         echo -e "\e[96mSollen die folgenden Dateien zu LF konvertiert werden?\e[0m\n$(echo $files | sed 's/ /\n/g' | nl)\n"
-        read -e answer
+        read -e -n1 answer
         [[ ! $answer =~ (Y|y|J|j) ]] && return
     else
         files=$@
@@ -304,7 +304,7 @@ which(){
     if [[ ( ! $isFunction == *"ist eine Funktion"* ) && -n $filelocation ]]; then
         if [[ $(file -L  $filelocation) =~ (ASCII|script) ]]; then
             echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
-            read -e answer
+            read -e -n1 answer
             if [[ $answer =~ ^[YyJj]$ ]]; then
                 less $filelocation
             fi
