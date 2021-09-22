@@ -19,4 +19,6 @@ alias tmux='tmux -u' #Setzt encoding für ö,ü und ä
 alias df="df -h"
 alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 
+alias time="stopwatch"
+
 log_auth="/var/log/auth.log"
