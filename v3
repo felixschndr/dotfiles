@@ -12,7 +12,6 @@ fi
 readarray -t commitauthor      <<< $(git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z)
 readarray -t statsofcommits    <<< $(git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
 readarray -t messagesofcommits <<< $(git --no-pager log -n $commitcount --reverse --pretty=" %s")
-exit
 
 linecounter=0
 max_files_changed=0
