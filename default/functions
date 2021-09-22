@@ -166,7 +166,7 @@ repeat(){
         [ "${#heading}" -ge "$(tput cols)" ] && heading="   $(date +%T)   |   Durchlauf: $counter   |   Alle $(echo $sleeptime | sed 's/\./,/')s   "
         echo -e "\n\e[96;1m"; center "$heading"; echo -e "\e[0m"
 
-        bash -c "${1}"
+        eval "${1}"
         read -t $sleeptime
     done
 }
@@ -238,7 +238,7 @@ stopwatch(){
     [ $# -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
     local argumente="$(echo $@ | sed 's/"/\\"/g')"
     local start=$(date +%s,%N)
-    bash -c "$argumente"
+    eval "$argumente"
     local end=$(date +%s,%N)
     local _s1=$(echo $start | cut -d',' -f1); local _s2=$(echo $start | cut -d',' -f2)
     local _e1=$(echo $end | cut -d',' -f1);   local _e2=$(echo $end | cut -d',' -f2)
