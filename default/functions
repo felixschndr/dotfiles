@@ -42,16 +42,15 @@ git_log(){
 
     [[ ${1} =~ ^[0-9]{1,}$ ]] && commitcount=${1}
 
-    if [[ $commitcount == 1 ]]; then
-        git --no-pager log -n $commitcount --reverse --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" > /tmp/.hashandtime
-    else
-        git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl > /tmp/.hashandtime
-    fi
-    git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
-    git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
-    git --no-pager log -n $commitcount --reverse --pretty=" %s" > /tmp/.messagesofcommits
-
     IFS=$'\n'
+    if [[ $commitcount == 1 ]]; then
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n $commitcount --reverse --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
+    else
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
+    fi
+    read -d $'\0' -a commitauthor      <<< $(git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z)
+    read -d $'\0' -a statsofcommits    <<< $(git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
+    read -d $'\0' -a messagesofcommits <<< $(git --no-pager log -n $commitcount --reverse --pretty=" %s")
 
     local linecounter=0
     local max_files_changed=0
@@ -62,10 +61,7 @@ git_log(){
     # "files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
     # &
     # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
-    while read -r line; do
-        ((linecounter++))
-        echo -ne "Log wird geparsed ($linecounter/$commitcount)\r"
-
+    for line in "${statsofcommits[@]}"; do
         local newline
         if [[ $line == *changed* ]]; then
             newline=$(echo $line | cut -d " " -f2-)
@@ -73,7 +69,6 @@ git_log(){
             local hash=$(echo $line | sed 's/§//')
             newline="$(git diff $hash^ $hash --stat | grep "changed,")"
         fi
-        sed -i "s/$line/$newline/" /tmp/.statsofcommits
 
         local files_changed=$(echo $newline | grep -Eo '[0-9]+' | head -1)
         local insertions=0
@@ -81,38 +76,39 @@ git_log(){
         local deletions=0
         [[ $newline == *"deletion"* ]] && deletions=$(echo $newline | grep -Eo '[0-9]+' | tail -1)
 
+        statsofcommits[$linecounter]="$files_changed $insertions $deletions"
+
         [[ $files_changed -gt $max_files_changed ]] && max_files_changed=$files_changed
         [[ $insertions    -gt $max_insertions    ]] && max_insertions=$insertions
         [[ $deletions     -gt $max_deletions     ]] && max_deletions=$deletions
-    done < /tmp/.statsofcommits
+        ((linecounter++))
+        echo -ne "Log wird geparsed ($linecounter/$commitcount)\r"
+    done
 
     echo -ne "                                               \r" #"Log wird geparsed" überschreiben
 
     local len_of_max_files_changed=$(echo $max_files_changed | wc -c)
-    local len_of_max_insertions=$(echo $max_insertions | wc -c)
-    local len_of_max_deletions=$(echo $max_deletions | wc -c)
+       local len_of_max_insertions=$(echo $max_insertions    | wc -c)
+        local len_of_max_deletions=$(echo $max_deletions     | wc -c)
 
-    ((len_of_max_files_changed--)) #wc -w is +1, aber nur bei der Variablen abziehen, da die anderen noch "+"/"-" haben
+    ((len_of_max_files_changed--)) #wc -w is +1, aber nur bei len_of_max_files_changed 1 abziehen, da die anderen noch "+" & "-" haben
 
     linecounter=0
-    cat /tmp/.hashandtime | while read -r line; do #Ausgabe der ganzen Infos
-        ((linecounter++))
-        local commitauthor=$(sed -n ${linecounter}p /tmp/.commitauthor)
+    for line in "${hashandtime[@]}"; do #Ausgabe der ganzen Infos
         echo -n $line
-        [[ $repo == "abm" ]] && echo -n "$commitauthor | "
-        local statsline=$(sed -n ${linecounter}p /tmp/.statsofcommits)
-        local files_changed=$(echo $statsline | grep -Eo '[0-9]+' | head -1)
-        local insertions=0
-        [[ $statsline == *"insertion"* ]] && insertions=$(echo $statsline | grep -Eo '[0-9]+' | sed -n 2p)
-        local deletions=0
-        [[ $statsline == *"deletion"* ]] && deletions=$(echo $statsline | grep -Eo '[0-9]+' | tail -1)
-        printf "%${len_of_max_files_changed}s" "$files_changed"
+        [[ $repo == "abm" ]] && echo -n "${commitauthor[$linecounter]} | "
+        local statsline=${statsofcommits[$linecounter]}
+
+        local files_changed=$(echo $statsline | cut -d " " -f1)
+           local insertions=$(echo $statsline | cut -d " " -f2)
+            local deletions=$(echo $statsline | cut -d " " -f3)
+
+        printf " %${len_of_max_files_changed}s" "$files_changed"
         printf " (\e[32m%${len_of_max_insertions}s\e[0m" "+$insertions"
         printf " \e[31m%${len_of_max_deletions}s\e[0m)" "-$deletions"
-        echo -e " |"$(sed -n ${linecounter}p /tmp/.messagesofcommits)
+        echo -e " | ""$(echo ${messagesofcommits[$linecounter]})"
+        ((linecounter++))
     done
-
-    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor,.mergestats}
 
     while true; do
         echo -e "\n\e[96;1m"
@@ -153,6 +149,17 @@ git_url(){
     echo -e "Repository URL: \e[96m$url\e[0m"
     [[ $branch =~ (master|main) ]] || echo -e "Branch URL: \e[96m$open_url\e[0m"
     [[ $session_typ != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "$open_url"
+}
+
+printarray(){
+    echo -e "\e[96;1m"; center "Ohne Index"; echo -e "\e[0m"
+    for i in "${!foo[@]}"; do
+        printf "%s\n" "${foo[$i]}"
+    done
+    echo -e "\n\e[96;1m"; center "Mit Index"; echo -e "\e[0m"
+    for i in "${!foo[@]}"; do
+        printf "%s\t%s\n" "$i" "${foo[$i]}"
+    done
 }
 
 repeat(){
