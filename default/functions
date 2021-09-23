@@ -152,6 +152,8 @@ git_url(){
 }
 
 printarray(){
+    [[ -n ${1} ]]        && echo -e "\e[33mAchtung das array muss \"foo\" heißen!" && return 1
+    [ ${#foo[@]} -eq 0 ] && echo -e "\e[31mDas Array \"foo\"ist leer!"             && return 1
     echo -e "\e[96;1m"; center "Ohne Index"; echo -e "\e[0m"
     for i in "${!foo[@]}"; do
         printf "%s\n" "${foo[$i]}"
