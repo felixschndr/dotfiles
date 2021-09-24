@@ -21,4 +21,6 @@ alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 
 alias time="stopwatch"
 
+[[ -n $(command -v code) ]] && alias c='code .'
+
 log_auth="/var/log/auth.log"
