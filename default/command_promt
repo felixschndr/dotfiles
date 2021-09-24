@@ -14,3 +14,5 @@ export HISTTIMEFORMAT="%d.%m. %H:%M:%S - " #Format der History anpassen
 export HISTSIZE=10000 #Kommandos, die im Memory gespeichert bleiben
 export HISTFILESIZE=30000 #Kommandos, die in .bash_history gespeichert bleiben
 shopt -s histappend #Kommandos werden an die History angehängt statt die History zu überschreiben
+
+export LANG=de_DE.UTF-8
