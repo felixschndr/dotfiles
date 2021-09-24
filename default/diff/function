@@ -4,7 +4,10 @@
 alias diff='diff_function'
 
 
-[[ $(ls /home/fschneider/.gnupg/openpgp-revocs.d/*.rev 2>/dev/null) ]] && git_signature_argument=" -S "
+[[ $(ls /home/fschneider/.gnupg/openpgp-revocs.d/*.rev 2>/dev/null) ]] && git_signature_argument=" -S " || git_signature_argument=""
+
+export use_git_signoff=true
+[[ $use_git_signoff = true ]] && git_signoff_argument=" -s " || git_signoff_argument=""
 
 
 check_if_repo_exists(){
@@ -168,7 +171,7 @@ commit_files(){
         elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
             if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja, benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
-                git commit $git_signature_argument -s "$file" -m "${commit_messages[commit_message]}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+                git commit $git_signature_argument $git_signoff_argument "$file" -m "${commit_messages[commit_message]}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
                 last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
@@ -187,8 +190,8 @@ commit_files(){
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-            echo "git commit $git_signature_argument -a -s -m \"$commit_type $answer\""
-            git commit $git_signature_argument -a -s -m "$commit_type $answer"
+            echo "git commit $git_signature_argument -a $git_signoff_argument -m \"$commit_type $answer\""
+            git commit $git_signature_argument -a $git_signoff_argument -m "$commit_type $answer"
             changed=true
             break 2
 
@@ -212,7 +215,7 @@ commit_files(){
                 continue
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
-            git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            git commit $git_signature_argument $git_signoff_argument "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
         elif [[ $commit_message =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
             echo -e "\e[31mStop\e[0m"
@@ -231,7 +234,7 @@ commit_files(){
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[${#commit_messages[@]}]="$commit_type $answer" #Die neue Nachricht überschreibt die alte
             last_commit_message="$commit_type""$commit_message"
-            git commit $git_signature_argument --amend -s -m "$last_commit_message"
+            git commit $git_signature_argument --amend $git_signoff_argument -m "$last_commit_message"
             return 1
 
         elif [[ $commit_message =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
@@ -252,8 +255,8 @@ commit_files(){
             commit_message="${commit_message^}" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type $commit_message" #Den aktuellen Commit ins Array packen
             last_commit_message="$commit_type $commit_message"
-            echo "git commit $git_signature_argument -s "$file" -m \"$last_commit_message\""
-	        git commit $git_signature_argument -s "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            echo "git commit $git_signature_argument $git_signoff_argument "$file" -m \"$last_commit_message\""
+	        git commit $git_signature_argument $git_signoff_argument "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
 
@@ -300,7 +303,7 @@ push(){
                     answer="Add $(basename $file) to repository"
                 fi
                 answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-                git commit $git_signature_argument --amend -s -m "$commit_type $answer"
+                git commit $git_signature_argument --amend $git_signoff_argument -m "$commit_type $answer"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
             git --no-pager log origin/master..HEAD --pretty="| %h | %s" --reverse | nl
