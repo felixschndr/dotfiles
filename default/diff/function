@@ -344,7 +344,7 @@ push(){
 
 pull(){
     #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
-    [[ $1 == "force" ]] && git remote update >/dev/null 2>/dev/null #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
+    [[ $1 == "force" ]] && git fetch >/dev/null 2>/dev/null #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
     git_status=$(git status 2>&1)
 
     if [[ ! "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
@@ -353,82 +353,14 @@ pull(){
     fi
 
     amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
-    [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
     if [[ $amount == 1 ]]; then
         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
-        git --no-pager log ..origin/$branch --pretty="    %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" > /tmp/.hashandtime
-
     else
         echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
-        git --no-pager log ..origin/$branch --pretty="| %cd | %h | " --date=format:"%d.%m. | %H:%M:%S" --reverse | nl > /tmp/.hashandtime
     fi
-    git --no-pager log ..origin/$branch --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z > /tmp/.commitauthor
-    git --no-pager log ..origin/$branch --reverse --pretty="%h§" -n $amount --shortstat | sed -z 's/§\n\n//g' > /tmp/.statsofcommits
-    git --no-pager log ..origin/$branch --pretty=" %s" --reverse > /tmp/.messagesofcommits
 
-    IFS=$'\n'
-
-    local linecounter=0
-    local max_files_changed=0
-    local max_insertions=0
-    local max_deletions=0
-
-    # Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
-    # "files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
-    # &
-    # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
-    while read -r line; do
-        ((linecounter++))
-        echo -ne "Log wird geparsed ($linecounter/$amount)\r"
-
-        local newline
-        if [[ $line == *changed* ]]; then
-            newline=$(echo $line | cut -d " " -f2-)
-        else
-            local hash=$(echo $line | sed 's/§//')
-            newline="$(git diff $hash^ $hash --stat | grep "changed,")"
-        fi
-        sed -i "s/$line/$newline/" /tmp/.statsofcommits
-
-        local files_changed=$(echo $newline | grep -Eo '[0-9]+' | head -1)
-        local insertions=0
-        [[ $newline == *"insertion"* ]] && insertions=$(echo $newline | grep -Eo '[0-9]+' | sed -n 2p)
-        local deletions=0
-        [[ $newline == *"deletion"* ]] && deletions=$(echo $newline | grep -Eo '[0-9]+' | tail -1)
-
-        [[ $files_changed -gt $max_files_changed ]] && max_files_changed=$files_changed
-        [[ $insertions    -gt $max_insertions    ]] && max_insertions=$insertions
-        [[ $deletions     -gt $max_deletions     ]] && max_deletions=$deletions
-    done < /tmp/.statsofcommits
-
-    echo -ne "                                               \r" #"Log wird geparsed" überschreiben
-
-    local len_of_max_files_changed=$(echo $max_files_changed | wc -c)
-    local len_of_max_insertions=$(echo $max_insertions | wc -c)
-    local len_of_max_deletions=$(echo $max_deletions | wc -c)
-
-    ((len_of_max_files_changed--)) #wc -w is +1, aber nur bei der Variablen abziehen, da die anderen noch "+"/"-" haben
-
-    linecounter=0
-    cat /tmp/.hashandtime | while read -r line; do #Ausgabe der ganzen Infos
-        ((linecounter++))
-        local commitauthor=$(sed -n ${linecounter}p /tmp/.commitauthor)
-        echo -n $line
-        [[ $repo == "abm" ]] && echo -n "$commitauthor | "
-        local statsline=$(sed -n ${linecounter}p /tmp/.statsofcommits)
-        local files_changed=$(echo $statsline | grep -Eo '[0-9]+' | head -1)
-        local insertions=0
-        [[ $statsline == *"insertion"* ]] && insertions=$(echo $statsline | grep -Eo '[0-9]+' | sed -n 2p)
-        local deletions=0
-        [[ $statsline == *"deletion"* ]] && deletions=$(echo $statsline | grep -Eo '[0-9]+' | tail -1)
-        printf "%${len_of_max_files_changed}s" "$files_changed"
-        printf " (\e[32m%${len_of_max_insertions}s\e[0m" "+$insertions"
-        printf " \e[31m%${len_of_max_deletions}s\e[0m)" "-$deletions"
-        echo -e " |"$(sed -n ${linecounter}p /tmp/.messagesofcommits)
-    done
-
-    rm -f /tmp/{.hashandtime,.statsofcommits,.messagesofcommits,.commitauthor,.mergestats}
+    git_log "$amount" "..origin/$branch"
 
     read -e -n1 answer
 

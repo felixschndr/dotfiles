@@ -38,19 +38,21 @@ git_log(){
 
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
-    local commitcount=30
+    local commitcount="-n30"
+    local diff=""
 
-    [[ ${1} =~ ^[0-9]{1,}$ ]] && commitcount=${1}
+    [[ -n ${1} ]] && commitcount="-n${1}"
+    [[ -n ${2} ]] && diff="${2}"
 
     IFS=$'\n'
-    if [[ $commitcount == 1 ]]; then
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n $commitcount --reverse --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
+    if [[ $commitcount == "-n1" ]]; then
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log $commitcount --reverse $diff --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
     else
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n $commitcount --reverse --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log $commitcount --reverse $diff --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
     fi
-    read -d $'\0' -a commitauthor      <<< $(git --no-pager log -n $commitcount --reverse --pretty="%ae" | cut -c -2 | tr a-z A-Z)
-    read -d $'\0' -a statsofcommits    <<< $(git --no-pager log -n $commitcount --reverse --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
-    read -d $'\0' -a messagesofcommits <<< $(git --no-pager log -n $commitcount --reverse --pretty=" %s")
+    read -d $'\0' -a commitauthor      <<< $(git --no-pager log $commitcount --reverse $diff --pretty="%ae" | cut -c -2 | tr a-z A-Z)
+    read -d $'\0' -a statsofcommits    <<< $(git --no-pager log $commitcount --reverse $diff --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
+    read -d $'\0' -a messagesofcommits <<< $(git --no-pager log $commitcount --reverse $diff --pretty=" %s")
 
     local linecounter=0
     local max_files_changed=0
@@ -103,12 +105,14 @@ git_log(){
            local insertions=$(echo $statsline | cut -d " " -f2)
             local deletions=$(echo $statsline | cut -d " " -f3)
 
-        printf " %${len_of_max_files_changed}s" "$files_changed"
+        printf "%${len_of_max_files_changed}s" "$files_changed"
         printf " (\e[32m%${len_of_max_insertions}s\e[0m" "+$insertions"
         printf " \e[31m%${len_of_max_deletions}s\e[0m)" "-$deletions"
-        echo -e " | ""$(echo ${messagesofcommits[$linecounter]})"
+        echo -e " |""$(echo ${messagesofcommits[$linecounter]})"
         ((linecounter++))
     done
+
+    [[ -n $diff ]] && return
 
     while true; do
         echo -e "\n\e[96;1m"
