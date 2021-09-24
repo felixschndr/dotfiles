@@ -4,7 +4,8 @@
 alias diff='diff_function'
 
 
-[[ $(ls /home/fschneider/.gnupg/openpgp-revocs.d/*.rev 2>/dev/null) ]] && git_signature_argument=" -S " || git_signature_argument=""
+#[[ $(ls /home/fschneider/.gnupg/openpgp-revocs.d/*.rev 2>/dev/null) ]] && git_signature_argument=" -S " || git_signature_argument=""
+git_signature_argument=" -S "
 
 export use_git_signoff=true
 [[ $use_git_signoff = true ]] && git_signoff_argument=" -s " || git_signoff_argument=""
@@ -298,7 +299,7 @@ push(){
     #Hier geht es drum alle Änderungen zu pushen
     pushed=false
     while [ $pushed == "false" ]; do
-        read -e answer
+        read -e -n1 answer
         echo ""
         if [[ $answer =~ ^[Uu]$ ]]; then
             ask_for_commit_type
