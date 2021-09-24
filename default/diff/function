@@ -46,7 +46,22 @@ ask_for_commit_type(){
 
     read -e commit_type_input
     local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
-    [[ -z $commit_type_input ]] && echo "skip" > /tmp/.diffcommit && return #Bei leerem Typ file skippen
+    if [[ -z $commit_type_input ]]; then #Bei leerem Typ file skippen
+        echo "skip" > /tmp/.diffcommit
+        return
+    elif [[ $commit_type_input =~ [Cc] ]]; then #Checkout HEAD
+        echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
+        read -e -n1 answer
+        if [[ $answer =~ ^[YyJj]$ ]]; then
+            echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
+            git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
+            [[ $(file $file) == *"CRLF"* ]] && echo && to_lf "$file"
+        else
+            echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
+        fi
+        echo "checkout" > /tmp/.diffcommit
+        return
+    fi
     local amount_of_commit_types=$(echo $commit_type_input | wc -w)
     local commit_type_counter=0
     local commit_type="{"
@@ -137,6 +152,9 @@ commit_files(){
 
         if [[ $commit_type == "skip"* ]]; then
             echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
+            ((file_counter ++))
+            continue
+        elif [[ $commit_type == "checkout"* ]]; then
             ((file_counter ++))
             continue
         fi
@@ -289,13 +307,12 @@ push(){
             if [[ $commit_type == "skip"* ]]; then
                 echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
                 continue
+            elif [[ $commit_type == "checkout"* ]]; then
+                continue
             else
                 echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
                 read -e answer
-                if [[ $answer =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
-                    echo -e "\e[31mStop\e[0m"
-                    continue
-                elif [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+                if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                     echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                     continue
                 fi
