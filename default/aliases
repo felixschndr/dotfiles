@@ -18,9 +18,9 @@ alias tf='tail -f -n 1000'
 alias tmux='tmux -u' #Setzt encoding für ö,ü und ä
 alias df="df -h"
 alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
-
 alias time="stopwatch"
 
 [[ -n $(command -v code) ]] && alias c='code .'
+             [[ -n $TMUX ]] && alias help='tmux_help'
 
 log_auth="/var/log/auth.log"
