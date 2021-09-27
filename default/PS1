@@ -39,7 +39,7 @@ PS1+="$GRUEN\u$PINK@"
 # Farbe für den Hostnamen generieren (|| hat nicht funktioniert, deswegen elif)
 PS1+='`if [[ -z $SSH_CLIENT ]]; then\
     echo "\[\e[32m\]";\
-elif [[ $SSH_CLIENT == "192.168.178."* ]] && [[ $SSH_CLIENT != "192.168.178.30"* && $SSH_CLIENT != "192.168.178.28"* ]] && [[ $(hostname) == "openhab" ]]; then\
+elif [[ $SSH_CLIENT == "192.168.178."* && $SSH_CLIENT != "192.168.178.30"* && $SSH_CLIENT != "192.168.178.28"* && $(hostname) == "openhab" ]]; then\
     echo "\[\e[32m\]";\
 else\
     echo "\[\e[31m\]";\
@@ -59,7 +59,7 @@ PS1+='`if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
     echo "\[\e[32m\] (svn)";\
 elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead|vor|behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
     echo "\[\e[31m\]";\
-elif [[ -n $(git --no-pager log origin/master..HEAD --pretty="%h" 2>/dev/null) ]]; then\
+elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then\
     echo "\[\e[31m\]";\
 else\
     echo "\[\e[32m\]";\
