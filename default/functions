@@ -44,6 +44,10 @@ git_log(){
     [[ -n ${1} ]] && commitcount="${1}"
     [[ -n ${2} ]] && diff="${2}"
 
+    local totalcommits=$(git rev-list --count HEAD)
+
+    [ $totalcommits -lt $commitcount ] && commitcount=$totalcommits
+
     IFS=$'\n'
     if [[ $commitcount == 1 ]]; then
         read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n$commitcount --reverse $diff --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
