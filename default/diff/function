@@ -168,7 +168,7 @@ commit_files(){
         [[ $? == 1 ]] && return
         commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
         [[ $? == 1 ]] && return
-        [[ -n $commit_type ]] && echo "test" && commit_type+=" "
+        [[ -n $commit_type ]] && commit_type+=" "
 
 
         if [[ $commit_type == "skip"* ]]; then
@@ -190,11 +190,10 @@ commit_files(){
         done
         echo -e "\nAlternativ kann auch folgendes angegeben werden:"
         [[ $(echo $files | wc -w) != 1 || $unmanaged_files == true ]] && echo -e "    - A    Alle Dateien committen"
-        echo -e "    - C    Die lokalen Änderungen verwerfen"\
-        "\n    - L    Die letzte Commitnachricht verwenden"
-        [[ $changed == "true" ]] && echo -e "    - R    Letzten Commit rückgängig machen"
-        echo -e "    - S    Stop"
-        [[ $changed == "true" ]] && echo -e "    - U    Letzte Comitnachricht umbenennen"
+        echo -e "    - C    Die lokalen Änderungen verwerfen"
+        [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    - L    Die letzte Commitnachricht verwenden"
+        [[ $changed == "true" ]] && \
+        echo -e "    - R    Letzten Commit rückgängig machen\n    - U    Letzte Comitnachricht umbenennen"
         read -e commit_message
 
 
@@ -221,15 +220,13 @@ commit_files(){
         elif [[ $commit_message =~ ^[Aa]$ ]]; then #Alle Files committen
             echo -e "\n\e[96mWie soll die Commtnachricht für alle Dateien heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
-            if [[ $answer =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
-                echo -e "\e[31mStop\e[0m"
-                return 1
-            elif [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+            if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
             echo "git commit $git_signature_arguments -a -m \"${commit_type}${answer}\""
+            git add .
             git commit $git_signature_arguments -a -m "${commit_type}${answer}"
             changed=true
             break 2
@@ -256,17 +253,10 @@ commit_files(){
             echo "Die letzte Commit-Nachricht wird verwendet"
             git commit $git_signature_arguments "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
-        elif [[ $commit_message =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
-            echo -e "\e[31mStop\e[0m"
-            return 1
-
         elif [[ $commit_message =~ ^[Uu]$ ]]; then #Letze Commitnachricht umbenennen
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
-            if [[ $answer =~ ^[Ss]$ ]]; then #Stop(Abbrechen)
-                echo -e "\e[31mStop\e[0m"
-                return 1
-            elif [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+            if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
