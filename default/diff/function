@@ -522,12 +522,12 @@ diff_function(){
     if [[ "$git_status" =~ (Commit vor |Commits vor| ahead) || $changed = true ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
-        if [[ $(git --no-pager log origin/master..HEAD --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
+        if [[ $(git --no-pager log origin/$diffbranch..HEAD --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m"
-            git --no-pager log origin/master..HEAD --pretty="    %h | %s"
+            git --no-pager log origin/$diffbranch..HEAD --pretty="    %h | %s"
         else
             echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
-            git --no-pager log origin/master..HEAD --pretty="| %h | %s" --reverse | nl
+            git --no-pager log origin/$diffbranch..HEAD --pretty="| %h | %s" --reverse | nl
         fi
         push
     fi
