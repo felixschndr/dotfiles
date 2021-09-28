@@ -48,6 +48,7 @@ check_for_branch_for_unpushed_commits(){
 
 ask_for_commit_type(){
     echo -e "\e[1;96mWas für einen Typ soll der Commit haben?\e[0m \n"\
+    "\n    0. -\t\t\e[2mKein Committyp\e[0m" \
     "\n    1. INITIAL\t\t\e[2mErster Commit\e[0m" \
     "\n    2. FEAT\t\t\e[2mEin neues Feature für den User\e[0m" \
     "\n    3. ENHANCEMENT\t\e[2mEine kleine Modifikation, die einen Vorteil erbringt\e[0m" \
@@ -56,7 +57,7 @@ ask_for_commit_type(){
     "\n    6. STYLE\t\t\e[2mÄnderung an der Ausgabe oder dem Erscheinungsbild\e[0m" \
     "\n    7. REFACTOR\t\t\e[2mUmschreiben von Code ohne neue Features\e[0m" \
     "\n    8. TYPO\t\t\e[2mBeheben von Rechtschreibfehlern\e[0m" \
-    "\n    9. OTHER\t\t\e[2mAlles andere\e[0m\n"
+    "\n    9. OTHER\t\t\e[2mAlles andere, u.a. Löschen von Code\e[0m\n"
 
     read -e commit_type_input
     local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
@@ -97,7 +98,12 @@ ask_for_commit_type(){
     done
     commit_type+="}"
 
-    echo -e "--> $commit_type\n"
+    if [[ $commit_type_input == *"0"* ]]; then
+        commit_type=""
+        echo -e "--> Kein Committyp\n"
+    else
+        echo -e "--> $commit_type\n"
+    fi
 
     echo $commit_type > /tmp/.diffcommit
 }
@@ -162,6 +168,7 @@ commit_files(){
         [[ $? == 1 ]] && return
         commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
         [[ $? == 1 ]] && return
+        [[ -n $commit_type ]] && echo "test" && commit_type+=" "
 
 
         if [[ $commit_type == "skip"* ]]; then
@@ -222,8 +229,8 @@ commit_files(){
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-            echo "git commit $git_signature_arguments -a -m \"$commit_type $answer\""
-            git commit $git_signature_arguments -a -m "$commit_type $answer"
+            echo "git commit $git_signature_arguments -a -m \"${commit_type}${answer}\""
+            git commit $git_signature_arguments -a -m "${commit_type}${answer}"
             changed=true
             break 2
 
@@ -264,7 +271,7 @@ commit_files(){
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-            commit_messages[${#commit_messages[@]}]="$commit_type $answer" #Die neue Nachricht überschreibt die alte
+            commit_messages[${#commit_messages[@]}]="${commit_type}${answer}" #Die neue Nachricht überschreibt die alte
             last_commit_message="$commit_type""$commit_message"
             git commit $git_signature_arguments --amend -m "$last_commit_message"
             return 1
@@ -285,8 +292,8 @@ commit_files(){
 
         else #Commit mit dem angegeben Text
             commit_message="${commit_message^}" #Den ersten Buchstaben der commit_message groß schreiben
-            commit_messages[$((${#commit_messages[@]} + 1 ))]="$commit_type $commit_message" #Den aktuellen Commit ins Array packen
-            last_commit_message="$commit_type $commit_message"
+            commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
+            last_commit_message="${commit_type}${commit_message}"
             echo "git commit $git_signature_arguments "$file" -m \"$last_commit_message\""
 	        git commit $git_signature_arguments "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
@@ -334,7 +341,7 @@ push(){
                     answer="Add $(basename $file) to repository"
                 fi
                 answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-                git commit $git_signature_arguments --amend -m "$commit_type $answer"
+                git commit $git_signature_arguments --amend -m "${commit_type}${answer}"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
             git --no-pager log origin/$diffbranch..HEAD --pretty="| %h | %s" --reverse | nl
