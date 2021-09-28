@@ -46,10 +46,24 @@ item_send(){
     echo -e "\e[36mAlter Status:\e[0m\t$alter_status"
 
 
-    neuer_status_setzen=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}")
-    [[ "$neuer_status_setzen" == *"not valid"* ]] && echo -e "\e[31m$neuer_status_setzen\e[0m" && return 1
+    output_file=$(mktemp)
+    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}" > ${output_file}
+    if [[ $(cat ${output_file}) == *"not valid"* ]]; then
+        echo -e "\n\e[33mDas Kommando konnte nicht gesendet werden.\e[0m Mögliche Kommandos sind:"
+        cat ${output_file} | tail -n +3 | sed 's/  /  - /g'
+        echo -ne "Es wird versucht ein Update für den Status durchzuführen\r"
+        sudo -u openhab ssh openhab@localhost -p8101 "smarthome:update ${1} ${2}" > ${output_file}
+        if [[ $(cat ${output_file}) == *"not valid"* ]]; then
+            echo -e "\e[31mDer neue Status wurde auch vom update nicht akzeptiert! \e[0m"
+            rm -f ${output_file}
+            return 1
+        fi
+        echo -e "\e[32mDer Status wurde erfolgreich upgedated                  \e[0m\n"
+    else
+        echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
+    fi
     echo -e "\e[36mNeuer Status:\e[0m\t${2}\e[0m"
-    echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
+    rm -f ${output_file}
 }
 
 
