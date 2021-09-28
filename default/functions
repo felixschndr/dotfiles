@@ -148,15 +148,17 @@ git_url(){
             sshd|*/sshd) session_typ=ssh;;
         esac
     fi
-    local url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
-    local branch=$(git branch | grep "*" | cut -d" " -f2-)
-    local open_url="$url"
-    [[ $branch =~ (master|main) ]] || open_url+="/-/tree/"$branch
 
-    [[ -z $url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
-    echo -e "Repository URL: \e[96m$url\e[0m"
-    [[ $branch =~ (master|main) ]] || echo -e "Branch URL: \e[96m$open_url\e[0m"
-    [[ $session_typ != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "$open_url"
+    local repository_url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
+    [[ -z $repository_url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
+
+    local branch=$(git rev-parse --abbrev-ref HEAD 2>&1)
+    local history_url="$repository_url"
+    [[ $repository_url == *"abm-local.de"* ]] && history_url+="/-"
+    history_url+="/commits/$branch/"
+
+    echo -e "Repository URL: \e[96m$repository_url\e[0m"
+    [[ $session_typ != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "$history_url"
 }
 
 printarray(){
