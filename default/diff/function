@@ -416,7 +416,7 @@ diff_function(){
 
     git_status=$(git status 2>&1)
 
-    if ! check_if_repo_exists; then return; fi
+    if ! check_if_git_repo_exists; then return; fi
 
     branch=$(git rev-parse --abbrev-ref HEAD 2>&1)
     check_for_branch_for_unpushed_commits #Prüft welcher Branch verwendet werden soll für den Check für ungepushte Commits

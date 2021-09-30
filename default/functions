@@ -34,7 +34,7 @@ file_info(){
 
 
 git_log(){
-    if ! check_if_repo_exists; then return 1; fi
+    if ! check_if_git_repo_exists; then return 1; fi
 
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
