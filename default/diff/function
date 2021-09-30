@@ -37,6 +37,9 @@ check_for_branch_for_unpushed_commits(){
 
 
 ask_for_commit_type(){
+    #Der Outout wird in eine Datei geschrieben,
+    #da wenn alles in eine Variable geschrieben werden würde das folgende echo auch nicht funktionieren würde
+
     echo -e "\e[1;96mWas für einen Typ soll der Commit haben?\e[0m \n"\
     "\n    0. -\t\t\e[2mKein Committyp\e[0m" \
     "\n    1. INITIAL\t\t\e[2mErster Commit\e[0m" \
