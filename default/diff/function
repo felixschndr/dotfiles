@@ -15,7 +15,7 @@ check_if_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
     git_status=$(git status 2>&1)
     if [[ "$git_status" =~ (Kein Git-Repo|not a git repository) ]]; then
-        echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m"
+        echo -e "\e[31mEs wurde kein GIT Repository gefunden\e[0m" >&2
         return 1
     fi
 }
