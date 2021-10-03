@@ -32,6 +32,13 @@ file_info(){
     return 0
 }
 
+git_history(){
+    local repository_url=$(git_base_url)
+    [[ -z $repository_url ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+
+    local session_typ=$(is_session_ssh)
+}
+
 git_issues(){
     local repository_url=$(git_base_url)
     [[ -z $repository_url ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
