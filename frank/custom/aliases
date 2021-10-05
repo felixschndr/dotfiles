@@ -5,8 +5,7 @@ alias vlc='vlc 2>/dev/null'
 alias evince='evince 2>/dev/null'
 alias dolphin='dolphin 2>/dev/null'
 alias cu='update-customers-git'
-alias cronus_connect='sshfs fschneider@cronus:/home/fschneider/repos/ cronus/ 2>/dev/null && cd /home/fschneider/cronus/ && code .'
 
 
 export PAGER="most" #Für farbige manpages
-cd ~/repos
+cd ~/repos || return 1
