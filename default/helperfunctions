@@ -13,10 +13,11 @@ check_if_git_repo_exists(){
 git_base_url(){ #Hilfsfunktion, die nur die Core-Url herausfindet
     if ! check_if_git_repo_exists; then return 1; fi
 
-    local repository_url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
+    local repository_url
+    repository_url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
     [[ -z $repository_url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
 
-    echo $repository_url
+    echo "$repository_url"
 }
 
 is_session_ssh(){ #Hilfsfunktion, die nur prüft, ob die aktuelle Session eine SSH-Session ist
