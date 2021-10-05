@@ -24,4 +24,4 @@ alias ct="cd /tmp/ && git clone git@github.com:Trysupe/testing.git && cd testing
 [[ -n $(command -v code) ]] && alias c='code .'
              [[ -n $TMUX ]] && alias help='tmux_help'
 
-log_auth="/var/log/auth.log"
+export log_auth="/var/log/auth.log"
