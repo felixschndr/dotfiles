@@ -1,5 +1,28 @@
 #!/bin/bash
 
+cd(){
+    # Macht ein normales cd, wenn ein Verzeichnis angegeben wurde
+    # Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
+    # Beispiel:
+    # ┌─[11:40:57]-[:)]-[fschneider@frank]-[/tmp/]
+    # └──> cd Resources/305075061F05.xml
+    #
+    # ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
+    # └──>
+
+    [[ $# -gt 1 && ${1} != "--" ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
+    local targetdirectory
+    [[ -z ${1} ]] && targetdirectory=${HOME} || targetdirectory=${1} # Bei keiner Angabe ins Homeverzeichnis wechseln
+
+    local checkfile
+    [[ ${1} == "/"* ]] && checkfile="${1}" || checkfile="$(pwd)/${1}" # Check, ob ein absoluter Pfad angegeben wurde
+
+    [[ -f ${checkfile} ]] && targetdirectory=$(dirname ${1})
+
+    command cd ${targetdirectory}
+}
+
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
     [[ ${1} == "." ]] && files=$(find . -type f -not -path "*/\.git/*") || files="$@"
