@@ -8,29 +8,29 @@ alias diff='diff_function'
 git_signature_arguments="-S"
 
 use_git_signoff=true
-[[ $use_git_signoff = true ]] && git_signature_arguments+=" -s"
+[[ ${use_git_signoff} = true ]] && git_signature_arguments+=" -s"
 
 
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
-    if [[ "$git_status" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
+    if [[ "${git_status}" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         unmanaged_files=true
         read -e -n1 answer
-        [[ $answer =~ ^[YyJj]$ ]] && return 1
+        [[ ${answer} =~ ^[YyJj]$ ]] && return 1
     fi
     return 0
 }
 
 
 check_for_branch_for_unpushed_commits(){
-    if [[ $branch == "master" ]]; then
+    if [[ ${branch} == "master" ]]; then
         diffbranch="master"
     else
-        if [[ $(git log origin/$branch 2>&1) =~ fatal ]]; then
+        if [[ $(git log origin/${branch} 2>&1) =~ fatal ]]; then
            diffbranch="master"
         else
-           diffbranch="$branch"
+           diffbranch="${branch}"
         fi
     fi
 }
@@ -53,29 +53,29 @@ ask_for_commit_type(){
     "\n    9. OTHER\t\t\e[2mAlles andere, u.a. Löschen von Code\e[0m\n"
 
     read -e commit_type_input
-    local commit_type_input=$(echo $commit_type_input | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
-    if [[ -z $commit_type_input ]]; then #Bei leerem Typ file skippen
+    local commit_type_input=$(echo ${commit_type_input} | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
+    if [[ -z ${commit_type_input} ]]; then #Bei leerem Typ file skippen
         echo "skip" > /tmp/.diffcommit
         return
-    elif [[ $commit_type_input =~ [Cc] ]]; then #Checkout HEAD
+    elif [[ ${commit_type_input} =~ [Cc] ]]; then #Checkout HEAD
         echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
         read -e -n1 answer
-        if [[ $answer =~ ^[YyJj]$ ]]; then
+        if [[ ${answer} =~ ^[YyJj]$ ]]; then
             echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
-            git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
-            [[ $(file $file) == *"CRLF"* ]] && echo && to_lf "$file"
+            git checkout HEAD "${file}" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
+            [[ $(file ${file}) == *"CRLF"* ]] && echo && to_lf "${file}"
         else
             echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
         fi
         echo "checkout" > /tmp/.diffcommit
         return
     fi
-    local amount_of_commit_types=$(echo $commit_type_input | wc -w)
+    local amount_of_commit_types=$(echo ${commit_type_input} | wc -w)
     local commit_type_counter=0
     local commit_type="{"
-    for type_input in $commit_type_input; do
+    for type_input in ${commit_type_input}; do
         ((commit_type_counter++))
-        case $type_input in
+        case ${type_input} in
             1) type_input="INITIAL" ;;
             2) type_input="FEAT" ;;
             3) type_input="ENHANCEMENT" ;;
@@ -86,19 +86,19 @@ ask_for_commit_type(){
             8) type_input="TYPO" ;;
             *) commit_type+="OTHER"; break;;
         esac
-        commit_type+=$type_input
-        [[ $commit_type_counter != $amount_of_commit_types ]] && commit_type+=" & "
+        commit_type+=${type_input}
+        [[ ${commit_type}_counter != ${amount_of_commit_types} ]] && commit_type+=" & "
     done
     commit_type+="}"
 
-    if [[ $commit_type_input == *"0"* ]]; then
+    if [[ ${commit_type_input} == *"0"* ]]; then
         commit_type=""
         echo -e "--> Kein Committyp\n"
     else
-        echo -e "--> $commit_type\n"
+        echo -e "--> ${commit_type}\n"
     fi
 
-    echo $commit_type > /tmp/.diffcommit
+    echo ${commit_type} > /tmp/.diffcommit
 }
 
 
@@ -109,66 +109,65 @@ commit_files(){
     changed=false
     file_counter=1
 
-    for file in $files; do #Gehe alle Files durch
+    for file in ${files}; do #Gehe alle Files durch
 
-        file=$(echo $file | sed 's/}/ /g')
-        echo -e "\e[1;96m"; center "Datei: $file ($file_counter/$(echo $files | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
-        if [[ "$(git diff "$file" 2>&1)" == *"Permission denied"* && "$file" != *"diff/function"* ]]; then
-            echo -e "\e[31mDie Datei \"$file\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m\n"
+        file=$(echo ${file} | sed 's/}/ /g')
+        echo -e "\e[1;96m"; center "Datei: ${file} (${file_counter}/$(echo ${files} | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
+        if [[ "$(git diff "${file}" 2>&1)" == *"Permission denied"* && "${file}" != *"diff/function"* ]]; then
+            echo -e "\e[31mDie Datei \"${file}\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m\n"
             ((file_counter ++))
             continue
         fi
 
         git_diff_empty=false
-        if [[ -z $( git diff "$file" 2>/dev/null ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
+        if [[ -z $( git diff "${file}" 2>/dev/null ) ]]; then #Für Dateien, bei denen kein Diff angezeigt werden kann, z.b. .pdf
             git_diff_empty=true
-            if [[ -z $(git diff --cached "$file" 2>/dev/null ) ]]; then
-                if [[ $(git status | grep "$file") =~ (neue Datei|new file) ]]; then
-                    echo -e "\e[32mFür die Datei \"$file\" ist kein Diff verfügbar, da sie neu ist\e[0m"
+            if [[ -z $(git diff --cached "${file}" 2>/dev/null ) ]]; then
+                if [[ $(git status | grep "${file}") =~ (neue Datei|new file) ]]; then
+                    echo -e "\e[32mFür die Datei \"${file}\" ist kein Diff verfügbar, da sie neu ist\e[0m"
                 else
-                    echo -e "\e[33mFür die Datei \"$file\" ist kein Diff verfügbar!\e[0m"
+                    echo -e "\e[33mFür die Datei \"${file}\" ist kein Diff verfügbar!\e[0m"
                 fi
             fi
         fi
 
-        if [[ "$files_that_need_checkout" == *"$file"* ]]; then
+        if [[ "${files_that_need_checkout}" == *"${file}"* ]]; then
             echo -e "\e[33mDiese lokalen Änderungen müssen gelöscht werden, da sonst die Änderungen aus dem Repository nicht heruntergeladen werden können\e[0\n"
         else
             echo ""
         fi
 
-        if [[ -z $(git diff --summary "$file" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
-            if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color-words --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+        if [[ -z $(git diff --summary "${file}" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
+            if [[ ${git_diff_empty} == "true" ]]; then
+                git --no-pager diff --cached --color-words --unified=5 "${file}" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color-words --unified=5 "$file" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color-words --unified=5 "${file}" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         else #Rechteänderungen anzeigen
             echo -ne "\e[33m"
-            git diff --summary "$file" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE --color=never '.+[0-9]' #Zeigt Rechteänderungen an
+            git diff --summary "${file}" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' | sed 's/100//g' | sed 's/\=>/auf/' | grep -oE --color=never '.+[0-9]' #Zeigt Rechteänderungen an
             echo -e "\e[0m"
-            echo $git_diff_empty
-            if [[ $git_diff_empty == "true" ]]; then
-                git --no-pager diff --cached --color-words --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+            if [[ ${git_diff_empty} == "true" ]]; then
+                git --no-pager diff --cached --color-words --unified=5 "${file}" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
-                git --no-pager diff --color-words --unified=5 "$file" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
+                git --no-pager diff --color-words --unified=5 "${file}" 2>/dev/null | tail -n +7 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             fi
         fi
 
         print_line "-"
 
         ask_for_commit_type
-        [[ $? == 1 ]] && return
+        [[ ${?} == 1 ]] && return
         commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
-        [[ $? == 1 ]] && return
-        [[ -n $commit_type ]] && commit_type+=" "
+        [[ ${?} == 1 ]] && return
+        [[ -n ${commit_type} ]] && commit_type+=" "
 
 
-        if [[ $commit_type == "skip"* ]]; then
+        if [[ ${commit_type} == "skip"* ]]; then
             echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
             ((file_counter ++))
             continue
-        elif [[ $commit_type == "checkout"* ]]; then
+        elif [[ ${commit_type} == "checkout"* ]]; then
             ((file_counter ++))
             continue
         fi
@@ -179,30 +178,30 @@ commit_files(){
         commit_counter=0
         for commit in ${commit_messages[@]} ; do
             (( commit_counter ++ ))
-            [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    $commit_counter      ${commit_messages[commit_counter]}"
+            [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    ${commit_counter}      ${commit_messages[commit_counter]}"
         done
         echo -e "\nAlternativ kann auch folgendes angegeben werden:"
-        [[ $(echo $files | wc -w) != 1 || $unmanaged_files == true ]] && echo -e "    - A    Alle Dateien committen"
+        [[ $(echo ${files} | wc -w) != 1 || ${unmanaged_files} == true ]] && echo -e "    - A    Alle Dateien committen"
         echo -e "    - C    Die lokalen Änderungen verwerfen"
         [[ -z ${commit_messages[commit_counter]} ]] || echo -e "    - L    Die letzte Commitnachricht verwenden"
-        [[ $changed == "true" ]] && \
+        [[ ${changed} == "true" ]] && \
         echo -e "    - R    Letzten Commit rückgängig machen\n    - U    Letzte Comitnachricht umbenennen"
         read -e commit_message
 
 
-        if [[ $commit_type == "{INITIAL}"* && -z $commit_message ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
-            commit_message="Add $(basename $file) to repository"
+        if [[ ${commit_type} == "{INITIAL}"* && -z ${commit_message} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
+            commit_message="Add $(basename ${file}) to repository"
         fi
 
-        if [[ -z $commit_message ]]; then #Keine Nachricht angegeben
+        if [[ -z ${commit_message} ]]; then #Keine Nachricht angegeben
             echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
             ((file_counter ++))
             continue
 
-        elif [[ $commit_message =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
+        elif [[ ${commit_message} =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
             if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja, benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
-                git commit $git_signature_arguments "$file" -m "${commit_messages[commit_message]}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+                git commit ${git_signature_arguments} "${file}" -m "${commit_messages[commit_message]}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
                 last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
@@ -210,65 +209,65 @@ commit_files(){
                 continue
             fi
 
-        elif [[ $commit_message =~ ^[Aa]$ ]]; then #Alle Files committen
+        elif [[ ${commit_message} =~ ^[Aa]$ ]]; then #Alle Files committen
             echo -e "\n\e[96mWie soll die Commtnachricht für alle Dateien heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
-            if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-            echo "git commit $git_signature_arguments -a -m \"${commit_type}${answer}\""
+            echo "git commit ${git_signature_arguments} -a -m \"${commit_type}${answer}\""
             git add .
-            git commit $git_signature_arguments -a -m "${commit_type}${answer}"
+            git commit ${git_signature_arguments} -a -m "${commit_type}${answer}"
             changed=true
             break 2
 
-        elif [[ $commit_message =~ ^[Cc]$ ]]; then #Checkout HEAD
+        elif [[ ${commit_message} =~ ^[Cc]$ ]]; then #Checkout HEAD
             echo -e "\n\e[33mSollen die Änderungen wirklich zurückgesetzt werden?\e[0m \e[2m(J/N)\e[0m"
             read -e -n1 answer
-            if [[ $answer =~ ^[YyJj]$ ]]; then
+            if [[ ${answer} =~ ^[YyJj]$ ]]; then
                 echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
-                git checkout HEAD "$file" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
-                [[ $(file $file) == *"CRLF"* ]] && echo && to_lf "$file"
+                git checkout HEAD "${file}" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
+                [[ $(file ${file}) == *"CRLF"* ]] && echo && to_lf "${file}"
             else
                 echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
             fi
             ((file_counter ++))
             continue
 
-        elif [[ $commit_message =~ ^[Ll]$ ]]; then #Der letzte Commit soll verwendet werden
-            if [[ $last_commit_message == "" ]]; then #Gibt es einen letzten Commit?
+        elif [[ ${commit_message} =~ ^[Ll]$ ]]; then #Der letzte Commit soll verwendet werden
+            if [[ ${last_commit_message} == "" ]]; then #Gibt es einen letzten Commit?
                 echo -e "\e[33mEs gibt keine letzte Commitnachricht, somit die Datei wird übersprungen\e[0m"
 		        ((file_counter ++))
                 continue
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
-            git commit $git_signature_arguments "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
-        elif [[ $commit_message =~ ^[Uu]$ ]]; then #Letze Commitnachricht umbenennen
+        elif [[ ${commit_message} =~ ^[Uu]$ ]]; then #Letze Commitnachricht umbenennen
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
-            if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
             answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[${#commit_messages[@]}]="${commit_type}${answer}" #Die neue Nachricht überschreibt die alte
-            last_commit_message="$commit_type""$commit_message"
-            git commit $git_signature_arguments --amend -m "$last_commit_message"
+            last_commit_message="${commit_type}""${commit_message}"
+            git commit ${git_signature_arguments} --amend -m "${last_commit_message}"
             return 1
 
-        elif [[ $commit_message =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
+        elif [[ ${commit_message} =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
             local commit_message=$(git log -n 1 --pretty="%s")
             local date=$(git log -n 1 --pretty="%ad" --date=format:'%A, den %d.%m.')
             local time=$(git log -n 1 --pretty="%ad" --date=format:'%H:%M:%S')
             local hash=$(git rev-parse --short HEAD)
-            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time\n         Hash: $hash"
+            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m${commit_message}\e[0m\n        Datum: ${date}\n      Uhrzeit: ${time}\n         Hash: ${hash}"
             git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
             return 1
 
-        elif [[ $commit_message =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+        elif [[ ${commit_message} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
             echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
             ((file_counter ++))
             continue
@@ -277,8 +276,8 @@ commit_files(){
             commit_message="${commit_message^}" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
             last_commit_message="${commit_type}${commit_message}"
-            echo "git commit $git_signature_arguments "$file" -m \"$last_commit_message\""
-	        git commit $git_signature_arguments "$file" -m "$last_commit_message" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            echo "git commit ${git_signature_arguments} "${file}" -m \"${last_commit_message}\""
+	        git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
 
@@ -291,7 +290,7 @@ commit_files(){
 
 
     #Prüfen, ob Commits angegeben wurden
-    if [ "$changed" = false ]; then
+    if [ "${changed}" = false ]; then
         echo -e "\e[1;96m"; center "Keine Änderungen"; echo -e "\n\e[0m"
         echo -e "\e[31mEs wurden keine neuen Commits angegeben\e[0m"
     fi
@@ -301,58 +300,58 @@ commit_files(){
 push(){
     #Hier geht es drum alle Änderungen zu pushen
     pushed=false
-    while [ $pushed == "false" ]; do
+    while [ ${pushed} == "false" ]; do
         read -e -n1 answer
         echo ""
-        if [[ $answer =~ ^[Uu]$ ]]; then
+        if [[ ${answer} =~ ^[Uu]$ ]]; then
             ask_for_commit_type
-            [[ $? == 1 ]] && return
+            [[ ${?} == 1 ]] && return
             commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
-            if [[ $commit_type == "skip"* ]]; then
+            if [[ ${commit_type} == "skip"* ]]; then
                 echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
                 continue
-            elif [[ $commit_type == "checkout"* ]]; then
+            elif [[ ${commit_type} == "checkout"* ]]; then
                 continue
             else
                 echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
                 read -e answer
-                if [[ $answer =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+                if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                     echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                     continue
                 fi
-                if [[ $commit_type == "{INITIAL}"* && -z $answer ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
-                    answer="Add $(basename $file) to repository"
+                if [[ ${commit_type} == "{INITIAL}"* && -z ${answer} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
+                    answer="Add $(basename ${file}) to repository"
                 fi
                 answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
-                git commit $git_signature_arguments --amend -m "${commit_type}${answer}"
+                git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
-            git --no-pager log origin/$diffbranch..HEAD --pretty="| %h | %s" --reverse | nl
+            git --no-pager log origin/${diffbranch}..HEAD --pretty="| %h | %s" --reverse | nl
 
-        elif [[ $answer =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
+        elif [[ ${answer} =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
             local commit_message=$(git log -n 1 --pretty="%s")
             local date=$(git log -n 1 --pretty="%ad" --date=format:'%A, den %d.%m.')
             local time=$(git log -n 1 --pretty="%ad" --date=format:'%H:%M:%S')
             local hash=$(git rev-parse --short HEAD)
-            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m$commit_message\e[0m\n        Datum: $date\n      Uhrzeit: $time\n         Hash: $hash"
+            echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m${commit_message}\e[0m\n        Datum: ${date}\n      Uhrzeit: ${time}\n         Hash: ${hash}"
             git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
             return
 
-        elif [[ $answer =~ ^[YyJj]$ ]]; then
+        elif [[ ${answer} =~ ^[YyJj]$ ]]; then
             pushed=true
             output=$(git push 2>&1)
-            if [[ $? == 0 ]]; then
-                if [[ $output == *"up-to-date"* ]]; then
+            if [[ ${?} == 0 ]]; then
+                if [[ ${output} == *"up-to-date"* ]]; then
                     echo -e "\e[33mAlle aktuellen Commits wurden schon hochgeladen. \e[32mJetzt ist alles aktuell\e[0m"
                 else
                     echo -e "\e[32mDie Änderungen wurden hochgeladen\e[0m"
                 fi
-            elif [[ $output == *"git pull"* ]]; then
+            elif [[ ${output} == *"git pull"* ]]; then
                 echo -e "\n\e[33mDie Änderungen des Repositories müssen erst heruntergeladen werden\e[0m"
                 git pull --rebase 2>/dev/null >/dev/null
                 git push
                 echo -e "\e[32mDie Änderungen wurden hochgeladen\e[0m"
-            elif [[ $output == *"--set-upstream"* ]]; then
+            elif [[ ${output} == *"--set-upstream"* ]]; then
                 echo -e "\e[33mDer Upsteam musste erst gesetzt werden\e[0m"
                 $(git push 2>&1 | grep "git push")
             else
@@ -371,38 +370,38 @@ pull(){
     [[ $1 == "force" ]] && git fetch >/dev/null 2>/dev/null #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
     git_status=$(git status 2>&1)
 
-    if [[ ! "$git_status" =~ (Commit hinter|Commits hinter|behind) ]]; then
+    if [[ ! "${git_status}" =~ (Commit hinter|Commits hinter|behind) ]]; then
         [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
         return
     fi
 
     amount=$(git status | sed '2!d' | sed 's/[^0-9]*//g')
 
-    if [[ $amount == 1 ]]; then
+    if [[ ${amount} == 1 ]]; then
         echo -e "\e[33mEs gibt noch einen Commit, der noch nicht heruntergeladen wurde. Soll er jetzt heruntergeladen werden?\e[0m"
     else
-        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
+        echo -e "\e[33mEs gibt noch ${amount} Commits, die noch nicht heruntergerladen wurden. Sollen sie jetzt heruntergeladen werden?\e[0m"
     fi
 
-    git_log "$amount" "..origin/$branch"
+    git_log "${amount}" "..origin/${branch}"
 
     read -e -n1 answer
 
-    if [[ ! $answer =~ ^[YyJj]$ ]]; then
+    if [[ ! ${answer} =~ ^[YyJj]$ ]]; then
         echo -e "\e[33mDie Änderungen werden nicht heruntergeladen\n\e[0m"
         return
     fi
 
     local pull_result="$(git pull --rebase 2>&1)"
-    local return_code=$?
-    if [[ "$pull_result" == *"stash"* ]]; then
+    local return_code=${?}
+    if [[ "${pull_result}" == *"stash"* ]]; then
         echo -e "\e[31mDie lokalen Änderungen müssen erst commited werden before die Änderungen aus dem Repository heruntergeladen werden können! \e[0m"
         echo -e "Dateien, die überschrieben werden würden:"
         git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' | sed -e 's/^[[:space:]]*/ - /' | tee /tmp/.files_that_need_checkout
         files_that_need_checkout=$(cat /tmp/.files_that_need_checkout)
         rm /tmp/.files_that_need_checkout
         echo -ne "\e[33m"; print_line "="; echo -ne "\e[0m"
-    elif [[ $return_code == 0 ]]; then
+    elif [[ ${return_code} == 0 ]]; then
         echo -e "\e[32mDie Änderungen wurden heruntergeladen\n\e[0m"
     else
         echo -e "\e[31mEs gab ein Problem beim Herunterladen!\n\e[0m"
@@ -415,7 +414,7 @@ pull(){
 
 diff_function(){
 
-    [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/../../"
+    [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "${BASH_SOURCE}")")/../../"
 
     git_status=$(git status 2>&1)
 
@@ -440,64 +439,64 @@ diff_function(){
         local files=$(echo "$@" | sed 's/ /\n/g' | uniq)
         files_to_commit=""
 
-        for file in $files; do
-            if [[ ! -f $file ]]; then
-                echo -e "\e[31mDie Datei \"$file\" existiert nicht - Sie wird übersprungen\e[0m"
+        for file in ${files}; do
+            if [[ ! -f ${file} ]]; then
+                echo -e "\e[31mDie Datei \"${file}\" existiert nicht - Sie wird übersprungen\e[0m"
                 continue
-            elif [[ -n $(echo $files_changed | grep $file) ]]; then
-                files_to_commit+=" ""$file"
+            elif [[ -n $(echo ${files_changed} | grep ${file}) ]]; then
+                files_to_commit+=" ""${file}"
                 continue
             else
-                echo -e "\e[33mDie Datei \"$file\" wurde nicht modifiziert - Sie wird übersprungen\e[0m"
+                echo -e "\e[33mDie Datei \"${file}\" wurde nicht modifiziert - Sie wird übersprungen\e[0m"
             fi
         done
 
-        files=$files_to_commit
+        files=${files_to_commit}
     else
         #Veränderte Files finden und je nach Anzahl verschiedene Verhalten starten
         files=$(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /}/g' | uniq) #umbenannt geht nicht
 
-        case $(echo $files | wc -w ) in
+        case $(echo ${files} | wc -w ) in
             0) #Es wurden keine Dateien verändert; gibt es noch Commits, die nicht hochgeladen wurden?
                 echo -e "\e[32mEs wurden keine Dateien modifiziert\e[0m"
-                amount=$(git --no-pager log origin/$diffbranch..HEAD --pretty="%h" | wc -l) #Zählt ungepushte Commits
-                if [[ $amount == 0 ]]; then
+                amount=$(git --no-pager log origin/${diffbranch}..HEAD --pretty="%h" | wc -l) #Zählt ungepushte Commits
+                if [[ ${amount} == 0 ]]; then
                     return
                 fi
                 echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
-                if [[ $amount == 1 ]]; then
+                if [[ ${amount} == 1 ]]; then
                     echo -e "\e[33mEs gibt noch einen Commit, der noch nicht hochgeladen wurde. Soll er jetzt hochgeladen werden?\e[0m"
-                    git --no-pager log origin/$diffbranch..HEAD --pretty="    %h | %s"
+                    git --no-pager log origin/${diffbranch}..HEAD --pretty="    %h | %s"
                 else
-                    number_of_duplicates=$(( $amount - $(git --no-pager log origin/$diffbranch..HEAD --pretty="%s"| awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
-                    if [[ $number_of_duplicates == 0 ]]; then
-                        echo -e "\e[33mEs gibt noch $amount Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
-                    elif [[ $number_of_duplicates == 1 ]]; then
-                        echo -e "\e[33mEs gibt noch $amount Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                    number_of_duplicates=$(( ${amount} - $(git --no-pager log origin/${diffbranch}..HEAD --pretty="%s"| awk '!x[$0]++' | wc -l) )) >/dev/null #Alle minus die nicht doppelten
+                    if [[ ${number_of_duplicates} == 0 ]]; then
+                        echo -e "\e[33mEs gibt noch ${amount} Commits, die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                    elif [[ ${number_of_duplicates} == 1 ]]; then
+                        echo -e "\e[33mEs gibt noch ${amount} Commits (1 doppelter), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     else
-                        echo -e "\e[33mEs gibt noch $amount Commits ($number_of_duplicates doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
+                        echo -e "\e[33mEs gibt noch ${amount} Commits (${number_of_duplicates} doppelte), die noch nicht hochgeladen wurden. Sollen sie jetzt hochgeladen werden?\e[0m"
                     fi
-                    git --no-pager log origin/$diffbranch..HEAD --pretty="| %h | %s" --reverse | nl
+                    git --no-pager log origin/${diffbranch}..HEAD --pretty="| %h | %s" --reverse | nl
                 fi
                 push
                 return;;
             1) echo -e "\e[1;96mEs wurde eine Datei modifiziert\e[0m";;
-            *) echo -e "\e[1;96mEs wurden $(echo $files | wc -w ) Dateien modifiziert\e[0m";;
+            *) echo -e "\e[1;96mEs wurden $(echo ${files} | wc -w ) Dateien modifiziert\e[0m";;
         esac
 
         local longest_filename=0
         for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2-); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
-            [[ $(echo $filename | wc -c) -gt $longest_filename ]] && longest_filename=$(echo $filename | wc -c)
+            [[ $(echo ${filename} | wc -c) -gt ${longest_filename} ]] && longest_filename=$(echo ${filename} | wc -c)
         done
 
         for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | uniq); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
-            local filename_length=$(echo $filename | wc -c)
-            echo -ne " - "$filename
+            local filename_length=$(echo ${filename} | wc -c)
+            echo -ne " - "${filename}
             local amount_of_spaces=$((longest_filename - filename_length))
-            for((i=0; i<=$amount_of_spaces; ++i)); do echo -n " "; done
-            local changed=$(git diff --stat $filename 2>/dev/null | cut -d "|" -f2- | head -n 1 ) #2>/dev/null um (CR)LF warning auszublenden
-            [[ -z $changed ]] && changed=$(git diff --stat --staged $filename 2>/dev/null | cut -d "|" -f2- | head -n 1 )
-            echo -e "| "$(echo $changed | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
+            for((i=0; i<=${amount_of_spaces}; ++i)); do echo -n " "; done
+            local changed=$(git diff --stat ${filename} 2>/dev/null | cut -d "|" -f2- | head -n 1 ) #2>/dev/null um (CR)LF warning auszublenden
+            [[ -z ${changed} ]] && changed=$(git diff --stat --staged ${filename} 2>/dev/null | cut -d "|" -f2- | head -n 1 )
+            echo -e "| "$(echo ${changed} | sed 's/+/\\e[32m+\\e[0m/g' | sed 's/-/\\e[31m-\\e[0m/g')
         done
 
 
@@ -509,15 +508,15 @@ diff_function(){
 
     git_status=$(git status 2>&1)
 
-    if [[ "$git_status" =~ (Commit vor |Commits vor| ahead) || $changed = true ]]; then
+    if [[ "${git_status}" =~ (Commit vor |Commits vor| ahead) || ${changed} = true ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
 
-        if [[ $(git --no-pager log origin/$diffbranch..HEAD --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
+        if [[ $(git --no-pager log origin/${diffbranch}..HEAD --pretty="%s" | awk '!x[$0]++' | wc -l) == 1 ]]; then #Doppelte Commits sollen nicht doppelt gerechnet werden
             echo -e "\e[32mSoll die Änderung gepusht werden?\e[0m"
-            git --no-pager log origin/$diffbranch..HEAD --pretty="    %h | %s"
+            git --no-pager log origin/${diffbranch}..HEAD --pretty="    %h | %s"
         else
             echo -e "\e[32mSollen die Änderungen gepusht werden?\e[0m"
-            git --no-pager log origin/$diffbranch..HEAD --pretty="| %h | %s" --reverse | nl
+            git --no-pager log origin/${diffbranch}..HEAD --pretty="| %h | %s" --reverse | nl
         fi
         push
     fi
