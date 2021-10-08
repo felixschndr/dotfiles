@@ -3,7 +3,7 @@
 check_if_git_repo_exists(){
     #Prüfen, ob ein GIT Repo gefunden wurde
     git_status=$(git status 2>&1)
-    if [[ "$git_status" =~ (Kein Git-Repo|not a git repository) ]]; then
+    if [[ "${git_status}" =~ (Kein Git-Repo|not a git repository) ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden!\e[0m" >&2
         return 1
     fi
@@ -15,16 +15,16 @@ git_base_url(){ #Hilfsfunktion, die nur die Core-Url herausfindet
 
     local repository_url
     repository_url=$(git config --get remote.origin.url | sed 's/:/\//'| sed 's/\.git//' | sed 's/git@/https:\/\//g')
-    [[ -z $repository_url ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
+    [[ -z ${repository_url} ]] && echo -e "\e[31mDie URL konnte nicht bestimmt werden! \e[0m]" && return 1
 
-    echo "$repository_url"
+    echo "${repository_url}"
 }
 
 is_session_ssh(){ #Hilfsfunktion, die nur prüft, ob die aktuelle Session eine SSH-Session ist
     local session_typ="lokal"
-    if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || $(ps -o comm= -p $PPID 2>/dev/null) == *"sshd"* ]]; then
+    if [[ -n "${SSH_CLIENT}" || -n "${SSH_TTY}" || $(ps -o comm= -p ${PPID} 2>/dev/null) == *"sshd"* ]]; then
         session_typ=ssh
     fi
 
-    echo $session_typ
+    echo ${session_typ}
 }

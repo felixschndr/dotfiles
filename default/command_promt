@@ -5,7 +5,7 @@ shopt -s cdspell #Korrigiert kleine Typos bei Pfaden nach dem Abschicken
 shopt -s autocd #In dir wechseln ohne cd
 
 
-LS_COLORS="$(echo "$LS_COLORS" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
+LS_COLORS="$(echo "${LS_COLORS}" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
 
 
 export HISTCONTROL=ignoreboth #schreibe nicht in die history was doppelt ist oder mit einem Leerzeichen anfängt
