@@ -87,7 +87,7 @@ ask_for_commit_type(){
             *) commit_type+="OTHER"; break;;
         esac
         commit_type+=${type_input}
-        [[ ${commit_type}_counter != ${amount_of_commit_types} ]] && commit_type+=" & "
+        [[ ${commit_type_counter} != ${amount_of_commit_types} ]] && commit_type+=" & "
     done
     commit_type+="}"
 
@@ -99,6 +99,26 @@ ask_for_commit_type(){
     fi
 
     echo ${commit_type} > /tmp/.diffcommit
+}
+
+
+commitmessageToUpperCase(){
+
+    # Checken, ob das erste Wort diverse Inhalte besitzt
+    #   - endet auf "()" --> handelt sich um einen Funktionsnamen
+    #   - enthält "://"  --> handelt sich um eine URL
+    # In den beiden Fällen solldie Commitnachricht nicht groß geschrieben werden
+
+    local input=${@}
+    local first_word=${1}
+
+    if [[ ${first_word} =~ (://|\(\)$) ]]; then
+        echo ${input} # Den Input unverändert zurück geben
+    else
+        echo ${input^} # Erstes Wort groß schreiben
+    fi
+
+    return
 }
 
 
@@ -216,7 +236,7 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             echo "git commit ${git_signature_arguments} -a -m \"${commit_type}${answer}\""
             git add .
             git commit ${git_signature_arguments} -a -m "${commit_type}${answer}"
@@ -252,7 +272,7 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[${#commit_messages[@]}]="${commit_type}${answer}" #Die neue Nachricht überschreibt die alte
             last_commit_message="${commit_type}""${commit_message}"
             git commit ${git_signature_arguments} --amend -m "${last_commit_message}"
@@ -273,7 +293,7 @@ commit_files(){
             continue
 
         else #Commit mit dem angegeben Text
-            commit_message="${commit_message^}" #Den ersten Buchstaben der commit_message groß schreiben
+            commit_message="$(commitmessageToUpperCase ${commit_message})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
             last_commit_message="${commit_type}${commit_message}"
             echo "git commit ${git_signature_arguments} "${file}" -m \"${last_commit_message}\""
@@ -322,7 +342,7 @@ push(){
                 if [[ ${commit_type} == "{INITIAL}"* && -z ${answer} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
                     answer="Add $(basename ${file}) to repository"
                 fi
-                answer="${answer^}" #Den ersten Buchstaben der commit_message groß schreiben
+                answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
                 git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}"
             fi
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
