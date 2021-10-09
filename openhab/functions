@@ -4,18 +4,21 @@
 echoTTS(){
     echo -e "\e[96mWas soll gesagt werden?\e[0m"
     read -e answer
+
     [[ -z "${answer}" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && exit 1
+
     item_send Sprachassistent_EchoDot_Lautstaerke_Proxy 80
     sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send Sprachassistent_EchoDot_TTS \"${answer}\""
+
     exit
 }
 
 
 _item_completions(){
-    items=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null | sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
-    local anfang="${COMP_WORDS[${COMP_CWORD}]}"
+    allItems=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null | sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
+    local beginning="${COMP_WORDS[${COMP_CWORD}]}"
 
-    for item in $( echo ${item}s | sed 's/ /\n/g' | grep -P "^${anfang}"); do
+    for item in $( echo ${allItems} | sed 's/ /\n/g' | grep -P "^${beginning}"); do
 	    COMPREPLY=("${COMPREPLY[@]}" "${item}")
     done
 }
@@ -25,72 +28,86 @@ complete -F _item_completions item_get item_send item_toggle search_log search_s
 
 
 item_get(){
+
     [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
-    for item in $@ ; do
-        status=$(curl -X GET "http://localhost:8080/rest/items/${item}/state" 2>/dev/null)
-        [[ "${status}" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"${item}\" existiert nicht\e[0m" && return 1
-        echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${status}"
+
+    for item in ${@} ; do
+        state=$(curl -X GET "http://localhost:8080/rest/items/${item}/state" 2>/dev/null)
+        [[ "${state}" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"${item}\" existiert nicht\e[0m" && return 1
+        echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
     done
 }
 
 
 item_send(){
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m"            && return 1
-    [ -z ${2} ] && echo -e "\e[31mEs wurde kein Status angegeben\e[0m"          && return 1
-    [ $# -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Item angegeben\e[0m"           && return 1
+    [[ -z ${2} ]]    && echo -e "\e[31mEs wurde kein Status angegeben\e[0m"         && return 1
+    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    alter_status=$(curl -X GET "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
-    [[ "${alter_status}" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
+    oldState=$(curl -X GET "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
+    [[ "${oldState}" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
 
     echo -e "\e[36mItem:\e[0m\t\t${1}"
-    echo -e "\e[36mAlter Status:\e[0m\t${alter_status}"
+    echo -e "\e[36mAlter Status:\e[0m\t${oldState}"
 
+    outputFile=$(mktemp)
+    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}" > ${outputFile}
 
-    output_file=$(mktemp)
-    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}" > ${output_file}
-    if [[ $(cat ${output_file}) == *"not valid"* ]]; then
+    if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
         echo -e "\n\e[33mDas Kommando konnte nicht gesendet werden.\e[0m Mögliche Kommandos sind:"
-        cat ${output_file} | tail -n +3 | sed 's/  /  - /g'
+        cat ${outputFile} | tail -n +3 | sed 's/  /  - /g'
         echo -ne "Es wird versucht ein Update für den Status durchzuführen\r"
-        sudo -u openhab ssh openhab@localhost -p8101 "smarthome:update ${1} ${2}" > ${output_file}
-        if [[ $(cat ${output_file}) == *"not valid"* ]]; then
+        sudo -u openhab ssh openhab@localhost -p8101 "smarthome:update ${1} ${2}" > ${outputFile}
+
+        if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
             echo -e "\e[31mDer neue Status wurde auch vom update nicht akzeptiert! \e[0m"
-            rm -f ${output_file}
+            rm -f ${outputFile}
             return 1
         fi
+
         echo -e "\e[32mDer Status wurde erfolgreich upgedated                  \e[0m\n"
+
     else
         echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
+
     fi
+
     echo -e "\e[36mNeuer Status:\e[0m\t${2}\e[0m"
-    rm -f ${output_file}
+    rm -f ${outputFile}
 }
 
 
 item_toggle(){
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
-    [ $# -gt 1 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Item angegeben\e[0m"           && return 1
+    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    alter_status=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
-    [[ "${alter_status}" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
+    oldState=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
+    [[ "${oldState}" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
 
     echo -e "\e[36mItem:\e[0m\t\t${1}"
-    echo -e "\e[36mAlter Status:\e[0m\t${alter_status}"
-    if [[ ${alter_status} =~ (ON|On|on) ]]; then
-        neuer_status="OFF"
-    elif [[ ${alter_status} =~ (OFF|Off|off) ]]; then
-        neuer_status="ON"
-    elif [[ ${alter_status} == "OPEN" ]]; then
-        neuer_status="CLOSED"
-    elif [[ ${alter_status} == "CLOSED" ]]; then
-        neuer_status="OPEN"
+    echo -e "\e[36mAlter Status:\e[0m\t${oldState}"
+
+    if [[ ${oldState} =~ (ON|On|on) ]]; then
+        newState="OFF"
+
+    elif [[ ${oldState} =~ (OFF|Off|off) ]]; then
+        newState="ON"
+
+    elif [[ ${oldState} == "OPEN" ]]; then
+        newState="CLOSED"
+
+    elif [[ ${oldState} == "CLOSED" ]]; then
+        newState="OPEN"
+
     else
         echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[0m" && return 1
     fi
 
-    ${neuer_status_setzen}=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${neuer_status}")
-    [[ "$${neuer_status_setzen}" == *"not valid"* ]] && echo -e "\e[31m$${neuer_status_setzen}\e[0m" && return 1
-    echo -e "\e[36mNeuer Status:\e[0m\t${neuer_status}\e[0m"
+    ${setNewStateOutput}=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${newState}")
+
+    [[ "${setNewStateOutput}" == *"not valid"* ]] && echo -e "\e[31m${setNewStateOutput}\e[0m" && return 1
+
+    echo -e "\e[36mNeuer Status:\e[0m\t${newState}\e[0m"
     echo -e "\e[32mDas Kommando wurde erfolgreich gesendet\e[0m"
 }
 
@@ -127,16 +144,20 @@ ssh_permissions(){
 
 fix_permissions(){
     cd /etc/openhab2/
+
     echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
     sudo openhabian-config
+
     sudo chmod -R 770 .
     ssh_permissions
+
     echo -e "\e[92mDone\e[0m"
     cd - >/dev/null
 }
 
 
 search_log(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+
     grep -in "${1}" --color=always /var/log/openhab2/events.log || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
 }
