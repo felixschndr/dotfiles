@@ -8,20 +8,27 @@ battery(){
 
 build(){
     echo -e "\e[1;36mPaket wird gebaut\e[0m"
-    local start_time=`date +%s`
+
+    local startTime=$(date +%s)
+
     dpkg-buildpackage -us -uc
     [[ $? != "0" ]] && return 1
+
     mv ../*.deb .
     rm ../*.{buildinfo,changes,dsc,tar.gz}
     debian/rules clean >/dev/null
-    local end_time=`date +%s`
-    local deb_package=$("ls" -1t *.deb | head -1)
-    sudo dpkg -i ${deb_package}
-    echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$((${end_time} - ${start_time})) +%M:%S) gedauert"
+
+    local endTime=$(date +%s)
+
+    local debianPackageName=$("ls" -1t *.deb | head -1)
+    sudo dpkg -i ${debianPackageName}
+
+    echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$((${endTime} - ${startTime})) +%M:%S) gedauert"
+
     echo -e "Soll das Paket hochgeladen werden?\e[0m"
     read -e -n1 answer
     if [[ ${answer} =~ ^[YyJj]$ ]]; then
-       upload "${deb_package}"
+       upload "${debianPackageName}"
     fi
 }
 
