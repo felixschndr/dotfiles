@@ -10,7 +10,9 @@ cd(){
     # ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
     # └──>
 
-    [[ ${#} -gt 1 && ${1} != "--" ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+    [[ ${1} == "--" ]] && shift
+
+    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     local targetDirectory
     [[ -z ${1} ]] && targetDirectory=${HOME} || targetDirectory=${1} # Bei keiner Angabe ins Homeverzeichnis wechseln
