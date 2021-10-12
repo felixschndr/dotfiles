@@ -78,11 +78,23 @@ git_history(){
         echo -e "History URL: ${urlOfHistoryOfRepository}"
     fi
 
-    local amountOfCommitsInRepository=$(git rev-list --count HEAD)
-    local nthCommitToBeShown=$(( ${1} - 1 ))
-    [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" && return 1
+    local commitHash
 
-    local urlOfCommit="${urlOfRepository}/commit/$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")"
+    if [[ ${1} =~ ^[0-9]{1,5}$ ]]; then
+        local amountOfCommitsInRepository=$(git rev-list --count HEAD)
+        local nthCommitToBeShown=$(( ${1} - 1 ))
+        [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" && return 1
+
+        commithash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
+    else
+        commithash=$(git rev-parse ${1} 2>/dev/null) #Langen Commithash zum kurzen Input bekommen
+        if [[ ${?} != 0 ]]; then
+            echo -e "\e[31mEs konnte kein Commit zu dem Hash gefunden werden\e[0m"
+            return 1
+        fi
+    fi
+
+    local urlOfCommit="${urlOfRepository}/commit/${commithash}"
 
     echo -e "Commit URL:  \e[96m${urlOfCommit}\e[0m"
 }
@@ -214,12 +226,8 @@ git_url(){
 
     local aktiveGitBranch=$(git rev-parse --abbrev-ref HEAD 2>&1)
 
-    local urlOfHistoryOfRepository="${urlOfRepository}"
-    [[ ${urlOfRepository} == *"abm-local.de"* ]] && urlOfHistoryOfRepository+="/-" #Gitlab benutzt, im Gegensatz zu Github, noch diesen Einschub
-    urlOfHistoryOfRepository+="/commits/${aktiveGitBranch}/"
-
     echo -e "Repository URL: \e[96m${urlOfRepository}\e[0m"
-    [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfHistoryOfRepository}"
+    [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
 printarray(){
