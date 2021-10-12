@@ -72,6 +72,9 @@ git_history(){
 
     if [[ ! ${1} =~ [0-9]+ ]]; then
         echo -e "History URL: \e[96m${urlOfHistoryOfRepository}\e[0m"
+
+        local typeOfSession=$(is_session_ssh)
+        [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" ]] && xdg-open "${urlOfHistoryOfRepository}"
         return 0
 
     else
