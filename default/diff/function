@@ -153,11 +153,11 @@ commit_files(){
 
         if [[ "${files_that_need_checkout}" == *"${file}"* ]]; then
             echo -e "\e[33mDiese lokalen Änderungen müssen gelöscht werden, da sonst die Änderungen aus dem Repository nicht heruntergeladen werden können\e[0\n"
-        else
-            echo ""
         fi
 
-        if [[ -z $(git diff --summary "${file}" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
+        if [[ $(git diff "${file}" 2>/dev/null) == *"Binary file"* ]]; then #Änderungen an einem binary file (z.B. jpg oder png)
+            echo -e "\e[33mEs handelt sich um eine Binärdatei. Die Änderung kann nicht angezeigt werden\e[0m"
+        elif [[ -z $(git diff --summary "${file}" 2>/dev/null) ]]; then #Blieben die Rechte der Datei gleich?
             if [[ ${git_diff_empty} == "true" ]]; then
                 git --no-pager diff --cached --color-words --unified=5 "${file}" 2>/dev/null | tail -n +5 #Mehr Abschneiden, da der Rechtewechsel auch im diff enthalten ist
             else
