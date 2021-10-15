@@ -355,8 +355,6 @@ stopwatch(){
 
     local endOfExecution=$(date +%s,%N)
 
-    echo $startOfExecution
-
     local secondsSinceEpochTillStartOfExecutions=$(echo ${startOfExecution} | cut -d',' -f1)
     local nanosecondsAtStartOfExecutions=$(echo ${startOfExecution} | cut -d',' -f2)
     local secondsSinceEpochTillEndOfExecutions=$(echo ${endOfExecution} | cut -d',' -f1)
