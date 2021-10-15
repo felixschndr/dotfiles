@@ -324,27 +324,17 @@ push(){
         read -e -n1 answer
         echo ""
         if [[ ${answer} =~ ^[Uu]$ ]]; then
-            ask_for_commit_type
-            [[ ${?} == 1 ]] && return
-            commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
-            if [[ ${commit_type} == "skip"* ]]; then
-                echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
+            echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
+            read -e answer
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
+                echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 continue
-            elif [[ ${commit_type} == "checkout"* ]]; then
-                continue
-            else
-                echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
-                read -e answer
-                if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
-                    echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
-                    continue
-                fi
-                if [[ ${commit_type} == "{INITIAL}"* && -z ${answer} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
-                    answer="Add $(basename ${file}) to repository"
-                fi
-                answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
-                git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}"
             fi
+            if [[ ${commit_type} == "{INITIAL}"* && -z ${answer} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
+                answer="Add $(basename ${file}) to repository"
+            fi
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
+            git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}"
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
             git --no-pager log origin/${diffbranch}..HEAD --pretty="| %h | %s" --reverse | nl
 
