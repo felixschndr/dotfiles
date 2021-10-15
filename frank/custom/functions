@@ -32,6 +32,12 @@ build(){
     fi
 }
 
+baslog(){
+    local logfile="/var/log/bas/$(command ls -1t /var/log/bas/ | head -n 1)"
+    echo -e "\e[96;1m"; center "Logfile: ${logfile}"; echo -e "\e[0m\n"
+    tail -f -n 1000 "${logfile}"
+}
+
 upload(){
     if [[ -z ${1} ]]; then
         sftp abm@packages.abm-local.de:/incoming
