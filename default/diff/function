@@ -377,7 +377,12 @@ push(){
 
 pull(){
     #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
-    [[ $1 == "force" ]] && git fetch >/dev/null 2>/dev/null #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
+    [[ $1 == "force" ]] && local fetch_result=$(git fetch 2>&1) #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
+    if [[ "${fetch_result}" == *"Permission denied"* ]]; then
+        echo -e "\e[31mFehler beim Pullen: Verbindung wurde von GIT abgelehnt (SSH-Key ist nicht nicht hinterlegt)"
+        return 1
+    fi
+
     git_status=$(git status 2>&1)
 
     if [[ ! "${git_status}" =~ (Commit hinter|Commits hinter|behind) ]]; then
