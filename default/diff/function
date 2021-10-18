@@ -230,7 +230,7 @@ commit_files(){
             fi
 
         elif [[ ${commit_message} =~ ^[Aa]$ ]]; then #Alle Files committen
-            echo -e "\n\e[96mWie soll die Commtnachricht für alle Dateien heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
+            echo -e "\n\e[96mWie soll die Commtinachricht für alle Dateien heißen?\e[0m \e[2m(\"S\" zum Abbrechen)\e[0m"
             read -e answer
             if [[ ${answer} =~ ^.{1,4}$ ]]; then #Die Commit Nachricht ist kürzer als 5 Zeichen
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-alias ..="cd .."; alias ...="cd ../.."; alias ....="cd ../../.."
-alias .....="cd ../../../.."; alias ......="cd ../../../../.."
+alias ..="cd .."; alias ...="cd ../.."; alias ....="cd ../../.."; alias .....="cd ../../../.."; alias ......="cd ../../../../.."
 alias dc='cd'
 alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"; alias l='ls'; alias ll='ls'; alias lll='ls'; alias sl='ls'; alias la="ls -A"
 alias rm='rm -R'
