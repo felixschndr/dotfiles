@@ -132,7 +132,10 @@ git_log(){
 
     local amountOfCommitsInRepository=$(git rev-list --count HEAD)
 
-    [ ${amountOfCommitsInRepository} -lt ${commitcount} ] && commitcount=${amountOfCommitsInRepository}
+    if [[ ${amountOfCommitsInRepository} -lt ${commitcount} ]]; then
+        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" 
+        commitcount=${amountOfCommitsInRepository}
+    fi
 
     IFS=$'\n'
     if [[ ${commitcount} == 1 ]]; then
