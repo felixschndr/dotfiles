@@ -70,6 +70,14 @@ git_history(){
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
 
+    local space=" "
+    local onlyCommitUrl=false
+    if [[ ${1} == "-u" ]]; then
+        local onlyCommitUrl=true
+        space=""
+        shift
+    fi
+
     local urlOfHistoryOfRepository="${urlOfRepository}/commits"
 
     if [[ ! ${1} =~ [0-9]+ ]]; then
@@ -80,7 +88,7 @@ git_history(){
         return 0
 
     else
-        echo -e "History URL: ${urlOfHistoryOfRepository}"
+        [[ ${onlyCommitUrl} == false ]] && echo -e "History URL: ${urlOfHistoryOfRepository}"
     fi
 
     local commitHash
@@ -101,7 +109,7 @@ git_history(){
 
     local urlOfCommit="${urlOfRepository}/commit/${commithash}"
 
-    echo -e "Commit URL:  \e[96m${urlOfCommit}\e[0m"
+    echo -e "Commit URL: ${space}\e[96m${urlOfCommit}\e[0m"
 }
 
 git_issues(){
@@ -133,7 +141,7 @@ git_log(){
     local amountOfCommitsInRepository=$(git rev-list --count HEAD)
 
     if [[ ${amountOfCommitsInRepository} -lt ${commitcount} ]]; then
-        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" 
+        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m"
         commitcount=${amountOfCommitsInRepository}
     fi
 
