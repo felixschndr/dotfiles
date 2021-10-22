@@ -300,9 +300,6 @@ commit_files(){
 	        git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
-        git_history -u "$(git rev-parse HEAD)"
-
-
         ((file_counter ++))
         changed=true
     done
