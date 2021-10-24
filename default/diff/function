@@ -383,10 +383,6 @@ pull(){
     fi
 
     outputOfGitStatus=$(git status 2>&1)
-        return 1
-    fi
-
-    git_status=$(git status 2>&1)
 
     if [[ ! "${outputOfGitStatus}" =~ (Commit hinter|Commits hinter|behind) ]]; then
         [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
