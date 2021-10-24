@@ -98,16 +98,16 @@ git_history(){
         local nthCommitToBeShown=$(( ${1} - 1 ))
         [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" && return 1
 
-        commithash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
+        commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
     else
-        commithash=$(git rev-parse ${1} 2>/dev/null) #Langen Commithash zum kurzen Input bekommen
+        commitHash=$(git rev-parse ${1} 2>/dev/null) #Langen Commithash zum kurzen Input bekommen
         if [[ ${?} != 0 ]]; then
             echo -e "\e[31mEs konnte kein Commit zu dem Hash gefunden werden\e[0m"
             return 1
         fi
     fi
 
-    local urlOfCommit="${urlOfRepository}/commit/${commithash}"
+    local urlOfCommit="${urlOfRepository}/commit/${commitHash}"
 
     echo -e "Commit URL: ${space}\e[96m${urlOfCommit}\e[0m"
 }
@@ -132,40 +132,39 @@ git_log(){
 
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
-    local commitcount="30"
-    local diff=""
+    local amountOfCommits="30"
+    local commitsOfBranchToShow="" # Argument supplied by default/diff/function that supplies what commits to show (..origin/${branch}"
 
-    [[ -n ${1} ]] && commitcount="${1}"
-    [[ -n ${2} ]] && diff="${2}"
+    [[ -n ${1} ]] && amountOfCommits="${1}"
+    [[ -n ${2} ]] && commitsOfBranchToShow="${2}"
 
     local amountOfCommitsInRepository=$(git rev-list --count HEAD)
 
-    if [[ ${amountOfCommitsInRepository} -lt ${commitcount} ]]; then
+    if [[ ${amountOfCommitsInRepository} -lt ${amountOfCommits} ]]; then
         echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m"
-        commitcount=${amountOfCommitsInRepository}
+        amountOfCommits=${amountOfCommitsInRepository}
     fi
 
     IFS=$'\n'
-    if [[ ${commitcount} == 1 ]]; then
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${commitcount} --reverse ${diff} --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
+    if [[ ${amountOfCommits} == 1 ]]; then
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
     else
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${commitcount} --reverse ${diff} --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
     fi
-    read -d $'\0' -a commitauthor      <<< $(git --no-pager log -n${commitcount} --reverse ${diff} --pretty="%ae" | cut -c -2 | tr a-z A-Z)
-    read -d $'\0' -a statsofcommits    <<< $(git --no-pager log -n${commitcount} --reverse ${diff} --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
-    read -d $'\0' -a messagesofcommits <<< $(git --no-pager log -n${commitcount} --reverse ${diff} --pretty=" %s")
+    read -d $'\0' -a commitAuthor      <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="%ae" | cut -c -2 | tr a-z A-Z)
+    read -d $'\0' -a statsOfCommit     <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
+    read -d $'\0' -a messageOfCommit   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty=" %s")
 
-    local linecounter=0
-    local max_files_changed=0
-    local max_insertions=0
-    local max_deletions=0
+    local lineCounter=0     # Holds the progress while iterating though the array
+    local maxFilesChanged=0 # Saves the maximum ammount of files changed of all commits
+    local maxInserions=0    # Saves the maximum ammount of intertions of all commits
+    local maxDeletions=0    # Saves the maximum ammount of deletions of all commits
 
-    # Wenn kein "changed" in der Zeile ist, handelt es sich wahrscheinlich um einen Merge und das
-    # "files changed" wird von git nicht ausgegeben, somit muss es erst per git diff geholt werden
-    # &
     # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
-    for line in "${statsofcommits[@]}"; do
+    for line in "${statsOfCommit[@]}"; do
         local newline
+        # If there is no "changed" in the line the commit is probably a merge commit from a MR
+        # If so git doesn't show the usual "g files changed, h insertions(+), i deletions(-)" so it has to be fetched from git diff
         if [[ ${line} == *changed* ]]; then
             newline=$(echo ${line} | cut -d " " -f2-)
         else
@@ -173,47 +172,47 @@ git_log(){
             newline="$(git diff ${hash}^ ${hash} --stat | grep "changed,")"
         fi
 
-        local files_changed=$(echo ${newline} | grep -Eo '[0-9]+' | head -1)
+        local filesChanged=$(echo ${newline} | grep -Eo '[0-9]+' | head -1)
         local insertions=0
         [[ ${newline} == *"insertion"* ]] && insertions=$(echo ${newline} | grep -Eo '[0-9]+' | sed -n 2p)
         local deletions=0
         [[ ${newline} == *"deletion"* ]] && deletions=$(echo ${newline} | grep -Eo '[0-9]+' | tail -1)
 
-        statsofcommits[${linecounter}]="${files_changed} ${insertions} ${deletions}"
+        statsOfCommit[${lineCounter}]="${filesChanged} ${insertions} ${deletions}"
 
-        [[ ${files_changed} -gt ${max_files_changed} ]] && max_files_changed=${files_changed}
-        [[ ${insertions}    -gt ${max_insertions}    ]] && max_insertions=${insertions}
-        [[ ${deletions}     -gt ${max_deletions}     ]] && max_deletions=${deletions}
-        ((linecounter++))
-        echo -ne "Log wird geparsed (${linecounter}/${commitcount})\r"
+        [[ ${filesChanged} -gt ${maxFilesChanged} ]] && maxFilesChanged=${filesChanged}
+        [[ ${insertions}   -gt ${maxInserions}    ]] && maxInserions=${insertions}
+        [[ ${deletions}    -gt ${maxDeletions}    ]] && maxDeletions=${deletions}
+        ((lineCounter++))
+        echo -ne "Log wird geparsed (${lineCounter}/${amountOfCommits})\r"
     done
 
     echo -ne "                                               \r" #"Log wird geparsed" überschreiben
 
-    local len_of_max_files_changed=$(echo ${max_files_changed} | wc -c)
-       local len_of_max_insertions=$(echo ${max_insertions}    | wc -c)
-        local len_of_max_deletions=$(echo ${max_deletions}     | wc -c)
+    local lenOfMaxFilesChanged=$(echo ${maxFilesChanged} | wc -c)
+       local lenOfMaxInserions=$(echo ${maxInserions}    | wc -c)
+       local lenOfMaxDeletions=$(echo ${maxDeletions}    | wc -c)
 
-    ((len_of_max_files_changed--)) #wc -w is +1, aber nur bei len_of_max_files_changed 1 abziehen, da die anderen noch "+" & "-" haben
+    ((lenOfMaxFilesChanged--)) #wc -w is +1, aber nur bei lenOfMaxFilesChanged 1 abziehen, da die anderen noch "+" & "-" haben
 
-    linecounter=0
+    lineCounter=0
     for line in "${hashandtime[@]}"; do #Ausgabe der ganzen Infos
         echo -n ${line}
-        [[ ${repo} == "abm" ]] && echo -n "${commitauthor[${linecounter}]} | "
-        local statsline=${statsofcommits[${linecounter}]}
+        [[ ${repo} == "abm" ]] && echo -n "${commitAuthor[${lineCounter}]} | "
+        local statsline=${statsOfCommit[${lineCounter}]}
 
-        local files_changed=$(echo ${statsline} | cut -d " " -f1)
-           local insertions=$(echo ${statsline} | cut -d " " -f2)
-            local deletions=$(echo ${statsline} | cut -d " " -f3)
+        local filesChanged=$(echo ${statsline} | cut -d " " -f1)
+          local insertions=$(echo ${statsline} | cut -d " " -f2)
+           local deletions=$(echo ${statsline} | cut -d " " -f3)
 
-        printf "%${len_of_max_files_changed}s" "${files_changed}"
-        printf " (\e[32m%${len_of_max_insertions}s\e[0m" "+${insertions}"
-        printf " \e[31m%${len_of_max_deletions}s\e[0m)" "-${deletions}"
-        echo -e " |""$(echo ${messagesofcommits[${linecounter}]})"
-        ((linecounter++))
+        printf "%${lenOfMaxFilesChanged}s" "${filesChanged}"
+        printf " (\e[32m%${lenOfMaxInserions}s\e[0m" "+${insertions}"
+        printf " \e[31m%${lenOfMaxDeletions}s\e[0m)" "-${deletions}"
+        echo -e " |""$(echo ${messageOfCommit[${lineCounter}]})"
+        ((lineCounter++))
     done
 
-    [[ -n ${diff} ]] && return
+    [[ -n ${commitsOfBranchToShow} ]] && return
 
     while true; do
         echo -e "\n\e[96;1m"
@@ -221,16 +220,16 @@ git_log(){
         echo -e "\e[0m"
         read -e answer
         [[ -z ${answer} ]] && break
-        local commithash
-        if [[ ${answer} =~ ^[0-9]{1,2}$ && ${answer} -le 30  ]]; then
-            commithash=$(git --no-pager log -n 30 --reverse --pretty="%h" | sed -n ${answer}p)
+        local commitHash
+        if [[ ${answer} =~ ^[0-9]{1,2}$ && ${answer} -le ${amountOfCommits} ]]; then
+            commitHash=$(git --no-pager log -n 30 --reverse --pretty="%h" | sed -n ${answer}p)
         elif [[ ${answer} =~ ^[0-9a-z]{5,}$ ]]; then
-            commithash=${answer}
+            commitHash=${answer}
         else
             echo -e "\e[31mDie Antwort konnte nicht interpretiert werden\e[0m"
             continue
         fi
-        git show ${commithash}
+        git show ${commitHash}
     done
 }
 
