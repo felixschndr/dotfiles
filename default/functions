@@ -5,7 +5,7 @@ cd(){
     # Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
     # Beispiel:
     # ┌─[11:40:57]-[:)]-[fschneider@frank]-[/tmp/]
-    # └──> cd Resources/305075061F05.xml
+    # cd Resources/305075061F05.xml
     #
     # ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
     # └──>
@@ -373,6 +373,25 @@ stopwatch(){
     local duration="0""$(bc <<< "scale=3; ${secondsSinceEpochTillEndOfExecutions} - ${secondsSinceEpochTillStartOfExecutions} + (${nanosecondsAtEndOfExecutions} -${nanosecondsAtStartOfExecutions})/1000000000")"
 
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @${duration} +%M:%S.%3N) gedauert"
+}
+
+tmux(){
+    local sessionName="${HOSTNAME}"
+
+    # Check for existing session
+    # If there is one:  attach the existing one
+    # If there is none: create a new one and then attach it
+    if [[ "$(command tmux ls | grep -o ${sessionName})" == "${sessionName}" ]]; then
+        command tmux attach-session -t ${sessionName}
+    else # if it wasn't there then setup as below
+        command tmux new-session -s ${sessionName} -d
+        command tmux rename-window "home"
+        command tmux split-window -h
+        command tmux split-window -v
+        command tmux send-keys -t 0.0 'shopt -s checkwinsize; tmux_help' Enter
+        command tmux select-pane -t 0
+        command tmux -u attach-session -d
+    fi
 }
 
 tmux_help(){

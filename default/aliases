@@ -14,7 +14,6 @@ alias cp='rsync -arh --info=progress2'
 alias b='exec $SHELL'
 alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias tf='tail -f -n 1000'
-alias tmux='tmux -u' #Setzt encoding für ö,ü und ä
 alias df="df -h"
 alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 alias time="stopwatch"
