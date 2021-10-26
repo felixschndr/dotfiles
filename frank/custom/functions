@@ -8,7 +8,7 @@ battery(){
 
 
 baslog(){
-    cd "/var/log/bas/$(date +'%d.%m.%Y')" || echo -e "\e[31mEs wurde kein aktueller Log gefunden\e[0m"; return 1
+    cd "/var/log/bas/$(date +'%d.%m.%Y')"
     local logfile="$(command ls -1t | head -n 1)"
     echo -e "\e[96;1m"; center "Logfile: ${logfile}"; echo -e "\e[0m\n"
     tail -f -n 1000 "${logfile}"
