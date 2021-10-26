@@ -6,6 +6,16 @@ battery(){
     echo -ne "\e[0m"
 }
 
+
+baslog(){
+    cd "/var/log/bas/$(date +'%d.%m.%Y')"
+    local logfile="$(command ls -1t | head -n 1)"
+    echo -e "\e[96;1m"; center "Logfile: ${logfile}"; echo -e "\e[0m\n"
+    tail -f -n 1000 "${logfile}"
+    cd - >/dev/null
+}
+
+
 build(){
     echo -e "\e[1;36mPaket wird gebaut\e[0m"
 
@@ -32,11 +42,6 @@ build(){
     fi
 }
 
-baslog(){
-    local logfile="/var/log/bas/$(command ls -1t /var/log/bas/ | head -n 1)"
-    echo -e "\e[96;1m"; center "Logfile: ${logfile}"; echo -e "\e[0m\n"
-    tail -f -n 1000 "${logfile}"
-}
 
 upload(){
     if [[ -z ${1} ]]; then
