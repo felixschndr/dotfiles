@@ -376,6 +376,8 @@ push(){
 
 pull(){
     #Prüfen, ob es Änderungen gibt, die noch gepullt werden müssen
+    local last_pull=$(git_last_pull)
+
     [[ $1 == "force" ]] && local fetch_result=$(git fetch 2>&1) #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
     if [[ "${fetch_result}" == *"Permission denied"* ]]; then
         echo -e "\e[31mFehler beim Pullen: Verbindung wurde von GIT abgelehnt (Der SSH-Key ist nicht nicht hinterlegt)"
@@ -385,7 +387,7 @@ pull(){
     outputOfGitStatus=$(git status 2>&1)
 
     if [[ ! "${outputOfGitStatus}" =~ (Commit hinter|Commits hinter|behind) ]]; then
-        [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n"
+        [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n\e[0m    --> ${last_pull}\n"
         return
     fi
 
@@ -398,6 +400,8 @@ pull(){
     fi
 
     git_log "${amount}" "..origin/${branch}"
+
+    echo -e "\n${last_pull}"
 
     read -e -n1 answer
 
