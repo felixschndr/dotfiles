@@ -127,6 +127,16 @@ git_issues(){
     return 0
 }
 
+git_last_pull(){
+    if ! check_if_git_repo_exists; then return 1; fi
+
+    local last_pull=$(date -r "$(git rev-parse --show-toplevel)/.git/FETCH_HEAD" +'am %A, den %d.%m. um %H:%M:%S Uhr')
+
+    echo "Der letzte Pull war ${last_pull}"
+
+    return 0
+}
+
 git_log(){
     if ! check_if_git_repo_exists; then return 1; fi
 
@@ -147,9 +157,9 @@ git_log(){
 
     IFS=$'\n'
     if [[ ${amountOfCommits} == 1 ]]; then
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="    %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
     else
-        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="| %cd | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
+        read -d $'\0' -a hashandtime   <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
     fi
     read -d $'\0' -a commitAuthor      <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="%ae" | cut -c -2 | tr a-z A-Z)
     read -d $'\0' -a statsOfCommit     <<< $(git --no-pager log -n${amountOfCommits} --reverse ${commitsOfBranchToShow} --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
