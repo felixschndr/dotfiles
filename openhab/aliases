@@ -1,8 +1,9 @@
 #!/bin/bash
 
-alias qnap='ssh openhab@qnap'
+alias clear_inbox='sudo -u openhab ssh openhab@localhost -p8101 "smarthome:inbox clear"'
 alias helper='ssh pi@helper'
 alias influx='influx -database openhab_db'
+alias qnap='ssh openhab@qnap'
 
 
 log_openhab='/var/log/openhab2/events.log'
