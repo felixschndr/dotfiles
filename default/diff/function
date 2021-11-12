@@ -210,7 +210,7 @@ commit_files(){
 
 
         if [[ ${commit_type} == "{INITIAL}"* && -z ${commit_message} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
-            commit_message="Add $(basename ${file}) to repository"
+            commit_message="Add $(basename "${file}") to repository"
         fi
 
         if [[ -z ${commit_message} ]]; then #Keine Nachricht angegeben
@@ -330,7 +330,8 @@ push(){
                 continue
             fi
             if [[ ${commit_type} == "{INITIAL}"* && -z ${answer} ]]; then #Bei INITIAL und keiner commit message eine Standardnachricht verwenden
-                answer="Add $(basename ${file}) to repository"
+
+                answer="Add $(basename "${file}") to repository"
             fi
             answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
@@ -503,11 +504,12 @@ diff_function(){
         esac
 
         local longest_filename=0
-        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2-); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/ /{/g'); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
             [[ $(echo ${filename} | wc -c) -gt ${longest_filename} ]] && longest_filename=$(echo ${filename} | wc -c)
         done
 
-        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | uniq); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+        for filename in $(git status | grep "geändert\|modified\|neue Datei\|new file" | cut -d ":" -f2- | sed 's/^ *//g' | sed 's/^ *//g' | sed 's/ /{/g' | uniq); do #Am Anfang alle Dateien auflisten, die bearbeitet wurden
+            filename=${filename//\{/ }
             local filename_length=$(echo ${filename} | wc -c)
             echo -ne " - "${filename}
             local amount_of_spaces=$((longest_filename - filename_length))
