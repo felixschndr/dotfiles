@@ -130,10 +130,21 @@ git_issues(){
 git_last_pull(){
     if ! check_if_git_repo_exists; then return 1; fi
 
-    local last_pull
-    local fetch_head_file=$(git rev-parse --show-toplevel)/.git/FETCH_HEAD
+    local fetchHeadFile=$(git rev-parse --show-toplevel)/.git/FETCH_HEAD
 
-    [[ -f ${fetch_head_file} ]] && echo "Der letzte Pull war $(date -r ${fetch_head_file} +'am %A, den %d.%m. um %H:%M:%S Uhr')"
+    [[ ! -f ${fetchHeadFile} ]] && return # Check if file exsits
+
+    local pullDate=$(date -r ${fetchHeadFile} +%D)
+    local pullTime=$(date -r ${fetchHeadFile} +'%H:%M:%S Uhr')
+
+    if [[ ${pullDate} == $(date +%D) ]]; then
+        echo -n "Der letzte Pull war heute"
+    elif [[ ${pullDate} == $(date +%D --date="1 day ago") ]]; then
+        echo -n "Der letzte Pull war gestern"
+    else
+        echo -n "Der letzte Pull war $(date -r ${fetchHeadFile} +'am %A, den %d.%m.')"
+    fi
+    echo " um ${pullTime}"
 
     return 0
 }
