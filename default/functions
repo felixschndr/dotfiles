@@ -36,8 +36,8 @@ file_info(){
 	for file in ${allFiles}; do
 		((counter++))
 
-		[[ -d ${file} ]] && echo -e "\e[31m\"${file}\" ist ein Ordner\e[0m"             && continue
-		[[ -f ${file} ]] || echo -e "\e[31mDie Datei \"${file}\" exisitiert nicht\e[0m" && continue
+		[[ -d ${file} ]]   && echo -e "\e[31m\"${file}\" ist ein Ordner\e[0m"             && continue
+		[[ ! -f ${file} ]] && echo -e "\e[31mDie Datei \"${file}\" exisitiert nicht\e[0m" && continue
 
     	filename=$(basename ${file})
         echo -e "\e[1;96mDateiname:\t${filename}\e[0m"
@@ -50,7 +50,7 @@ file_info(){
     	echo -e "Gruppe:\t\t$(find ${file} -printf "%g")"
     	echo -e "Rechte:\t\t$(find ${file} -printf "%M (%m)" | cut -c 2-)"
 
-    	[[ "${filename}" =~ ^\..{1,} ]] && fileHidden="Ja" ||  fileHidden="Nein"
+    	[[ "${filename}" =~ ^\..{1,} ]] && fileHidden="Ja" || fileHidden="Nein"
         echo -e "Versteckt:\t${fileHidden}"
 
         if [[ $(file ${file}) == *"CRLF"* ]]; then
