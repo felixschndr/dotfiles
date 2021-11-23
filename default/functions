@@ -96,7 +96,7 @@ git_history(){
     if [[ ${1} =~ ^[0-9]{1,5}$ ]]; then
         local amountOfCommitsInRepository=$(git rev-list --count HEAD)
         local nthCommitToBeShown=$(( ${1} - 1 ))
-        [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m" && return 1
+        [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m" && return 1
 
         commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
     else
@@ -164,7 +164,7 @@ git_log(){
     local amountOfCommitsInRepository=$(git rev-list --count HEAD)
 
     if [[ ${amountOfCommitsInRepository} -lt ${amountOfCommits} ]]; then
-        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in dieses Repo! \e[0m"
+        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m"
         amountOfCommits=${amountOfCommitsInRepository}
     fi
 
