@@ -480,9 +480,7 @@ upgrade(){
     [[ ${?} == 0 ]] || return
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
 
-    if [[ $(hostname) != "openhab" ]]; then
-        return
-    fi
+    [[ $(hostname) == "openhab" ]] || return
 
     openHABIP="localhost"
     itemToBeUpdated="System_Updates"
