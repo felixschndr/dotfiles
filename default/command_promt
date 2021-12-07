@@ -2,13 +2,11 @@
 
 complete -d cd #Damit werden files ausgeblendet bei der Vervollständigung
 shopt -s cdspell #Korrigiert kleine Typos bei Pfaden nach dem Abschicken
-shopt -s autocd #In dir wechseln ohne cd
-
+[[ $(echo $BASH_VERSION | cut -c1) -ge 4 ]] && shopt -s autocd #In dir wechseln ohne cd (erst ab BASH v.4 verfügbar)
 
 LS_COLORS="$(echo "${LS_COLORS}" | sed 's/ex=01;32:/ex=32:/g')" #Nur die Farbe von ausführbaren Programmen ersetzen
 
-
-export HISTCONTROL=ignoreboth #schreibe nicht in die history was doppelt ist oder mit einem Leerzeichen anfängt
+export HISTCONTROL=ignoreboth #schreibe nicht in die history was doppelt ist oder in HISTIGNORE steht
 export HISTIGNORE="clear:ll:* --help:man" #Kommandos, die nicht in die History aufgenommen werden
 export HISTTIMEFORMAT="%d.%m. %H:%M:%S - " #Format der History anpassen
 export HISTSIZE=10000 #Kommandos, die im Memory gespeichert bleiben
