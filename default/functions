@@ -66,6 +66,17 @@ file_info(){
     return 0
 }
 
+git_checkout_history(){
+    local urlOfRepository=$(git_base_url)
+    [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+
+    git reflog --format=' - %<(14)%cr | %<(70)%gs | %s' | \
+        grep "checkout:" | \
+        head -n 15 | \
+        tac | \
+        sed 's/checkout: moving from //g;s/to/-->/g'
+}
+
 git_history(){
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
