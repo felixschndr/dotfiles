@@ -493,10 +493,10 @@ which(){
     [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m"       && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    type ${1}
+    type ${1} || return 1
 
     local isFunction=$(type ${1})
-    local fileLocation=$(bash -c "which ${1}")
+    local fileLocation=$(command which ${1})
 
     if [[ ( ! ${isFunction} == *"ist eine Funktion"* ) && -n ${fileLocation} ]]; then
 
