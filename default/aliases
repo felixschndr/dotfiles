@@ -18,6 +18,7 @@ alias df="df -h"
 alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 alias time="stopwatch"
 alias ct="cd /tmp/ && git clone git@github.com:Trysupe/testing.git && cd testing/"
+alias ip='ip --color=always'
 
 [[ -n $(command -v code) ]] && alias c='code .'
            [[ -n ${TMUX} ]] && alias help='tmux_help'
