@@ -33,13 +33,10 @@ fi`'
 # ]-[
 PS1+="${GRAU}]-[${DEFAULT}"
 
-# Fabrbe für den Username
-#   - root:  rot
-#   - sonst: grün
-[[ $(id -u) -eq 0 ]] && PS1+="${ROT}" || PS1+="${GRUEN}"
-
-# Username und '@'
-PS1+="\u${PINK}@"
+# Unterscheidung nach Username
+#   - root:  roter  username und "💀"
+#   - sonst: grüner username und "@"
+[[ $(id -u) -eq 0 ]] && PS1+="${ROT}\u💀" || PS1+="${GRUEN}\u${PINK}@"
 
 # Farbe für den Hostnamen generieren (|| hat nicht funktioniert, deswegen elif)
 PS1+='`if [[ -z ${SSH_CLIENT} ]]; then\
