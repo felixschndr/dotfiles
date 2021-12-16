@@ -380,8 +380,11 @@ pull(){
     local last_pull=$(git_last_pull)
 
     [[ $1 == "force" ]] && local fetch_result=$(git fetch 2>&1) #Nur Wenn diff mit "force" gestartet wurde soll auf Commits geprüft werden, sonst nicht, da es zu lange dauert
-    if [[ "${fetch_result}" == *"Permission denied"* ]]; then
-        echo -e "\e[31mFehler beim Pullen: Verbindung wurde von GIT abgelehnt (Der SSH-Key ist nicht nicht hinterlegt)"
+    if [[ "${fetch_result}" == *"unable to access 'https://"* ]]; then
+        echo -e "\e[31mEs konnte keine Verbindung über HTTPS zum GIT-Server aufgebaut werden!\n\e[0m"
+        return 1
+    elif [[ "${fetch_result}" == *"Connection refused"* ]]; then
+        echo -e "\e[31mEs konnte keine Verbindung über SSH zum GIT-Server aufgebaut werden!\n\e[0m"
         return 1
     fi
 
