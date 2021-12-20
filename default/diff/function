@@ -296,7 +296,7 @@ commit_files(){
             commit_message="$(commitmessageToUpperCase ${commit_message})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
             last_commit_message="${commit_type}${commit_message}"
-            echo "git commit ${git_signature_arguments} "${file}" -m \"${last_commit_message}\""
+            echo -e "git commit ${git_signature_arguments} \"${file}\" -m \"${last_commit_message}\""
 	        git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
