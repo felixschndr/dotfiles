@@ -1,0 +1,10 @@
+#!/bin/bash
+
+[[ ${USER} == "root" ]] && return
+
+command="curl http://whatthecommit.com/index.txt 2>/dev/null"
+
+[[ -n $(command -v cowthink 2>/dev/null) ]] && command+=" | cowthink"
+[[ -n $(command -v lolcat 2>/dev/null) ]]   && command+=" | lolcat"
+
+eval "${command}"
