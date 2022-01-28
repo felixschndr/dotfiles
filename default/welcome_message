@@ -1,6 +1,7 @@
 #!/bin/bash
 
-[[ ${USER} == "root" ]] && return
+[[ ${USER} == "root" ]]      && return
+[[ ${HOSTNAME} == "bassi" ]] && return
 
 command="curl http://whatthecommit.com/index.txt 2>/dev/null"
 
