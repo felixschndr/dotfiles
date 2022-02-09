@@ -363,7 +363,7 @@ push(){
                 echo -e "\e[32mDie Änderungen wurden hochgeladen\e[0m"
             elif [[ ${output} == *"--set-upstream"* ]]; then
                 echo -e "\e[33mDer Upsteam musste erst gesetzt werden\e[0m"
-                $(git push 2>&1 | grep "git push")
+                eval $(git push 2>&1 | grep "git push")
             else
                 echo -e "\e[31mEs gab ein Problem beim Hochladen!\e[0m"
             fi
