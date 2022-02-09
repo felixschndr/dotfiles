@@ -103,7 +103,7 @@ item_toggle(){
         echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[0m" && return 1
     fi
 
-    ${setNewStateOutput}=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${newState}")
+    local setNewStateOutput=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${newState}")
 
     [[ "${setNewStateOutput}" == *"not valid"* ]] && echo -e "\e[31m${setNewStateOutput}\e[0m" && return 1
 
