@@ -2,13 +2,16 @@
 
 
 echoTTS(){
-    echo -e "\e[96mWas soll gesagt werden?\e[0m"
-    read -e answer
+    local answer=${@}
+    if [[ -z ${1} ]]; then
+        echo -e "\e[96mWas soll gesagt werden?\e[0m"
+        read -e answer
+    fi
 
     [[ -z "${answer}" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && exit 1
 
-    item_send Sprachassistent_EchoDot_Lautstaerke_Proxy 80
-    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send Sprachassistent_EchoDot_TTS \"${answer}\""
+    [[ $(item_get --raw Sprachassistent_EchoDot_Lautstaerke_Proxy) != 80 ]] && item_send Sprachassistent_EchoDot_Lautstaerke_Proxy 80
+    ssh openhabian@localhost -p8101 "smarthome:send Sprachassistent_EchoDot_TTS \"${answer}\""
 
     exit
 }
@@ -29,12 +32,14 @@ complete -F _item_completions item_get item_send item_toggle search_log search_s
 
 item_get(){
 
-    [ -z ${1} ] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Item angegeben\e[0m" && return 1
+    local raw=false
+    [[ ${1} == "--raw" ]] && raw=true && shift
 
     for item in ${@} ; do
         state=$(curl -X GET "http://localhost:8080/rest/items/${item}/state" 2>/dev/null)
         [[ "${state}" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"${item}\" existiert nicht\e[0m" && return 1
-        echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
+        [[ ${raw} == true ]] && echo ${state} || echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
     done
 }
 
@@ -51,13 +56,13 @@ item_send(){
     echo -e "\e[36mAlter Status:\e[0m\t${oldState}"
 
     outputFile=$(mktemp)
-    sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${2}" > ${outputFile}
+    ssh openhabian@localhost -p8101 "smarthome:send ${1} ${2}" > ${outputFile}
 
     if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
         echo -e "\n\e[33mDas Kommando konnte nicht gesendet werden.\e[0m Mögliche Kommandos sind:"
         cat ${outputFile} | tail -n +3 | sed 's/  /  - /g'
         echo -ne "Es wird versucht ein Update für den Status durchzuführen\r"
-        sudo -u openhab ssh openhab@localhost -p8101 "smarthome:update ${1} ${2}" > ${outputFile}
+        ssh openhabian@localhost -p8101 "smarthome:update ${1} ${2}" > ${outputFile}
 
         if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
             echo -e "\e[31mDer neue Status wurde auch vom update nicht akzeptiert! \e[0m"
@@ -103,7 +108,7 @@ item_toggle(){
         echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[0m" && return 1
     fi
 
-    local setNewStateOutput=$(sudo -u openhab ssh openhab@localhost -p8101 "smarthome:send ${1} ${newState}")
+    local setNewStateOutput=$(ssh openhabian@localhost -p8101 "smarthome:send ${1} ${newState}")
 
     [[ "${setNewStateOutput}" == *"not valid"* ]] && echo -e "\e[31m${setNewStateOutput}\e[0m" && return 1
 
