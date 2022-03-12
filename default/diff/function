@@ -447,6 +447,11 @@ diff_function(){
 
     if ! check_for_unmanaged_files; then git status && return; fi
 
+    if ! check_for_root_user; then
+        # Prüfen, ob der Nutzer aktuell root ist, da root sehr wahrscheinlich nicht das git-Repository gehört
+        echo -e "\e[31mAchtung! Aktueller Nutzer: ${USER}"
+        return 1
+    fi
 
     if [[ "$1" =~ ^(p|pull|diff)$ ]]; then
         pull "force"
