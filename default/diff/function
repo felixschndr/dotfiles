@@ -13,8 +13,20 @@ use_git_signoff=true
 
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
-    if [[ "${outputOfGitStatus}" =~ (Untracked file|deleted|Unversioniert|gelöscht|umbenannt|renamed) ]]; then
-        echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder unversioniert sind. Sollen diese jetzt bearbeitet werden?\e[0m"
+    if [[ "${outputOfGitStatus}" =~ (Untracked file|Unversioniert) ]]; then
+        echo -e "\e[33mEs gibt noch Dateien, die unversioniert sind. Sollen diese jetzt hinzugefügt werden?\e[0m"
+        read -e -n1 answer
+        if [[ ${answer} =~ ^[YyJj]$ ]]; then
+            echo -e "\e[32mFolgende Dateien werden hinzugefügt:\e[0m"
+            git ls-files    -o --exclude-standard | sed 's/^/ - /g'
+            git ls-files -z -o --exclude-standard | xargs -0 git add
+            echo -e "\n\n"
+        fi
+    fi
+
+    updateOutputOfGitStatusVar()
+    if [[ "${outputOfGitStatus}" =~ (deleted|gelöscht|umbenannt|renamed) ]]; then
+        echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder umbenannt sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         unmanaged_files=true
         read -e -n1 answer
         [[ ${answer} =~ ^[YyJj]$ ]] && return 1
@@ -122,9 +134,14 @@ commitmessageToUpperCase(){
 }
 
 
+updateOutputOfGitStatusVar(){
+    outputOfGitStatus=$(git status 2>&1)
+}
+
+
 commit_files(){
     #Die Dateien durchgehen und gegebenenfalls committen
-    outputOfGitStatus=$(git status 2>&1)
+    updateOutputOfGitStatusVar
     unset commit_messages
     changed=false
     file_counter=1
@@ -388,7 +405,7 @@ pull(){
         return 1
     fi
 
-    outputOfGitStatus=$(git status 2>&1)
+    updateOutputOfGitStatusVar
 
     if [[ ! "${outputOfGitStatus}" =~ (Commit hinter|Commits hinter|behind) ]]; then
         [[ $1 == "force" ]] && echo -e "\e[32mEs gibt keine Änderungen, die noch heruntergeladen werden müssen\n\e[0m    --> ${last_pull}\n"
@@ -438,7 +455,7 @@ diff_function(){
 
     [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "${BASH_SOURCE}")")/../../"
 
-    outputOfGitStatus=$(git status 2>&1)
+    updateOutputOfGitStatusVar
 
     if ! check_if_git_repo_exists; then return; fi
 
@@ -534,7 +551,7 @@ diff_function(){
     if ! commit_files; then return; fi
 
 
-    outputOfGitStatus=$(git status 2>&1)
+    updateOutputOfGitStatusVar
 
     if [[ "${outputOfGitStatus}" =~ (Commit vor |Commits vor| ahead) || ${changed} = true ]]; then
         echo -e "\e[1;96m"; center "Push"; echo -e "\n\e[0m"
