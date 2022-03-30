@@ -13,12 +13,13 @@ use_git_signoff=true
 
 check_for_unmanaged_files(){
     #Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
+    updateOutputOfGitStatusVar()
     if [[ "${outputOfGitStatus}" =~ (Untracked file|Unversioniert) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die unversioniert sind. Sollen diese jetzt hinzugefügt werden?\e[0m"
+        git ls-files -o --exclude-standard | sed 's/^/ - /g'
         read -e -n1 answer
         if [[ ${answer} =~ ^[YyJj]$ ]]; then
             echo -e "\e[32mFolgende Dateien werden hinzugefügt:\e[0m"
-            git ls-files    -o --exclude-standard | sed 's/^/ - /g'
             git ls-files -z -o --exclude-standard | xargs -0 git add
             echo -e "\n\n"
         fi
