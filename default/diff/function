@@ -373,6 +373,15 @@ push(){
                     echo -e "\e[33mAlle aktuellen Commits wurden schon hochgeladen. \e[32mJetzt ist alles aktuell\e[0m"
                 else
                     echo -e "\e[32mDie Änderungen wurden hochgeladen\e[0m"
+                    if [[ ${output} == *"merge_request"* ]]; then # GitLab: Merge Request
+                        echo -e "\e[1;96m"; center "Merge Request"; echo -e "\n\e[0m"
+                        echo -ne "\e[32mEine Merge Request kann hier erstellt werden: \e[0m"
+                        echo ${output} | grep -o "https:\/\/.*merge_request.*" | cut -d " " -f1
+                    elif [[ ${output} == *"/pull/new/"* ]]; then # GitHub: Pull Request
+                        echo -e "\e[1;96m"; center "Pull Request"; echo -e "\n\e[0m"
+                        echo -ne "\e[32mEine Pull Request kann hier erstellt werden: \e[0m"
+                        echo ${output} | grep -o "https:\/\/.*\/pull\/new\/.*" | cut -d " " -f1
+                    fi
                 fi
             elif [[ ${output} == *"git pull"* ]]; then
                 echo -e "\n\e[33mDie Änderungen des Repositories müssen erst heruntergeladen werden\e[0m"
