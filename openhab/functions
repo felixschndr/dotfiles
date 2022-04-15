@@ -5,7 +5,7 @@ echoTTS(){
     local answer=${@}
     if [[ -z ${1} ]]; then
         echo -e "\e[96mWas soll gesagt werden?\e[0m"
-        read -e answer
+        read -r -e answer
     fi
 
     [[ -z "${answer}" ]] && echo -e "\e[31mEs wurde kein Text angegeben!" && exit 1
@@ -21,7 +21,7 @@ _item_completions(){
     allItems=$(curl -X GET "http://localhost:8080/rest/items/" 2>/dev/null | sed 's/,/\n/g' | grep name | grep -v Gruppe | sed 's/name//g' | sed 's/[":]//g')
     local beginning="${COMP_WORDS[${COMP_CWORD}]}"
 
-    for item in $( echo ${allItems} | sed 's/ /\n/g' | grep -P "^${beginning}"); do
+    for item in $( echo "${allItems}" | sed 's/ /\n/g' | grep -P "^${beginning}"); do
 	    COMPREPLY=("${COMPREPLY[@]}" "${item}")
     done
 }
@@ -39,7 +39,7 @@ item_get(){
     for item in ${@} ; do
         state=$(curl -X GET "http://localhost:8080/rest/items/${item}/state" 2>/dev/null)
         [[ "${state}" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"${item}\" existiert nicht\e[0m" && return 1
-        [[ ${raw} == true ]] && echo ${state} || echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
+        [[ ${raw} == true ]] && echo "${state}" || echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
     done
 }
 
@@ -56,17 +56,17 @@ item_send(){
     echo -e "\e[36mAlter Status:\e[0m\t${oldState}"
 
     outputFile=$(mktemp)
-    ssh openhabian@localhost -p8101 "smarthome:send ${1} ${2}" > ${outputFile}
+    ssh openhabian@localhost -p8101 "smarthome:send ${1} ${2}" > "${outputFile}"
 
-    if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
+    if [[ $(cat "${outputFile}") == *"not valid"* ]]; then
         echo -e "\n\e[33mDas Kommando konnte nicht gesendet werden.\e[0m Mögliche Kommandos sind:"
-        cat ${outputFile} | tail -n +3 | sed 's/  /  - /g'
+        tail -n +3 "${outputFile}" | sed 's/  /  - /g'
         echo -ne "Es wird versucht ein Update für den Status durchzuführen\r"
-        ssh openhabian@localhost -p8101 "smarthome:update ${1} ${2}" > ${outputFile}
+        ssh openhabian@localhost -p8101 "smarthome:update ${1} ${2}" > "${outputFile}"
 
-        if [[ $(cat ${outputFile}) == *"not valid"* ]]; then
+        if [[ $(cat "${outputFile}") == *"not valid"* ]]; then
             echo -e "\e[31mDer neue Status wurde auch vom update nicht akzeptiert! \e[0m"
-            rm -f ${outputFile}
+            rm -f "${outputFile}"
             return 1
         fi
 
@@ -78,7 +78,7 @@ item_send(){
     fi
 
     echo -e "\e[36mNeuer Status:\e[0m\t${2}\e[0m"
-    rm -f ${outputFile}
+    rm -f "${outputFile}"
 }
 
 
@@ -148,7 +148,7 @@ ssh_permissions(){
 
 
 fix_permissions(){
-    cd /etc/openhab2/
+    cd /etc/openhab2/ || return 1
 
     echo -e "Fix Permissions:\n\t1. Apply Improvements\n\t2. Fix Permissions"
     sudo openhabian-config
@@ -157,7 +157,7 @@ fix_permissions(){
     ssh_permissions
 
     echo -e "\e[92mDone\e[0m"
-    cd - >/dev/null
+    cd - >/dev/null || return 1
 }
 
 

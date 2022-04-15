@@ -1,9 +1,7 @@
 #!/bin/bash
 
 check_if_git_repo_exists(){ # Prüfen, ob ein GIT Repo gefunden wurde
-    local outputOfGitStatus=$(git status 2>&1)
-
-    if [[ "${outputOfGitStatus}" =~ (Kein Git-Repo|not a git repository) ]]; then
+    if [[ "$(git status 2>&1)" =~ (Kein Git-Repo|not a git repository) ]]; then
         echo -e "\e[31mEs wurde kein GIT Repository gefunden!\e[0m" >&2
         return 1
     fi

@@ -3,8 +3,10 @@
 [[ ${USER} == "root" ]]             && return
 [[ ${HOSTNAME} =~ (bassi|cronus) ]] && return
 
-command="curl http://whatthecommit.com/index.txt 2>/dev/null"
+text=$(curl http://whatthecommit.com/index.txt 2>/dev/null)
+[[ -z ${text} ]] && return
 
+command="echo ${text}"
 [[ -n $(command -v cowthink 2>/dev/null) ]] && command+=" | cowthink"
 [[ -n $(command -v lolcat 2>/dev/null) ]]   && command+=" | lolcat"
 

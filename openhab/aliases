@@ -5,7 +5,7 @@ alias helper='ssh pi@helper'
 alias influx='influx -database openhab_db'
 alias qnap='ssh openhab@qnap'
 
-log_openhab='/var/log/openhab2/events.log'
+export log_openhab='/var/log/openhab2/events.log'
 
 alias copy_bashrc_to_qnap='sudo -u openhab ssh qnap "rm -Rf /share/CACHEDEV1_DATA/homes/openhab/bashrc"; sudo -u openhab scp -r /home/openhabian/bashrc/ qnap:/share/CACHEDEV1_DATA/homes/openhab/'
 

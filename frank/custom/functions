@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck disable=2155
+
 battery(){
     echo -ne "Status:\e[96;1m"
     acpi | grep "Battery 0" | cut -d ":" -f2- | sed 's/, rate information unavailable//'
@@ -8,11 +10,11 @@ battery(){
 
 
 baslog(){
-    cd "/var/log/bas/$(date +'%d.%m.%Y')"
+    cd "/var/log/bas/$(date +'%d.%m.%Y')" || return
     local logfile="$(command ls -1t | head -n 1)"
     echo -e "\e[96;1m"; center "Logfile: ${logfile}"; echo -e "\e[0m\n"
     tail -f -n 1000 "${logfile}"
-    cd - >/dev/null
+    cd - >/dev/null || return
 }
 
 
@@ -22,7 +24,7 @@ build(){
     local startTime=$(date +%s)
 
     dpkg-buildpackage -us -uc
-    [[ $? != "0" ]] && return 1
+    [[ "${?}" != "0" ]] && return 1
 
     mv ../*.deb .
     rm ../*.{buildinfo,changes,dsc,tar.gz}
@@ -31,12 +33,12 @@ build(){
     local endTime=$(date +%s)
 
     local debianPackageName=$("ls" -1t *.deb | head -1)
-    sudo dpkg -i ${debianPackageName}
+    sudo dpkg -i "${debianPackageName}"
 
-    echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$((${endTime} - ${startTime})) +%M:%S) gedauert"
+    echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$((endTime - startTime)) +%M:%S) gedauert"
 
     echo -e "Soll das Paket hochgeladen werden?\e[0m"
-    read -e -n1 answer
+    read -r -e -n1 answer
     if [[ ${answer} =~ ^[YyJj]$ ]]; then
        upload "${debianPackageName}"
     fi
