@@ -17,11 +17,10 @@ check_for_unmanaged_files(){
     if [[ "${outputOfGitStatus}" =~ (Untracked file|Unversioniert) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die unversioniert sind. Sollen diese jetzt hinzugefügt werden?\e[0m"
         git ls-files -o --exclude-standard | sed 's/^/ - /g'
-        read -e -n1 answer
+        read -r -e -n1 answer
         if [[ ${answer} =~ ^[YyJj]$ ]]; then
-            echo -e "\e[32mFolgende Dateien werden hinzugefügt:\e[0m"
+            echo -e "\e[32mDie Dateien werden hinzugefügt\n\e[0m"
             git ls-files -z -o --exclude-standard | xargs -0 git add
-            echo -e "\n\n"
         fi
     fi
 
@@ -29,7 +28,7 @@ check_for_unmanaged_files(){
     if [[ "${outputOfGitStatus}" =~ (deleted|gelöscht|umbenannt|renamed) ]]; then
         echo -e "\e[33mEs gibt noch Dateien, die gelöscht oder umbenannt sind. Sollen diese jetzt bearbeitet werden?\e[0m"
         unmanaged_files=true
-        read -e -n1 answer
+        read -r -e -n1 answer
         [[ ${answer} =~ ^[YyJj]$ ]] && return 1
     fi
     return 0
@@ -65,7 +64,7 @@ ask_for_commit_type(){
     "\n    8. TYPO\t\t\e[2mBeheben von Rechtschreibfehlern\e[0m" \
     "\n    9. OTHER\t\t\e[2mAlles andere, u.a. Löschen von Code\e[0m\n"
 
-    read -e commit_type_input
+    read -r -e commit_type_input
     local commit_type_input=$(echo ${commit_type_input} | sed -e 's/\(.\)/\1 /g' | sed 's/ /\n/g' | sort -u) #sed fügt nach jedem Zeichen ein Leerzeichen ein (für for-loop)
     if [[ -z ${commit_type_input} ]]; then #Bei leerem Typ file skippen
         echo "skip" > /tmp/.diffcommit
@@ -76,14 +75,14 @@ ask_for_commit_type(){
         if [[ ${answer} =~ ^[YyJj]$ ]]; then
             echo -e "\e[33mDie Änderungen werden gelöscht\e[0m"
             git checkout HEAD "${file}" || echo -e "\e[31mEs gab ein Problem beim Zurücksetzten!\e[0m"
-            [[ $(file ${file}) == *"CRLF"* ]] && echo && to_lf "${file}"
+            [[ $(file "${file}") == *"CRLF"* ]] && echo && to_lf "${file}"
         else
             echo -e "\e[32mDie Änderungen werden nicht gelöscht\e[0m"
         fi
         echo "checkout" > /tmp/.diffcommit
         return
     fi
-    local amount_of_commit_types=$(echo ${commit_type_input} | wc -w)
+    local amount_of_commit_types=$(echo "${commit_type_input}" | wc -w)
     local commit_type_counter=0
     local commit_type="{"
     for type_input in ${commit_type_input}; do
@@ -100,7 +99,7 @@ ask_for_commit_type(){
             *) commit_type+="OTHER"; break;;
         esac
         commit_type+=${type_input}
-        [[ ${commit_type_counter} != ${amount_of_commit_types} ]] && commit_type+=" & "
+        [[ ${commit_type_counter} != "${amount_of_commit_types}" ]] && commit_type+=" & "
     done
     commit_type+="}"
 
@@ -126,9 +125,9 @@ commitmessageToUpperCase(){
     local first_word=${1}
 
     if [[ ${first_word} =~ (://|\(\)$) ]]; then
-        echo ${input} # Den Input unverändert zurück geben
+        echo "${input}" # Den Input unverändert zurück geben
     else
-        echo ${input^} # Erstes Wort groß schreiben
+        echo "${input^}" # Erstes Wort groß schreiben
     fi
 
     return
@@ -145,7 +144,7 @@ commit_files(){
     for file in ${files}; do #Gehe alle Files durch
 
         file=$(echo ${file} | sed 's/}/ /g')
-        echo -e "\e[1;96m"; center "Datei: ${file} (${file_counter}/$(echo ${files} | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
+        echo -e "\e[1;96m"; center "Datei: ${file} (${file_counter}/$(echo "${files}" | wc -w))"; echo -e "\e[0m\n" #Dateinamen mittig und fett anzeigen
         if [[ "$(git diff "${file}" 2>&1)" == *"Permission denied"* && "${file}" != *"diff/function"* ]]; then
             echo -e "\e[31mDie Datei \"${file}\" ist noch in einem anderen Programm geöffnet. Bitte dieses Programm zuerst schließen!\e[0m\n"
             ((file_counter ++))
