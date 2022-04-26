@@ -2,7 +2,8 @@
 
 
 echoTTS(){
-    local answer=${@}
+    local answer
+    answer=${*}
     if [[ -z ${1} ]]; then
         echo -e "\e[96mWas soll gesagt werden?\e[0m"
         read -r -e answer
@@ -86,7 +87,7 @@ item_toggle(){
     [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Item angegeben\e[0m"           && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    oldState=$(curl -X GET http://localhost:8080/rest/items/${1}/state 2>/dev/null)
+    oldState=$(curl -X GET "http://localhost:8080/rest/items/${1}/state" 2>/dev/null)
     [[ "${oldState}" == *"does not exist!"* ]] && echo -e "\e[31mDas angegebene Item existiert nicht\e[0m" && return 1
 
     echo -e "\e[36mItem:\e[0m\t\t${1}"
@@ -108,7 +109,8 @@ item_toggle(){
         echo -e "\n\e[33mDer neue Status konnte nicht bestimmt werden\e[0m" && return 1
     fi
 
-    local setNewStateOutput=$(ssh openhabian@localhost -p8101 "smarthome:send ${1} ${newState}")
+    local setNewStateOutput
+    setNewStateOutput=$(ssh openhabian@localhost -p8101 "smarthome:send ${1} ${newState}")
 
     [[ "${setNewStateOutput}" == *"not valid"* ]] && echo -e "\e[31m${setNewStateOutput}\e[0m" && return 1
 

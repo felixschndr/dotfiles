@@ -32,7 +32,7 @@ build(){
 
     local endTime=$(date +%s)
 
-    local debianPackageName=$("ls" -1t *.deb | head -1)
+    local debianPackageName=$("ls" -1t ./*.deb | head -1)
     sudo dpkg -i "${debianPackageName}"
 
     echo -e "\n\n\e[1;36mDas Bauen des Pakets hat $(date -u --date @$((endTime - startTime)) +%M:%S) gedauert"
