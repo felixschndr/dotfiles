@@ -169,13 +169,12 @@ git_log(){
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
 
     local amountOfCommits="30"
-    local commitsOfBranchToShow="" # Argument supplied by default/diff/function that supplies what commits to show (..origin/${branch}"
+    local commitsOfBranchToShow="$(git rev-parse --abbrev-ref HEAD)" # Argument supplied by default/diff/function that supplies what commits to show (..origin/${branch}"
 
     [[ -n ${1} ]] && amountOfCommits="${1}"
     [[ -n ${2} ]] && commitsOfBranchToShow="${2}"
 
     local amountOfCommitsInRepository=$(git rev-list --count HEAD)
-
     if [[ ${amountOfCommitsInRepository} -lt ${amountOfCommits} ]]; then
         echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m"
         amountOfCommits=${amountOfCommitsInRepository}
@@ -183,13 +182,13 @@ git_log(){
 
     IFS=$'\n'
     if [[ ${amountOfCommits} == 1 ]]; then
-        read -r -d $'\0' -a hashandtime <<< $(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")
+        read -r -d $'\0' -a hashandtime <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")"
     else
-        read -r -d $'\0' -a hashandtime <<< $(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)
+        read -r -d $'\0' -a hashandtime <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
     fi
-    read -r -d $'\0' -a commitAuthor    <<< $(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2 | tr a-z A-Z)
-    read -r -d $'\0' -a statsOfCommit   <<< $(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g') #TODO: sed entfernen da langsam
-    read -r -d $'\0' -a messageOfCommit <<< $(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")
+    read -r -d $'\0' -a commitAuthor    <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2)"
+    read -r -d $'\0' -a statsOfCommit   <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" #TODO: sed entfernen da langsam
+    read -r -d $'\0' -a messageOfCommit <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
 
     local lineCounter=0     # Holds the progress while iterating though the array
     local maxFilesChanged=0 # Saves the maximum ammount of files changed of all commits
@@ -204,7 +203,7 @@ git_log(){
         if [[ ${line} == *changed* ]]; then
             newline=$(echo "${line}" | cut -d " " -f2-)
         else
-            local hash=$(echo "${line}" | sed 's/§//')
+            local hash="${line//$/}"
             newline="$(git diff "${hash}"^ "${hash}" --stat | grep "changed,")"
         fi
 
@@ -225,16 +224,17 @@ git_log(){
 
     echo -ne "                                               \r" #"Log wird geparsed" überschreiben
 
-    local lenOfMaxFilesChanged=$(echo "${maxFilesChanged}" | wc -c)
-       local lenOfMaxInserions=$(echo "${maxInserions}"    | wc -c)
-       local lenOfMaxDeletions=$(echo "${maxDeletions}"    | wc -c)
+    local lenOfMaxFilesChanged=${#maxFilesChanged}
+       local lenOfMaxInserions=${#maxInserions}
+       local lenOfMaxDeletions=${#maxDeletions}
 
-    ((lenOfMaxFilesChanged--)) #wc -w is +1, aber nur bei lenOfMaxFilesChanged 1 abziehen, da die anderen noch "+" & "-" haben
+    ((lenOfMaxInserions++))
+    ((lenOfMaxDeletions++))
 
     lineCounter=0
     for line in "${hashandtime[@]}"; do #Ausgabe der ganzen Infos
         echo -n "${line}"
-        [[ ${repo} == "abm" ]] && echo -n "${commitAuthor[${lineCounter}]} | "
+        [[ ${repo} == "abm" ]] && echo -n "${commitAuthor[${lineCounter}]^^} | "
         local statsline=${statsOfCommit[${lineCounter}]}
 
         local filesChanged=$(echo "${statsline}" | cut -d " " -f1)
@@ -244,7 +244,7 @@ git_log(){
         printf "%${lenOfMaxFilesChanged}s" "${filesChanged}"
         printf " (\e[32m%${lenOfMaxInserions}s\e[0m" "+${insertions}"
         printf " \e[31m%${lenOfMaxDeletions}s\e[0m)" "-${deletions}"
-        echo -e " |""$(echo "${messageOfCommit[${lineCounter}]}")"
+        echo -e " |${messageOfCommit[${lineCounter}]}"
         ((lineCounter++))
     done
 
@@ -297,14 +297,14 @@ printarray(){
 repeat(){
     [ ${#} -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    [[ -z ${2} ]]  && sleeptime="1.0" || sleeptime=$(echo "${2}" | sed 's/,/./')
+    [[ -z ${2} ]]  && sleeptime="1.0" || sleeptime="${2//,/\.}"
 
     local counter=0
     while (true); do
         ((counter ++))
 
-        header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle $(echo "${sleeptime}" | sed 's/\./,/')s   |   Kommando: ${1}   "
-        [ "${#header}" -ge "$(tput cols)" ] && header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle $(echo "${sleeptime}" | sed 's/\./,/')s   "
+        header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   |   Kommando: ${1}   "
+        [ "${#header}" -ge "$(tput cols)" ] && header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   "
         echo -e "\n\e[96;1m"; center "${header}"; echo -e "\e[0m"
 
         eval "${1}"
