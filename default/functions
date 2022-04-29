@@ -279,21 +279,6 @@ git_url(){
     [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
-printarray(){
-    [[ -n ${1} ]]        && echo -e "\e[33mAchtung das array muss \"foo\" heißen!" && return 1
-    [ ${#foo[@]} -eq 0 ] && echo -e "\e[31mDas Array \"foo\"ist leer!"             && return 1
-
-    echo -e "\e[96;1m"; center "Ohne Index"; echo -e "\e[0m"
-    for i in "${!foo[@]}"; do
-        printf "%s\n" "${foo[${i}]}"
-    done
-
-    echo -e "\n\e[96;1m"; center "Mit Index"; echo -e "\e[0m"
-    for i in "${!foo[@]}"; do
-        printf "%s\t%s\n" "${i}" "${foo[${i}]}"
-    done
-}
-
 repeat(){
     [ ${#} -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
