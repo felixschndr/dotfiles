@@ -445,7 +445,7 @@ tmux_help(){
 to_lf(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
 
-    if [[ "${1}" == "alle" ]]; then
+    if [[ "${1}" =~ (alle|\.) ]]; then
         allFiles=$(find . -type f -not -path "*/\.git/*" | xargs file | grep "CRLF" | cut -d " " -f1 | cut -d ":" -f1)
 
         [[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
