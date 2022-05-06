@@ -470,7 +470,7 @@ pull(){
 
 diff_function(){
 
-    [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "${BASH_SOURCE[@]}")")/../../" || return
+    [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "${BASH_SOURCE[@]}")")/../../"
 
     outputOfGitStatus=$(git status 2>&1)
 
