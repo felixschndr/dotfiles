@@ -475,7 +475,7 @@ upgrade(){
 
     if [[ -f /var/run/reboot-required.pkgs ]]; then
         echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
-        nl /var/run/reboot-required.pkgs
+        sort -u /var/run/reboot-required.pkgs | nl
     fi
 }
 
