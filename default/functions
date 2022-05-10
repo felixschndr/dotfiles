@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# shellcheck disable=2155
+# shellcheck disable=2015,2155
 
 cd(){
     # Macht ein normales cd, wenn ein Verzeichnis angegeben wurde
     # Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
     # Beispiel:
     # ┌─[11:40:57]-[:)]-[fschneider@frank]-[/tmp/]
-    # cd Resources/305075061F05.xml
+    # └──> cd Resources/305075061F05.xml
     #
     # ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
     # └──>
@@ -30,7 +30,7 @@ cd(){
 file_info(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
 
-    [[ ${1} == "." ]] && allFiles=$(find . -type f -not -path "*/\.git/*") || allFiles="${@}"
+    [[ ${1} == "." ]] && allFiles=$(find . -type f -not -path "*/\.git/*") || allFiles="${*}"
 
     local counter=0
     local amountOfFiles=$(echo "${allFiles}" | wc -w)
@@ -46,7 +46,7 @@ file_info(){
         absolutePath=$(realpath "${file}")
         echo -e "Absoluter Pfad:\t${absolutePath}"
     	echo -e "Größe:\t\t$(du -h "${file}" | cut -f1)"
-    	echo -e "Anzahl Zeilen:\t$(cat "${file}" | wc -l | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
+    	echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
     	echo -e "Modifiziert:\t$(find "${file}" -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
     	echo -e "Besitzer:\t$(find "${file}" -printf "%u")"
     	echo -e "Gruppe:\t\t$(find "${file}" -printf "%g")"
@@ -376,7 +376,7 @@ search_file(){
 stopwatch(){
     [ ${#} -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
 
-    local commandToRun="$(echo ${@} | sed 's/"/\\"/g')"
+    local commandToRun="${*//\"/\\\"}" # Ersetze '"' durch '\"'
 
     local startOfExecution=$(date +%s,%N)
 
@@ -431,7 +431,7 @@ to_lf(){
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
 
     if [[ "${1}" =~ (alle|\.) ]]; then
-        allFiles=$(find . -type f -not -path "*/\.git/*" | xargs file | grep "CRLF" | cut -d " " -f1 | cut -d ":" -f1)
+        allFiles=$(find . -type f -not -path "*/\.git/*" -print0 | xargs --null file | grep "CRLF" | cut -d ":" -f1)
 
         [[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
 
@@ -441,7 +441,7 @@ to_lf(){
         [[ ! ${answer} =~ (Y|y|J|j) ]] && return
 
     else
-        allFiles=${@}
+        allFiles=${*}
 
     fi
 
@@ -461,8 +461,9 @@ complete -F _longopt -W "alle" to_lf
 upgrade(){
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
 
-    sudo apt upgrade "${1}" #Falls -y angegeben wurde
-    [[ "${?}" == 0 ]] || return
+    if ! sudo apt upgrade "${1}"; then #Falls -y angegeben wurde
+        return
+    fi
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
 
     if [[ $(hostname) == "openhab" ]]; then

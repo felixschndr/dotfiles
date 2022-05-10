@@ -10,7 +10,6 @@ alias upgradable='apt list --upgradable'
 alias mygrep='grep -ins --color=always'
 alias nano='nano -l -T 4'
 alias less='less -IN'
-alias cp='rsync -arh --info=progress2'
 alias b='exec $SHELL'
 alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias tf='tail -f -n 1000'
@@ -20,6 +19,7 @@ alias time="stopwatch"
 alias ct="cd /tmp/ && git clone git@github.com:Trysupe/testing.git && cd testing/"
 alias ip='ip -color'
 
+[[ -n $(command -v rsync) ]] && alias cp='rsync -arh --info=progress2'
 [[ -n $(command -v code) ]] && alias c='code .'
            [[ -n ${TMUX} ]] && alias help='tmux_help'
 
