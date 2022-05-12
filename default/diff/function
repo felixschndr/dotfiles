@@ -127,7 +127,7 @@ commitmessageToUpperCase(){
     local first_word=${1}
 
     if [[ ${first_word} =~ (://|\(\)$) ]]; then
-        echo "${input}" # Den Input unverändert zurück geben
+        echo "${input}" # Den Input unverändert zurückgeben
     else
         echo "${input^}" # Erstes Wort groß schreiben
     fi
@@ -250,7 +250,8 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            answer="$(commitmessageToUpperCase "${answer}")" #Den ersten Buchstaben der commit_message groß schreiben
+            # shellcheck disable=2086
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             echo "git commit ${git_signature_arguments} -a -m \"${commit_type}${answer}\""
             git add .
             git commit "${git_signature_arguments}" -a -m "${commit_type}${answer}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
@@ -286,7 +287,8 @@ commit_files(){
                 echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
-            answer="$(commitmessageToUpperCase "${answer}")" #Den ersten Buchstaben der commit_message groß schreiben
+            # shellcheck disable=2086
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[${#commit_messages[@]}]="${commit_type}${answer}" #Die neue Nachricht überschreibt die alte
             last_commit_message="${commit_type}""${commit_message}"
             git commit "${git_signature_arguments}" --amend -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
@@ -307,7 +309,8 @@ commit_files(){
             continue
 
         else #Commit mit dem angegeben Text
-            commit_message="$(commitmessageToUpperCase "${commit_message}")" #Den ersten Buchstaben der commit_message groß schreiben
+            # shellcheck disable=2086
+            commit_message="$(commitmessageToUpperCase ${commit_message})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
             last_commit_message="${commit_type}${commit_message}"
             echo -e "git commit ${git_signature_arguments} \"${file}\" -m \"${last_commit_message}\""
@@ -347,7 +350,8 @@ push(){
 
                 answer="Add $(basename "${file}") to repository"
             fi
-            answer="$(commitmessageToUpperCase "${answer}")" #Den ersten Buchstaben der commit_message groß schreiben
+            # shellcheck disable=2086
+            answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             git commit "${git_signature_arguments}" --amend -m "${commit_type}${answer}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
             git --no-pager log "origin/${diffbranch}..HEAD" --pretty="| %h | %s" --reverse | nl
@@ -470,6 +474,7 @@ pull(){
 
 diff_function(){
 
+    # shellcheck disable=2164
     [[ ${1} == "diff" ]] && cd "$(dirname "$(readlink -f "${BASH_SOURCE[@]}")")/../../"
 
     outputOfGitStatus=$(git status 2>&1)
