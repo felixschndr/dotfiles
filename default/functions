@@ -114,6 +114,7 @@ git_history(){
         commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
     else
         commitHash=$(git rev-parse "${1}" 2>/dev/null) #Langen Commithash zum kurzen Input bekommen
+        # shellcheck disable=2181
         if [[ ${?} != 0 ]]; then
             echo -e "\e[31mEs konnte kein Commit zu dem Hash gefunden werden\e[0m"
             return 1
