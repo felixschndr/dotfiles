@@ -279,6 +279,15 @@ git_url(){
     [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
+
+psgrep(){
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+
+    ps aux    | head -n 1
+    # shellcheck disable=2009
+    ps aux -H | grep -i "${*}"
+}
+
 repeat(){
     [ ${#} -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
