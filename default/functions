@@ -204,7 +204,7 @@ git_log(){
         if [[ ${line} == *changed* ]]; then
             newline=$(echo "${line}" | cut -d " " -f2-)
         else
-            local hash="${line//$/}"
+            local hash="${line//§/}"
             newline="$(git diff "${hash}"^ "${hash}" --stat | grep "changed,")"
         fi
 
