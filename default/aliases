@@ -8,7 +8,7 @@ alias status='git status'
 alias update='sudo apt update && apt list --upgradable'
 alias upgradable='apt list --upgradable'
 alias mygrep='grep -ins --color=always'
-alias nano='nano -ilS -T 4 --softwrap'
+alias nano='nano -ilmS -T 4 --softwrap'
 alias less='less -IN'
 alias b='exec $SHELL'
 alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
