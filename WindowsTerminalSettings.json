@@ -1,19 +1,19 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
-    [
-        {
-            "command": "togglePaneZoom",
-            "keys": "ctrl+shift+x"
-        },
-        {
-            "command": 
-            {
+    "actions": [{
+            "command": {
                 "action": "resizePane",
                 "direction": "up"
             },
             "keys": "shift+up"
+        },
+        {
+            "command": {
+                "action": "copy",
+                "singleLine": false
+            },
+            "keys": "ctrl+c"
         },
         {
             "command": "unbound",
@@ -132,24 +132,18 @@
             "keys": "ctrl+shift+d"
         },
         {
-            "command": 
-            {
-                "action": "copy",
-                "singleLine": false
-            },
-            "keys": "ctrl+c"
+            "command": "togglePaneZoom",
+            "keys": "ctrl+shift+x"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "moveFocus",
                 "direction": "up"
             },
             "keys": "alt+up"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "splitPane",
                 "split": "right"
             },
@@ -160,32 +154,28 @@
             "keys": "ctrl+v"
         },
         {
-            "command": 
-            {
-                "action": "splitPane",
-                "split": "down"
-            },
-            "keys": "ctrl+shift+o"
-        },
-        {
-            "command": 
-            {
+            "command": {
                 "action": "moveFocus",
                 "direction": "right"
             },
             "keys": "alt+right"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "moveFocus",
                 "direction": "left"
             },
             "keys": "alt+left"
         },
         {
-            "command": 
-            {
+            "command": {
+                "action": "splitPane",
+                "split": "down"
+            },
+            "keys": "ctrl+shift+o"
+        },
+        {
+            "command": {
                 "action": "moveFocus",
                 "direction": "down"
             },
@@ -196,8 +186,7 @@
             "keys": "ctrl+shift+f"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "splitPane",
                 "split": "auto",
                 "splitMode": "duplicate"
@@ -205,24 +194,21 @@
             "keys": "alt+shift+d"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "resizePane",
                 "direction": "down"
             },
             "keys": "shift+down"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "resizePane",
                 "direction": "left"
             },
             "keys": "shift+left"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "resizePane",
                 "direction": "right"
             },
@@ -234,24 +220,20 @@
     "copyOnSelect": true,
     "defaultProfile": "{54e969a7-a2f1-43e0-bbb9-2a6b9117d07b}",
     "launchMode": "maximized",
-    "profiles": 
-    {
-        "defaults": 
-        {
+    "multiLinePasteWarning": false,
+    "profiles": {
+        "defaults": {
             "bellStyle": "taskbar",
             "closeOnExit": "always",
             "colorScheme": "Solarized Dark",
             "experimental.retroTerminalEffect": false,
-            "font": 
-            {
+            "font": {
                 "face": "Cascadia Mono"
             },
             "historySize": 10000,
             "startingDirectory": "%USERPROFILE%"
         },
-        "list": 
-        [
-            {
+        "list": [{
                 "commandline": "%PROGRAMFILES%/Git/usr/bin/bash.exe -i -l",
                 "guid": "{54e969a7-a2f1-43e0-bbb9-2a6b9117d07b}",
                 "icon": "%PROGRAMFILES%/Git/mingw64/share/git/git-for-windows.ico",
@@ -267,9 +249,7 @@
             }
         ]
     },
-    "schemes": 
-    [
-        {
+    "schemes": [{
             "background": "#0C0C0C",
             "black": "#0C0C0C",
             "blue": "#0037DA",
