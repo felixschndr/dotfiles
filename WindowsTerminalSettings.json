@@ -457,5 +457,5 @@
             "yellow": "#808000"
         }
     ],
-    "startupActions": "; sp -V; mf left; sp -H; mf up"
+    "startupActions": "; sp -V; sp -H; mf left"
 }
