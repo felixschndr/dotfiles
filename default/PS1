@@ -50,6 +50,15 @@ fi`'
 # Hostname
 PS1+="\H"
 
+# WSL Erkennung
+#    - bei WSL: "]-[WSL" Einschub
+#    - sonst:   Nichts
+PS1+='`if [[ -f /proc/version ]]; then\
+    if [[ $(cat /proc/version) =~ (M|m)icrosoft ]]; then\
+        echo "\[\e[1;30m\]]-[\[\e[31m\]WSL";\
+    fi;\
+fi`'
+
 # ]-[
 PS1+="${GRAU}]-[${DEFAULT}"
 
