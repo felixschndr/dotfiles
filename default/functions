@@ -157,7 +157,7 @@ git_last_pull(){
         echo -n "Der letzte Pull war gestern"
     else
         daysSince=$(( ($(date +%s) - $(date --date="${pullDate}" +%s) )/(60*60*24) ))
-        echo -n "Der letzte Pull war vor ${daysSince} Tagen am $(date -r "${fetchHeadFile}" +'%A, den %d.%m.')"
+        echo -n "Der letzte Pull war vor ${daysSince} Tagen am $(LANG=de_DE.UTF-8 date -r "${fetchHeadFile}" +'%A, den %d.%m.')"
     fi
     echo " um ${pullTime}"
 
