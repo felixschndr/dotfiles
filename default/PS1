@@ -11,6 +11,26 @@ CYAN="\[\e[1;36m\]"
 ##############################
 
 
+# Berechnung dafür wie lang das Kommando gedauert hat
+function timer_start {
+    timer=${timer:-$SECONDS}
+}
+
+function timer_stop {
+    timer_show=$(($SECONDS - $timer))
+    ((m=(${timer_show}%3600)/60))
+    ((s=${timer_show}%60))
+    timer_show=""
+    if [[ ! (${m} == 0 && ${s} -lt 10) ]]; then
+        [[ ${m} != 0 ]] && timer_show=$(printf "%dm%ds" $m $s) || timer_show=$(printf "%ds" $s)
+    fi
+    
+    unset timer
+}
+
+trap 'timer_start' DEBUG
+
+
 # Erstmal eine Leerzeile für mehr Platz
 PS1="\n"
 
@@ -50,14 +70,18 @@ fi`'
 # Hostname
 PS1+="\H"
 
-# WSL Erkennung
+# Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
+is_wsl=false
+if [[ -f /proc/version ]]; then
+    if [[ $(cat /proc/version) =~ (M|m)icrosoft ]]; then
+        is_wsl=true
+    fi
+fi
+
+# WSL Ausgabe
 #    - bei WSL: "]-[WSL" Einschub
 #    - sonst:   Nichts
-PS1+='`if [[ -f /proc/version ]]; then\
-    if [[ $(cat /proc/version) =~ (M|m)icrosoft ]]; then\
-        echo "\[\e[1;30m\]]-[\[\e[31m\]WSL";\
-    fi;\
-fi`'
+PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[31m\]WSL"`'
 
 # ]-[
 PS1+="${GRAU}]-[${DEFAULT}"
@@ -66,18 +90,26 @@ PS1+="${GRAU}]-[${DEFAULT}"
 PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
-PS1+='`if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
-    echo "\[\e[32m\] (svn)";\
-elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
-    echo "\[\e[31m\]";\
-elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then\
-    echo "\[\e[31m\]";\
-else\
-    echo "\[\e[32m\]";\
+PS1+='`if [[ ${is_wsl} == false ]]; then\
+    if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
+        echo "\[\e[32m\] (svn)";\
+    elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+        echo "\[\e[31m\]";\
+    elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then\
+        echo "\[\e[31m\]";\
+    else\
+        echo "\[\e[32m\]";\
+    fi;\
 fi`'
 
 # Git Branch, wenn es sich um ein Git Verzeichnis handelt
-PS1+=""'$(__git_ps1 " (%s)")'
+PS1+='`[[ ${is_wsl} == false ]] && echo "$(__git_ps1 " (%s)")"`'
+
+# Wenn das Kommando länger als 10 Sekunden gedauert hat wird die Dauer ausgegeben
+PROMPT_COMMAND=timer_stop
+PS1+='`if [[ -n ${timer_show} ]]; then\
+    echo "\[\e[1;30m\]]-[\[\e[0m\]${timer_show}";\
+fi`'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
 PS1+="${GRAU}]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
