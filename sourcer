@@ -2,7 +2,8 @@
 
 repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-while read -r file; do
-    # shellcheck disable=1090
+allFiles=$(find "${repoLocation}"/{default,"$(hostname | tr '[:upper:]' '[:lower:]')"} -type f 2>/dev/null)
+
+for file in ${allFiles}; do
     source "${file}"
-done < <(find "${repoLocation}"/{default,"$(hostname | tr '[:upper:]' '[:lower:]')"} -type f 2>/dev/null)
+done
