@@ -83,7 +83,7 @@ PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[31m\]WSL"`'
 PS1+="${GRAU}]-[${DEFAULT}"
 
 # Pfad, es wird noch ein "/" angehängt, wenn der aktuelle Pfad != "/" ist
-PS1+="${CYAN}${PWD}"'`[[ ${PWD} != "/" ]] && echo "/"`'"${DEFAULT}"
+PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
 PS1+='`if [[ ${PWD} != *"/fschneider/repos/"* ]]; then\
