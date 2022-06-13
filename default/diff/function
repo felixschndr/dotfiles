@@ -7,7 +7,7 @@ alias diff='diff_function'
 
 
 # Wenn ein GPG-Key vorhanden ist benutze ihn
-git_signature_arguments=" -S "
+git_signature_arguments="-S"
 if [[ -z $(gpg --list-keys 2>/dev/null) ]]; then
     echo -e "\e[33mEs konnte kein GPG-Key gefunden werden! Commits werden nicht signiert\e[0m"
     git_signature_arguments=""
