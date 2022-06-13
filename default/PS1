@@ -58,14 +58,10 @@ PS1+="${GRAU}]-[${DEFAULT}"
 #   - sonst: grüner username und "@"
 [[ $(id -u) -eq 0 ]] && PS1+="${ROT}\u💀" || PS1+="${GRUEN}\u${PINK}@"
 
-# Farbe für den Hostnamen generieren (|| hat nicht funktioniert, deswegen elif)
-PS1+='`if [[ -z ${SSH_CLIENT} ]]; then\
-    echo "\[\e[32m\]";\
-elif [[ ${SSH_CLIENT} == "192.168.178."* && ${SSH_CLIENT} != "192.168.178.30"* && ${SSH_CLIENT} != "192.168.178.28"* && $(hostname) == "openhab" ]]; then\
-    echo "\[\e[32m\]";\
-else\
-    echo "\[\e[31m\]";\
-fi`'
+# Farbe für den Hostnamen generieren. Unterscheidung nach SSH Session
+#   - SSH-Session:    Hostname rot
+#   - Lokale Session: Hostname grün
+PS1+='`[[ -z ${SSH_CLIENT} ]] && echo "\[\e[32m\]" || echo "\[\e[31m\]"`'
 
 # Hostname
 PS1+="\H"
@@ -87,9 +83,7 @@ PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
 PS1+='`if [[ ${PWD} != *"/fschneider/repos/"* ]]; then\
-    if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
-        echo "\[\e[32m\] (svn)";\
-    elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
+    if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
         echo "\[\e[31m\]";\
     elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then\
         echo "\[\e[31m\]";\
@@ -108,7 +102,7 @@ PS1+='`if [[ -n ${timer_show} ]]; then\
 fi`'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
-PS1+="${GRAU}]"$'\n' #\n: https://stackoverflow.com/a/21561763/14638014
+PS1+="${GRAU}]"$'\n' # \n: https://stackoverflow.com/a/21561763/14638014
 
 # Untere Linie
 PS1+="${GRAU}\342\224\224\342\224\200\342\224\200> ${DEFAULT}"
