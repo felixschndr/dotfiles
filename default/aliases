@@ -16,13 +16,17 @@ alias tf='tail -f -n 1000'
 alias cp='cp -r'
 alias df="df -h"
 alias ip='ip -color'
-alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 alias nano='nano -l -T 4'
 alias less='less -IN'
-alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
+alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias time="stopwatch"
 
 [[ -n $(command -v code) ]] && alias c='code .'
            [[ -n ${TMUX} ]] && alias help='tmux_help'
+
+# In wsl die git.exe verwenden von Windows, da sie um EINIGES schneller ist
+# https://github.com/microsoft/WSL/issues/4401#issuecomment-811830248
+# Zusätzlich keinen pager verwenden
+[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && alias git='git.exe --no-pager' || alias git="git --no-pager"
 
 export log_auth="/var/log/auth.log"
