@@ -16,7 +16,7 @@ alias tf='tail -f -n 1000'
 alias df="df -h"
 alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
 alias time="stopwatch"
-alias ct="cd /tmp/ && git clone git@github.com:Trysupe/testing.git && cd testing/"
+alias ct="cd /tmp/; [[ -d testing ]] || git clone git@github.com:Trysupe/testing.git; cd testing/"
 alias ip='ip -color'
 
 #[[ -n $(command -v rsync) ]] && alias cp='rsync -arh --info=progress2'
