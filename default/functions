@@ -383,6 +383,23 @@ search_file(){
     fi
 }
 
+
+ssh_permissions(){
+    local ssh_path=${HOME}/.ssh
+    [[ -d ${ssh_path} ]] || return
+    chmod 700 ${ssh_path}
+    [[ -f ${ssh_path}/id_ed25519.pub ]]  && chmod 644 ~/.ssh/id_ed25519.pub
+    [[ -f ${ssh_path}/id_ed25519 ]]      && chmod 600 ~/.ssh/id_ed25519
+    [[ -f ${ssh_path}/authorized_keys ]] && chmod 600 ~/.ssh/authorized_keys
+    [[ -f ${ssh_path}/config ]]          && chmod 600 ~/.ssh/config
+
+    [[ -d /var/lib/openhab2 ]] || return
+    sudo -u openhab chmod 700 /var/lib/openhab2/.ssh
+    sudo -u openhab chmod 644 /var/lib/openhab2/.ssh/id_ed25519.pub
+    sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_ed25519 #/var/lib/openhab2/.ssh/config
+}
+
+
 stopwatch(){
     [ ${#} -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
 
