@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cd repos/
+[[ -d repos/ ]] && cd repos/
