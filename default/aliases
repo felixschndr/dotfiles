@@ -1,8 +1,18 @@
 #!/bin/bash
 
-alias ..="cd .."; alias ,,=".."; alias ...="cd ../.."; alias ....="cd ../../.."; alias .....="cd ../../../.."; alias ......="cd ../../../../.."
+alias ..="cd .."
+alias ,,=".."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+alias ......="cd ../../../../.."
 alias dc='cd'
-alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"; alias l='ls'; alias ll='ls'; alias lll='ls'; alias sl='ls'; alias la="ls -A"
+alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"
+alias l='ls'
+alias ll='ls'
+alias lll='ls'
+alias sl='ls'
+alias la="ls -A"
 alias rm='rm -R'
 
 alias upgradable='apt list --upgradable'
@@ -22,12 +32,16 @@ alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias time="stopwatch"
 
 [[ -n $(command -v code) ]] && alias c='code .'
-           [[ -n ${TMUX} ]] && alias help='tmux_help'
+[[ -n ${TMUX} ]] && alias help='tmux_help'
+
+# Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
+is_wsl=false
+[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && is_wsl=true
 
 # In wsl die git.exe verwenden von Windows, da sie um EINIGES schneller ist
 # https://github.com/microsoft/WSL/issues/4401#issuecomment-811830248
 # Zusätzlich keinen pager verwenden
-[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && alias git='git.exe --no-pager' || alias git="git --no-pager"
-[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && alias cdh="cd /mnt/c/Users/${USER}" # In das Homeverzeichnis in Windows wechseln
+[[ ${is_wsl} == true ]] && alias git='git.exe --no-pager' || alias git="git --no-pager"
+[[ ${is_wsl} == true ]] && alias cdh="cd /mnt/c/Users/${USER}" # In das Homeverzeichnis in Windows wechseln
 
 export log_auth="/var/log/auth.log"

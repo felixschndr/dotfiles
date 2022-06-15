@@ -2,7 +2,7 @@
 
 # shellcheck disable=2015,2155
 
-cd(){
+cd() {
     # Macht ein normales cd, wenn ein Verzeichnis angegeben wurde
     # Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
     # Beispiel:
@@ -27,14 +27,14 @@ cd(){
     command cd "${targetDirectory}" || return 1
 }
 
-ds(){ # Docker Shell
-    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m"  && return 1
+ds() { # Docker Shell
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     docker exec -it ${1} bash
 }
 
-_ds_completions(){
+_ds_completions() {
     for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
         COMPREPLY=("${COMPREPLY[@]}" "${item}")
     done
@@ -42,7 +42,7 @@ _ds_completions(){
 
 complete -F _ds_completions ds
 
-file_info(){
+file_info() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
 
     [[ ${1} == "." ]] && allFiles=$(find . -type f -not -path "*/\.git/*") || allFiles="${*}"
@@ -50,24 +50,24 @@ file_info(){
     local counter=0
     local amountOfFiles=$(echo "${allFiles}" | wc -w)
 
-	for file in ${allFiles}; do
-		((counter++))
+    for file in ${allFiles}; do
+        ((counter++))
 
-		[[ -d ${file} ]]   && echo -e "\e[31m\"${file}\" ist ein Ordner\e[0m"             && continue
-		[[ ! -f ${file} ]] && echo -e "\e[31mDie Datei \"${file}\" exisitiert nicht\e[0m" && continue
+        [[ -d ${file} ]] && echo -e "\e[31m\"${file}\" ist ein Ordner\e[0m" && continue
+        [[ ! -f ${file} ]] && echo -e "\e[31mDie Datei \"${file}\" exisitiert nicht\e[0m" && continue
 
-    	filename=$(basename "${file}")
+        filename=$(basename "${file}")
         echo -e "\e[1;96mDateiname:\t${filename}\e[0m"
         absolutePath=$(realpath "${file}")
         echo -e "Absoluter Pfad:\t${absolutePath}"
-    	echo -e "Größe:\t\t$(du -h "${file}" | cut -f1)"
-    	echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
-    	echo -e "Modifiziert:\t$(find "${file}" -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
-    	echo -e "Besitzer:\t$(find "${file}" -printf "%u")"
-    	echo -e "Gruppe:\t\t$(find "${file}" -printf "%g")"
-    	echo -e "Rechte:\t\t$(find "${file}" -printf "%M (%m)" | cut -c 2-)"
+        echo -e "Größe:\t\t$(du -h "${file}" | cut -f1)"
+        echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
+        echo -e "Modifiziert:\t$(find "${file}" -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
+        echo -e "Besitzer:\t$(find "${file}" -printf "%u")"
+        echo -e "Gruppe:\t\t$(find "${file}" -printf "%g")"
+        echo -e "Rechte:\t\t$(find "${file}" -printf "%M (%m)" | cut -c 2-)"
 
-    	[[ "${filename}" =~ ^\..{1,} ]] && fileHidden="Ja" || fileHidden="Nein"
+        [[ "${filename}" =~ ^\..{1,} ]] && fileHidden="Ja" || fileHidden="Nein"
         echo -e "Versteckt:\t${fileHidden}"
 
         if [[ $(file "${file}") == *"CRLF"* ]]; then
@@ -75,7 +75,7 @@ file_info(){
         else
             lineEndings="LF"
         fi
-    	echo -e "Zeilenenden:\t${lineEndings}"
+        echo -e "Zeilenenden:\t${lineEndings}"
 
         [[ "${amountOfFiles}" -gt "${counter}" ]] && echo -e "\n\n"
     done
@@ -83,18 +83,18 @@ file_info(){
     return 0
 }
 
-git_checkout_history(){
+git_checkout_history() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
 
-    git reflog --format=' - %<(14)%cr | %<(70)%gs | %s' | \
-        grep "checkout:" | \
-        head -n 15 | \
-        tac | \
+    git reflog --format=' - %<(14)%cr | %<(70)%gs | %s' |
+        grep "checkout:" |
+        head -n 15 |
+        tac |
         sed 's/checkout: moving from //g;s/to/-->/g'
 }
 
-git_history(){
+git_history() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
 
@@ -123,7 +123,7 @@ git_history(){
 
     if [[ ${1} =~ ^[0-9]{1,5}$ ]]; then
         local amountOfCommitsInRepository=$(git rev-list --count HEAD)
-        local nthCommitToBeShown=$(( ${1} - 1 ))
+        local nthCommitToBeShown=$((${1} - 1))
         [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m" && return 1
 
         commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
@@ -141,7 +141,7 @@ git_history(){
     echo -e "Commit URL: ${space}\e[96m${urlOfCommit}\e[0m"
 }
 
-git_issues(){
+git_issues() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
 
@@ -156,7 +156,7 @@ git_issues(){
     return 0
 }
 
-git_last_pull(){
+git_last_pull() {
     if ! check_if_git_repo_exists; then return 1; fi
 
     local fetchHeadFile="$(git rev-parse --show-toplevel)/.git/FETCH_HEAD"
@@ -171,7 +171,7 @@ git_last_pull(){
     elif [[ ${pullDate} == $(date +%D --date="1 day ago") ]]; then
         echo -n "Der letzte Pull war gestern"
     else
-        daysSince=$(( ($(date +%s) - $(date --date="${pullDate}" +%s) )/(60*60*24) ))
+        daysSince=$((($(date +%s) - $(date --date="${pullDate}" +%s)) / (60 * 60 * 24)))
         echo -n "Der letzte Pull war vor ${daysSince} Tagen am $(LANG=de_DE.UTF-8 date -r "${fetchHeadFile}" +'%A, den %d.%m.')"
     fi
     echo " um ${pullTime}"
@@ -179,7 +179,7 @@ git_last_pull(){
     return 0
 }
 
-git_log(){
+git_log() {
     if ! check_if_git_repo_exists; then return 1; fi
 
     [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
@@ -198,13 +198,13 @@ git_log(){
 
     IFS=$'\n'
     if [[ ${amountOfCommits} == 1 ]]; then
-        read -r -d $'\0' -a hashandtime <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")"
+        read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")"
     else
-        read -r -d $'\0' -a hashandtime <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
+        read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
     fi
-    read -r -d $'\0' -a commitAuthor    <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2)"
-    read -r -d $'\0' -a statsOfCommit   <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" #TODO: sed entfernen da langsam
-    read -r -d $'\0' -a messageOfCommit <<< "$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
+    read -r -d $'\0' -a commitAuthor <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2)"
+    read -r -d $'\0' -a statsOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" #TODO: sed entfernen da langsam
+    read -r -d $'\0' -a messageOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
 
     local lineCounter=0     # Holds the progress while iterating though the array
     local maxFilesChanged=0 # Saves the maximum ammount of files changed of all commits
@@ -232,8 +232,8 @@ git_log(){
         statsOfCommit[${lineCounter}]="${filesChanged} ${insertions} ${deletions}"
 
         [[ ${filesChanged} -gt ${maxFilesChanged} ]] && maxFilesChanged=${filesChanged}
-        [[ ${insertions}   -gt ${maxInserions}    ]] && maxInserions=${insertions}
-        [[ ${deletions}    -gt ${maxDeletions}    ]] && maxDeletions=${deletions}
+        [[ ${insertions} -gt ${maxInserions} ]] && maxInserions=${insertions}
+        [[ ${deletions} -gt ${maxDeletions} ]] && maxDeletions=${deletions}
         ((lineCounter++))
         echo -ne "Log wird geparsed (${lineCounter}/${amountOfCommits})\r"
     done
@@ -241,8 +241,8 @@ git_log(){
     echo -ne "                                               \r" #"Log wird geparsed" überschreiben
 
     local lenOfMaxFilesChanged=${#maxFilesChanged}
-       local lenOfMaxInserions=${#maxInserions}
-       local lenOfMaxDeletions=${#maxDeletions}
+    local lenOfMaxInserions=${#maxInserions}
+    local lenOfMaxDeletions=${#maxDeletions}
 
     ((lenOfMaxInserions++))
     ((lenOfMaxDeletions++))
@@ -254,8 +254,8 @@ git_log(){
         local statsline=${statsOfCommit[${lineCounter}]}
 
         local filesChanged=$(echo "${statsline}" | cut -d " " -f1)
-          local insertions=$(echo "${statsline}" | cut -d " " -f2)
-           local deletions=$(echo "${statsline}" | cut -d " " -f3)
+        local insertions=$(echo "${statsline}" | cut -d " " -f2)
+        local deletions=$(echo "${statsline}" | cut -d " " -f3)
 
         printf "%${lenOfMaxFilesChanged}s" "${filesChanged}"
         printf " (\e[32m%${lenOfMaxInserions}s\e[0m" "+${insertions}"
@@ -285,7 +285,7 @@ git_log(){
     done
 }
 
-git_url(){
+git_url() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
 
@@ -295,36 +295,37 @@ git_url(){
     [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
-
-psgrep(){
+psgrep() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
 
-    ps aux    | head -n 1
+    ps aux | head -n 1
     # shellcheck disable=2009
     ps aux -H | grep -i "${*}"
 }
 
-repeat(){
+repeat() {
     [ ${#} -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    [[ -z ${2} ]]  && sleeptime="1.0" || sleeptime="${2//,/\.}"
+    [[ -z ${2} ]] && sleeptime="1.0" || sleeptime="${2//,/\.}"
 
     local counter=0
     while (true); do
-        ((counter ++))
+        ((counter++))
 
         header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   |   Kommando: ${1}   "
         [ "${#header}" -ge "$(tput cols)" ] && header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   "
-        echo -e "\n\e[96;1m"; center "${header}"; echo -e "\e[0m"
+        echo -e "\n\e[96;1m"
+        center "${header}"
+        echo -e "\e[0m"
 
         eval "${1}"
         read -r -t "${sleeptime}"
     done
 }
 
-sa(){
-    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Name angegeben\e[0m"           && return 1
-    [[ -f ${1} ]]    && echo -e "\e[31mDie Datei exisitiert bereits\e[0m"           && return 1
+sa() {
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Name angegeben\e[0m" && return 1
+    [[ -f ${1} ]] && echo -e "\e[31mDie Datei exisitiert bereits\e[0m" && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     filename="${1}"
@@ -332,10 +333,10 @@ sa(){
     chmod +x "${filename}"
 
     if [[ ${filename} == *".sh" ]]; then
-        echo -e "#!/bin/bash\n\n" >> "${filename}"
+        echo -e "#!/bin/bash\n\n" >>"${filename}"
 
     elif [[ ${filename} == *".py" ]]; then
-        echo -e "#!/usr/bin/python3\n# -*- coding: utf-8 -*-\n\n" >> "${filename}"
+        echo -e "#!/usr/bin/python3\n# -*- coding: utf-8 -*-\n\n" >>"${filename}"
 
     fi
 
@@ -345,7 +346,9 @@ sa(){
     read -r -e -n1 answer
     if [[ ${answer} =~ ^[YyJj]$ ]]; then
         if [[ -f ${filename} ]]; then
-            echo -e "\e[1;96m"; center "${filename}"; echo -e "\n\e[0m"
+            echo -e "\e[1;96m"
+            center "${filename}"
+            echo -e "\n\e[0m"
             eval "${filename}"
 
         else
@@ -360,19 +363,19 @@ sa(){
     fi
 }
 
-search_string(){
-    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m"    && return 1
+search_string() {
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     if [[ ${#} == 1 ]]; then
-        grep -inrs --color=always "${1}" ./*    || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+        grep -inrs --color=always "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     else
         grep -inrs --color=always "${1}" "${2}" || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
 }
 
-search_file(){
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m"      && return 1
+search_file() {
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
 
     #grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
     if [[ ${#} == 1 ]]; then
@@ -380,7 +383,7 @@ search_file(){
             echo -e "\e[33mSoll auch im customers-Ordner gesucht werden?\e[0m"
             read -r -e -n1 answer
             if [[ ${answer} =~ ^[YyJj]$ ]]; then
-                find . -iname "*${1}*"                            -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+                find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
 
             else
                 find . -iname "*${1}*" -not -path "./customers/*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
@@ -398,15 +401,14 @@ search_file(){
     fi
 }
 
-
-ssh_permissions(){
+ssh_permissions() {
     local ssh_path=${HOME}/.ssh
     [[ -d ${ssh_path} ]] || return
     chmod 700 ${ssh_path}
-    [[ -f ${ssh_path}/id_ed25519.pub ]]  && chmod 644 ~/.ssh/id_ed25519.pub
-    [[ -f ${ssh_path}/id_ed25519 ]]      && chmod 600 ~/.ssh/id_ed25519
+    [[ -f ${ssh_path}/id_ed25519.pub ]] && chmod 644 ~/.ssh/id_ed25519.pub
+    [[ -f ${ssh_path}/id_ed25519 ]] && chmod 600 ~/.ssh/id_ed25519
     [[ -f ${ssh_path}/authorized_keys ]] && chmod 600 ~/.ssh/authorized_keys
-    [[ -f ${ssh_path}/config ]]          && chmod 600 ~/.ssh/config
+    [[ -f ${ssh_path}/config ]] && chmod 600 ~/.ssh/config
 
     [[ -d /var/lib/openhab2 ]] || return
     sudo -u openhab chmod 700 /var/lib/openhab2/.ssh
@@ -414,8 +416,7 @@ ssh_permissions(){
     sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_ed25519 #/var/lib/openhab2/.ssh/config
 }
 
-
-stopwatch(){
+stopwatch() {
     [ ${#} -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
 
     local commandToRun="${*//\"/\\\"}" # Ersetze '"' durch '\"'
@@ -431,12 +432,12 @@ stopwatch(){
     local secondsSinceEpochTillEndOfExecutions=$(echo "${endOfExecution}" | cut -d',' -f1)
     local nanosecondsAtEndOfExecutions=$(echo "${endOfExecution}" | cut -d',' -f2)
 
-    local duration="0""$(bc <<< "scale=3; ${secondsSinceEpochTillEndOfExecutions} - ${secondsSinceEpochTillStartOfExecutions} + (${nanosecondsAtEndOfExecutions} -${nanosecondsAtStartOfExecutions})/1000000000")"
+    local duration="0""$(bc <<<"scale=3; ${secondsSinceEpochTillEndOfExecutions} - ${secondsSinceEpochTillStartOfExecutions} + (${nanosecondsAtEndOfExecutions} -${nanosecondsAtStartOfExecutions})/1000000000")"
 
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @"${duration}" +%M:%S.%3N) gedauert"
 }
 
-tmux(){
+tmux() {
     local sessionName="${HOSTNAME}"
 
     # Check for existing session
@@ -455,21 +456,23 @@ tmux(){
     fi
 }
 
-tmux_help(){
-    echo -e "\e[1;36m"; center "TMUX Hilfe"; echo -e "\n\e[0m" \
-    "\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
-    "\nTeilen:" \
-    "\n    - Horizontal:      <\e[1;36m%\e[0m>" \
-    "\n    - Vertikal:        <\e[1;36m\"\e[0m>\n" \
-    "\nPanes:" \
-    "\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
-    "\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
-    "\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
-    "\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
-    "\nEinfügen: <\e[1;36mShift\e[0m> + <\e[1;36mMittlere Maustaste\e[0m>"
+tmux_help() {
+    echo -e "\e[1;36m"
+    center "TMUX Hilfe"
+    echo -e "\n\e[0m" \
+        "\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
+        "\nTeilen:" \
+        "\n    - Horizontal:      <\e[1;36m%\e[0m>" \
+        "\n    - Vertikal:        <\e[1;36m\"\e[0m>\n" \
+        "\nPanes:" \
+        "\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
+        "\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
+        "\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
+        "\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
+        "\nEinfügen: <\e[1;36mShift\e[0m> + <\e[1;36mMittlere Maustaste\e[0m>"
 }
 
-to_lf(){
+to_lf() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
 
     if [[ "${1}" =~ (alle|\.) ]]; then
@@ -500,7 +503,7 @@ to_lf(){
 
 complete -F _longopt -W "alle" to_lf
 
-upgrade(){
+upgrade() {
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
 
     if ! sudo apt upgrade "${1}"; then #Falls -y angegeben wurde
@@ -522,8 +525,8 @@ upgrade(){
     fi
 }
 
-which(){
-    [[ -z ${1} ]]    && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m"       && return 1
+which() {
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
     type "${1}" || return 1
@@ -531,7 +534,7 @@ which(){
     local isFunction=$(type "${1}")
     local fileLocation=$(command which "${1}")
 
-    if [[ ( ! ${isFunction} == *"ist eine Funktion"* ) && -n ${fileLocation} ]]; then
+    if [[ (! ${isFunction} == *"ist eine Funktion"*) && -n ${fileLocation} ]]; then
 
         if [[ $(file -L "${fileLocation}") =~ (ASCII|script) ]]; then
             echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
