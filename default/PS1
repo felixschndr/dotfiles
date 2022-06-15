@@ -63,10 +63,6 @@ PS1+='`[[ -z ${SSH_CLIENT} ]] && echo "\[\e[32m\]" || echo "\[\e[31m\]"`'
 # Hostname
 PS1+="\H"
 
-# Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
-is_wsl=false
-[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && is_wsl=true
-
 # WSL Ausgabe
 #    - bei WSL: "]-[WSL" Einschub
 #    - sonst:   Nichts
