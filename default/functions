@@ -389,27 +389,15 @@ search_string() {
 search_file() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
 
-    #grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
+    # grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
     if [[ ${#} == 1 ]]; then
-        if [[ -n $(find . -maxdepth 1 -type d -iname "customers") && $(hostname) == "frank" ]]; then #Ausnahme für frank
-            echo -e "\e[33mSoll auch im customers-Ordner gesucht werden?\e[0m"
-            read -r -e -n1 answer
-            if [[ ${answer} =~ ^[YyJj]$ ]]; then
-                find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-
-            else
-                find . -iname "*${1}*" -not -path "./customers/*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-
-            fi
-
-        else
-            find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-
-        fi
+        find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always ||
+            echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     else
         local fileToSearchFor=${1}
         shift
-        find "${@}" -iname "*${fileToSearchFor}*" -not -path "*/\.git/*" | grep -i "${fileToSearchFor}" --color=always || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+        find "${@}" -iname "*${fileToSearchFor}*" -not -path "*/\.git/*" | grep -i "${fileToSearchFor}" --color=always ||
+            echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
 }
 
