@@ -1,13 +1,13 @@
 #!/bin/bash
 
 print_line() {
-    #Zeichnet eine horizontale Linie; Zeichen wird per ${1} übertragen
+    # Zeichnet eine horizontale Linie; Zeichen wird per ${1} übertragen
     COLUMNS=$(tput cols)
     printf '\n%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' ${1}
 }
 
 center() {
-    #Schreibt einen Text mittig auf der Konsole; Text wird per ${1} übertragen
+    # Schreibt einen Text mittig auf der Konsole; Text wird per ${1} übertragen
     termwidth="$(tput cols)"
     padding="$(printf '%0.1s' ={1..500})"
     printf '%*.*s %s %*.*s' 0 "$(((termwidth - 2 - ${#1}) / 2))" "${padding}" "$1" 0 "$(((termwidth - 1 - ${#1}) / 2))" "${padding}"
