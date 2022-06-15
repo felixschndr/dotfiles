@@ -145,7 +145,7 @@ git_history() {
 
     local urlOfCommit="${urlOfRepository}/commit/${commitHash}"
 
-    echo -e "Commit URL: ${space}\e[96m${urlOfCommit}\e[0m"
+    echo -e "\e[32mCommit URL:\e[0m ${space}\e[96m${urlOfCommit}\e[0m"
 }
 
 git_issues() {
