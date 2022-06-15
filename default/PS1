@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ########### Farben ###########
 GRAU="\[\e[1;30m\]"
 DEFAULT="\[\e[0m\]"
@@ -10,7 +9,6 @@ PINK="\[\e[35m\]"
 CYAN="\[\e[1;36m\]"
 ##############################
 
-
 # Berechnung dafür wie lang das Kommando gedauert hat
 function timer_start {
     timer=${timer:-$SECONDS}
@@ -18,8 +16,8 @@ function timer_start {
 
 function timer_stop {
     timer_show=$((SECONDS - timer))
-    ((minuten=(timer_show % 3600) / 60))
-    ((sekunden=timer_show % 60))
+    ((minuten = (timer_show % 3600) / 60))
+    ((sekunden = timer_show % 60))
     timer_show=""
     if [[ ! (${minuten} == 0 && ${sekunden} -lt 10) ]]; then
         [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm %ds" ${minuten} ${sekunden}) || timer_show=$(printf "%ds" ${sekunden})
@@ -29,7 +27,6 @@ function timer_stop {
 }
 
 trap 'timer_start' DEBUG
-
 
 # Erstmal eine Leerzeile für mehr Platz
 PS1="\n"
