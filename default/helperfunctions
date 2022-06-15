@@ -25,6 +25,10 @@ git_base_url() { # Hilfsfunktion, die nur die Core-Url herausfindet
     echo "${repositoryUrl}"
 }
 
+escape_quotes() {
+    echo ${@} | sed 's/\"/\\\"/g'
+}
+
 is_session_ssh() { # Hilfsfunktion, die nur prüft, ob die aktuelle Session eine SSH-Session ist
     local sessionType="lokal"
 
