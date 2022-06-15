@@ -160,6 +160,11 @@ git_last_pull() {
     if ! check_if_git_repo_exists; then return 1; fi
 
     local fetchHeadFile="$(git rev-parse --show-toplevel)/.git/FETCH_HEAD"
+    # Wenn das Verzeichnis in Windows liegt, aber die Session im WSL ist muss der Pfad angepasst werden
+    # C:/Users/fschneider/repos/bashrc --> /mnt/c/Users/fschneider/repos/bashrc
+    if [[ ${is_wsl} == true ]]; then
+        fetchHeadFile=${fetchHeadFile/C:/\/mnt\/c}
+    fi
 
     [[ ! -f ${fetchHeadFile} ]] && return # Check if file exsits
 
