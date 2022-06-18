@@ -475,7 +475,7 @@ tmux_help() {
 to_lf() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
 
-    if [[ "${1}" =~ (alle|\.) ]]; then
+    if [[ "${1}" =~ (alle|^\.$) ]]; then
         allFiles=$(find . -type f -not -path "*/\.git/*" -print0 | xargs --null file | grep "CRLF" | cut -d ":" -f1)
 
         [[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
@@ -492,12 +492,19 @@ to_lf() {
 
     for file in ${allFiles}; do
 
+        if [[ ! -f ${file} ]]; then
+            echo -e "\e[33mDie Datei \"${file}\" existiert nicht\e[0m"
+            continue
+        fi
+
         [[ "$(file "${file}")" == *"CRLF"* ]] && lineEndings="\e[31mCRLF" || lineEndings="\e[32mLF"
 
         echo -e "Ändere die Zeilenenden zu LF von \e[96;1m${file}\e[0m\n    War davor: ${lineEndings}\e[0m"
 
-        tr -d '\015' <"${file}" >"${file}""_new"
-        mv "${file}""_new" "${file}"
+        tmp_file=$(mktemp)
+        tr -d '\015' <"${file}" >"${tmp_file}"
+        mv "${tmp_file}" "${file}"
+        rm -f "${tmp_file}"
     done
 }
 
