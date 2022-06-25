@@ -26,7 +26,7 @@ git_base_url() { # Hilfsfunktion, die nur die Core-Url herausfindet
 }
 
 escape_quotes() {
-    echo ${@} | sed 's/\"/\\\"/g'
+    echo "${@//\"/\\\"}"
 }
 
 is_session_ssh() { # Hilfsfunktion, die nur prüft, ob die aktuelle Session eine SSH-Session ist
