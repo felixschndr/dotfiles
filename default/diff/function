@@ -149,6 +149,7 @@ commit_files() {
     # Die Dateien durchgehen und gegebenenfalls committen
     outputOfGitStatus=$(git status 2>&1)
     unset commit_messages
+    commit_messages+=("$(git show -s --format=%s)")
     changed=false
     file_counter=1
 
@@ -219,11 +220,11 @@ commit_files() {
         fi
 
         echo -e "\e[1;96mWie soll die Commit-Nachricht lauten?\e[0m"
-        [[ ${#commit_messages[@]} != 0 ]] && echo -e "Die letzten Commit Nachrichten: \e[2m(Um eine davon zu benutzen, die entsprechende Zahl angeben)\e[0m" # Wenn es vorherige Commits gibt werden diese nun angezeigt
+        [[ ${#commit_messages[@]} -gt 1 ]] && echo -e "Die letzten Commit Nachrichten:" || echo -e "Die letzten Commit Nachricht:"
         commit_counter=0
         for commit in "${commit_messages[@]}"; do
-            ((commit_counter++))
             [[ -n ${commit} ]] && echo -e "    ${commit_counter}      ${commit}"
+            ((commit_counter++))
         done
         echo -e "\nAlternativ kann auch folgendes angegeben werden:"
         [[ $(echo "${files}" | wc -w) != 1 || ${unmanaged_files} == true ]] && echo -e "    - A    Alle Dateien committen"
