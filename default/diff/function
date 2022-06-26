@@ -419,7 +419,9 @@ push() {
                 echo -e "\e[32mDie Änderungen wurden hochgeladen\e[0m"
             elif [[ ${output} == *"--set-upstream"* ]]; then
                 echo -e "\e[33mDer Upsteam musste erst gesetzt werden\e[0m"
-                output=$(git push 2>&1 | grep "git push")
+                local upsteam_set_command=$(git push 2>&1 | grep "git push")
+                # shellcheck disable=2086
+                output=$(eval ${upsteam_set_command})
 
                 if [[ ${output} == *"merge_request"* ]]; then # GitLab: Merge Request
                     echo -e "\e[1;96m"
