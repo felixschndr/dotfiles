@@ -241,8 +241,8 @@ commit_files() {
             fi
         fi
 
-        echo -e "\e[1;96mWie soll die Commit-Nachricht lauten?\e[0m"
-        [[ ${#commit_messages[@]} -gt 1 ]] && echo -e "Die letzten Commit Nachrichten:" || echo -e "Die letzten Commit Nachricht:"
+        echo -e "\e[1;96mWie soll die Commitnachricht lauten?\e[0m"
+        [[ ${#commit_messages[@]} -gt 1 ]] && echo -e "Die letzten Commitnachrichten:" || echo -e "Die letzten Commitnachricht:"
         commit_counter=0
         for commit in "${commit_messages[@]}"; do
             [[ -n ${commit} ]] && echo -e "    ${commit_counter}      ${commit}"
@@ -282,8 +282,8 @@ commit_files() {
         elif [[ ${commit_message} =~ ^[Aa]$ ]]; then # Alle Files committen
             echo -e "\n\e[96mWie soll die Commitnachricht für alle Dateien heißen?\e[0m"
             read -r -e answer
-            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commit Nachricht ist kürzer als 5 Zeichen
-                echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commitnachricht ist kürzer als 5 Zeichen
+                echo -e "\e[33mDie Commitnachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
             # shellcheck disable=2086
@@ -313,15 +313,15 @@ commit_files() {
                 ((file_counter++))
                 continue
             fi
-            echo "Die letzte Commit-Nachricht wird verwendet"
+            echo "Die letzte Commitnachricht wird verwendet"
             eval "git commit ${git_signature_arguments} \"${file}\" -m \"$(escape_quotes "${last_commit_message}")\" >/dev/null" &&
                 git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
         elif [[ ${commit_message} =~ ^[Uu]$ ]]; then # Letze Commitnachricht umbenennen
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
             read -r -e answer
-            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commit Nachricht ist kürzer als 5 Zeichen
-                echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commitnachricht ist kürzer als 5 Zeichen
+                echo -e "\e[33mDie Commitnachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 return 1
             fi
             # shellcheck disable=2086
@@ -342,8 +342,8 @@ commit_files() {
             git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
             return 1
 
-        elif [[ ${commit_message} =~ ^.{1,4}$ ]]; then # Die Commit Nachricht ist kürzer als 5 Zeichen
-            echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+        elif [[ ${commit_message} =~ ^.{1,4}$ ]]; then # Die Commitnachricht ist kürzer als 5 Zeichen
+            echo -e "\e[33mDie Commitnachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
             ((file_counter++))
             continue
 
@@ -380,8 +380,8 @@ push() {
         if [[ ${answer} =~ ^[Uu]$ ]]; then
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
             read -r -e answer
-            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commit Nachricht ist kürzer als 5 Zeichen
-                echo -e "\e[33mDie Commit-Nachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
+            if [[ ${answer} =~ ^.{1,4}$ ]]; then # Die Commitnachricht ist kürzer als 5 Zeichen
+                echo -e "\e[33mDie Commitnachricht war zu kurz. Sie muss mindestens fünf Zeichen haben\e[0m"
                 continue
             fi
             # Bei INITIAL und keiner commit message eine Standardnachricht verwenden
