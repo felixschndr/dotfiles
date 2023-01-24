@@ -21,8 +21,8 @@ export HISTFILESIZE=30000                  # Anzahl der Kommandos, die in .bash_
 shopt -s histappend                        # Kommandos werden an die History angehängt statt die History zu überschreiben
 shopt -s checkwinsize                      # Nach jedem Kommando die Größe des Fensters checken
 
-export LANG=de_DE.UTF-8
-export LANGUAGE=de_DE.UTF-8
-export LC_ALL=de_DE.UTF-8
+export LANG=de_DE.UTF-8 2>/dev/null
+export LANGUAGE=de_DE.UTF-8 2>/dev/null
+export LC_ALL=de_DE.UTF-8 2>/dev/null
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1 # Auschalten der automatischen Anspassung von $PS1 durch venv
