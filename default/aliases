@@ -17,7 +17,7 @@ alias rm='rm -R'
 alias upgradable='apt list --upgradable'
 alias update='sudo apt update && apt list --upgradable'
 
-alias b='exec ${SHELL}'
+alias b='exec ${SHELL} -l' # -l ensures that the bashrc is loaded
 alias ct="cd /tmp/; [[ -d testing ]] || git clone git@github.com:Trysupe/testing.git; cd testing/"
 alias mygrep='grep -ins --color=always'
 alias tf='tail -f -n 1000'
