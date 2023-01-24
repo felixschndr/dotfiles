@@ -10,10 +10,25 @@
         },
         {
             "command": {
+                "action": "splitPane",
+                "split": "right"
+            },
+            "keys": "ctrl+shift+e"
+        },
+        {
+            "command": {
                 "action": "copy",
                 "singleLine": false
             },
             "keys": "ctrl+c"
+        },
+        {
+            "command": "paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": "find",
+            "keys": "ctrl+f"
         },
         {
             "command": "unbound",
@@ -132,8 +147,15 @@
             "keys": "ctrl+shift+d"
         },
         {
-            "command": "togglePaneZoom",
-            "keys": "ctrl+shift+x"
+            "command": "unbound",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "keys": "alt+right"
         },
         {
             "command": {
@@ -143,22 +165,15 @@
             "keys": "alt+up"
         },
         {
-            "command": {
-                "action": "splitPane",
-                "split": "right"
-            },
-            "keys": "ctrl+shift+e"
-        },
-        {
-            "command": "paste",
-            "keys": "ctrl+v"
+            "command": "togglePaneZoom",
+            "keys": "ctrl+shift+x"
         },
         {
             "command": {
-                "action": "moveFocus",
-                "direction": "right"
+                "action": "resizePane",
+                "direction": "down"
             },
-            "keys": "alt+right"
+            "keys": "shift+down"
         },
         {
             "command": {
@@ -182,25 +197,6 @@
             "keys": "alt+down"
         },
         {
-            "command": "find",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "command": {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            },
-            "keys": "alt+shift+d"
-        },
-        {
-            "command": {
-                "action": "resizePane",
-                "direction": "down"
-            },
-            "keys": "shift+down"
-        },
-        {
             "command": {
                 "action": "resizePane",
                 "direction": "left"
@@ -213,6 +209,14 @@
                 "direction": "right"
             },
             "keys": "shift+right"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+d"
         }
     ],
     "confirmCloseAllTabs": false,
