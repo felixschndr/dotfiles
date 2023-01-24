@@ -170,9 +170,7 @@ git_last_pull() {
     # Wenn das Verzeichnis in Windows liegt, aber die Session im WSL ist muss der Pfad angepasst werden
     # C:/Users/fschneider/repos/bashrc --> /mnt/c/Users/fschneider/repos/bashrc
     # shellcheck disable=2154
-    if [[ ${is_wsl} == true ]]; then
-        fetchHeadFile=${fetchHeadFile/C:/\/mnt\/c}
-    fi
+    [[ ${is_wsl} == true ]] && fetchHeadFile=${fetchHeadFile/C:/\/mnt\/c}
 
     [[ ! -f ${fetchHeadFile} ]] && return # Check if file exsits
 
@@ -542,7 +540,7 @@ whats() {
     type "${1}" || return 1
 
     local isFunction=$(type "${1}")
-    local fileLocation=$(command which "${1}")
+    local fileLocation=$(command which "${1}" 2>/dev/null)
 
     if [[ (! ${isFunction} == *"ist eine Funktion"*) && -n ${fileLocation} ]]; then
 
@@ -554,7 +552,7 @@ whats() {
 
         else
             # Nicht anzeigen, wenn es sich um einen Alias handelt
-            [[ ${isFunction} == *"Alias"* ]] || echo -e "\nEs handelt sich um eine Binärdatei"
+            [[ ${isFunction} =~ (A|a)lias ]] || echo -e "\nEs handelt sich um eine Binärdatei"
 
         fi
     fi
