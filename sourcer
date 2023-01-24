@@ -5,5 +5,6 @@ repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 allFiles=$(find "${repoLocation}"/{default,"$(hostname | tr '[:upper:]' '[:lower:]')"} -type f 2>/dev/null)
 
 for file in ${allFiles}; do
+    # shellcheck disable=1090
     source "${file}"
 done
