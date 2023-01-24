@@ -1,0 +1,5 @@
+#!/bin/bash
+
+git config --global user.name "Felix Schneider"
+git config --global core.autocrlf "input"
+git config --global help.autocorrect 15
