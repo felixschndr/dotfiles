@@ -524,9 +524,9 @@ to_lf() {
 complete -F _longopt -W "alle" to_lf # Autovervollständigung mit allen verfügbaren Dateien
 
 upgrade() {
-    echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
+    [[ $(hostname) == "openhab" ]] && echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
 
-    if ! sudo apt upgrade "${1}"; then # Falls -y angegeben wurde
+    if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
         return
     fi
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
@@ -539,9 +539,15 @@ upgrade() {
         echo -e "\e[1;96mDie Anzahl der Updates wurde aktualisiert\e[0m"
     fi
 
-    if [[ -f /var/run/reboot-required.pkgs ]]; then
-        echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
-        sort -u /var/run/reboot-required.pkgs | nl
+    local reboot_required_packages_file="/var/run/reboot-required.pkgs"
+    if [[ -f ${reboot_required_packages_file} ]]; then
+        if [[ $(wc -l <<< ${reboot_required_packages_file}) == 1 ]]; then
+            echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
+            cat ${reboot_required_packages_file}
+        else
+            echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
+            sort -u ${reboot_required_packages_file} | nl
+        fi
     fi
 }
 
