@@ -3,7 +3,7 @@
 [[ ${USER} == "root" ]] && return
 [[ ${HOSTNAME} =~ (Asterix|Miraculix|ws-win-00224) ]] && return
 
-text=$(curl http://whatthecommit.com/index.txt --max-time 2 2>/dev/null)
+text=$(curl https://whatthecommit.com/index.txt --max-time 2 -L 2>/dev/null)
 [[ -z ${text} ]] && return
 
 command="echo -e \"${text}\""
