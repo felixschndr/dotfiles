@@ -22,16 +22,18 @@ function timer_stop {
         return
     }
 
+    ((stunden = (delta % 86400) / 3600))
     ((minuten = (delta % 3600) / 60))
     ((sekunden = delta % 60))
 
-    [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm " ${minuten})
+    [[ ${stunden} != 0 ]] && timer_show+=$(printf "%dh " ${stunden})
+    [[ ${minuten} != 0 ]] && timer_show+=$(printf "%dm " ${minuten})
     timer_show+=$(printf "%ds" ${sekunden})
 
     unset timer
 }
 
-trap 'timer_start' DEBUG
+trap 'timer_start' DEBUG # FIXME: Statt aufrufen beim Bauen der Kommandozeile lieber beim Kommandostart
 
 # Erstmal eine Leerzeile für mehr Platz
 PS1="\n"
