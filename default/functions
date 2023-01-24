@@ -463,7 +463,9 @@ stopwatch() {
 }
 
 toggle_venv() {
-    local git_root_path=$(git rev-parse --show-toplevel)
+    local git_root_path=$(git rev-parse --show-toplevel 2>/dev/null)
+    [[ -z ${git_root_path} ]] && git_root_path=${PWD} # Für den Fall, dass es einen venv ordner gibt, aber es sich nicht um ein Git Repo handelt
+
     local venv_directory=""
     if [[ -d ${git_root_path}/venv ]]; then
         venv_directory="${git_root_path}/venv"
