@@ -67,6 +67,7 @@ PS1+="\H"
 # WSL Ausgabe
 #    - bei WSL: "]-[WSL" Einschub
 #    - sonst:   Nichts
+# shellcheck disable=2154
 PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[0;32m\]WSL"`'
 
 # ]-[
