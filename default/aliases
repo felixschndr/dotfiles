@@ -34,7 +34,10 @@ alias time="stopwatch"
 
 [[ -n $(command -v code) && -z $(command -v c) ]] && alias c='code .'
 [[ -n $(command -v docker-compose) && -z $(command -v dc) ]] && alias dc='docker-compose'
+[[ -n $(command -v docker-compose) && -z $(command -v dcdu) ]] && alias dcdu='docker-compose down; docker-compose up -d'
+[[ -n $(command -v docker) && -z $(command -v dps) ]] && alias dps='docker ps'
 [[ -n $(command -v python) && -z $(command -v py) ]] && alias py='python'
+[[ -z $(command -v idea) ]] && alias idea="/mnt/c/Program\ Files/JetBrains/IntelliJ\ IDEA\ Community\ Edition\ 2022.2.1/bin/idea64.exe &"
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
