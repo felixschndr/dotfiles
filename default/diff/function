@@ -18,13 +18,22 @@ check_for_unmanaged_files() {
     # Prüfen, ob es noch gelöschte, neue oder unversionierte Dateien gibt, diese erst direkt in der Shell bearbeitet werden sollen
     outputOfGitStatus=$(git status 2>&1)
     if [[ "${outputOfGitStatus}" =~ (Untracked file|Unversioniert) ]]; then
-        echo -e "\e[33mEs gibt noch Dateien, die unversioniert sind. Sollen diese jetzt hinzugefügt werden?\e[0m"
-        git ls-files -o --exclude-standard | sed 's/^/ - /g'
+        untracked_files=$(mktemp)
+        git ls-files -o --exclude-standard >"${untracked_files}"
+        number_of_untracked_files=$(wc -l <"${untracked_files}")
+        if [[ ${number_of_untracked_files} == 1 ]]; then
+            echo -e "\e[33mEs gibt noch eine Datei, die unversioniert ist. Soll diese jetzt hinzugefügt werden?\e[0m"
+        else
+            echo -e "\e[33mEs gibt noch ${number_of_untracked_files} Dateien, die unversioniert sind. Sollen diese jetzt hinzugefügt werden?\e[0m"
+        fi
+        sed 's/^/    - /g' "${untracked_files}"
         read -r -e -n1 answer
         if [[ ${answer} =~ ^[YyJj]$ ]]; then
             echo -e "\e[32mDie Dateien werden hinzugefügt\n\e[0m"
+            # Nochmal git benutzen um auch Dateien zu unterstützen, die ein Leerzeichen im Namen haben
             git ls-files -z -o --exclude-standard | xargs -0 git add
         fi
+        rm -f "${untracked_files}"
     fi
 
     outputOfGitStatus=$(git status 2>&1)
