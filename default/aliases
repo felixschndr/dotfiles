@@ -36,6 +36,7 @@ alias time="stopwatch"
 [[ -z $(command -v dc) ]] && alias dc='docker-compose'
 [[ -z $(command -v dcdu) ]] && alias dcdu='docker-compose down; docker-compose up -d'
 [[ -z $(command -v dps) ]] && alias dps='docker ps'
+[[ -z $(command -v pc) ]] && alias pc='pre-commit run --all-files'
 [[ -z $(command -v py) ]] && alias py='python'
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
