@@ -12,6 +12,7 @@ export HISTTIMEFORMAT="%d.%m. %H:%M:%S - "   # Format der History anpassen
 export HISTSIZE=10000                        # Anzahl der Kommandos, die im Memory gespeichert bleiben
 export HISTFILESIZE=30000                    # Anzahl der Kommandos, die in .bash_history gespeichert bleiben
 shopt -s histappend                          # Kommandos werden an die History angehängt statt die History zu überschreiben
+shopt -s checkwinsize                        # Nach jedem Kommando die Größe des Fensters checken
 
 export LANG=de_DE.UTF-8
 export LANGUAGE=de_DE.UTF-8
