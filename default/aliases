@@ -38,12 +38,5 @@ alias time="stopwatch"
 is_wsl=false
 [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && is_wsl=true
 
-# In wsl die den credential manager von windows benutzen, da er um EINIGES schneller ist
-# https://stackoverflow.com/a/47350274
-# Zusätzlich keinen pager verwenden
-[[ ${is_wsl} == true ]] && git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager-core.exe"
-alias git='git --no-pager'
 # shellcheck disable=2139
 [[ ${is_wsl} == true ]] && alias cdh="cd /mnt/c/Users/${USER}" # In das Homeverzeichnis in Windows wechseln
-
-export log_auth="/var/log/auth.log"

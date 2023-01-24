@@ -3,3 +3,14 @@
 git config --global user.name "Felix Schneider"
 git config --global core.autocrlf "input"
 git config --global help.autocorrect 15
+
+# In wsl die den credential manager von windows benutzen, da er um EINIGES schneller ist
+# https://stackoverflow.com/a/47350274
+# Zusätzlich keinen pager verwenden
+# shellcheck disable=2154
+if [[ ${is_wsl} == true ]]; then
+    git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager-core.exe"
+else
+    git config --global --unset credential.helper
+fi
+alias git='git --no-pager'
