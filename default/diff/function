@@ -9,7 +9,7 @@ alias diff='diff_function'
 #[[ $(ls /home/fschneider/.gnupg/openpgp-revocs.d/*.rev 2>/dev/null) ]] && git_signature_arguments=" -S " || git_signature_arguments=""
 git_signature_arguments="-S"
 
-use_git_signoff=true
+use_git_signoff=false
 [[ ${use_git_signoff} = true ]] && git_signature_arguments+=" -s"
 
 
