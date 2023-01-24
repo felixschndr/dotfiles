@@ -31,10 +31,13 @@ de() { # Docker Execute (Shell)
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
+    shell_binary=$(docker exec -it "${1}" sh -c "command -v bash" | tr -d '\015')
+    [[ -z ${shell_binary} ]] && shell_binary="sh"
+
     if [[ ${#} -eq 1 ]]; then
-        docker exec -it "${1}" bash
+        docker exec -it "${1}" "${shell_binary}"
     else
-        docker exec -it --user "${2}" "${1}" bash
+        docker exec -it --user "${2}" "${1}" "${shell_binary}"
     fi
 }
 
@@ -50,8 +53,12 @@ _docker_containers_completion() {
         for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
             COMPREPLY=("${COMPREPLY[@]}" "${item}")
         done
-    else
-        COMPREPLY=("root" "${USER}")
+    elif [[ ${COMP_CWORD} -eq 2 && ${COMP_WORDS[0]} == "de" ]]; then
+        container_name=${COMP_WORDS[1]}
+        available_users=$(docker exec -it "${container_name}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd | cut -d':' -f1")
+        for user in $(echo "${available_users}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+            COMPREPLY+=("${user}")
+        done
     fi
 }
 
