@@ -145,7 +145,10 @@ git_checkout_history() {
 git_delete_old_branches() {
     if ! check_if_git_repo_exists; then return 1; fi
 
-    git fetch -pq || return
+    if ! git_pull_if_clean >/dev/null; then
+        git fetch -pq || return
+    fi
+
     local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
     local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
 
@@ -175,7 +178,6 @@ git_delete_old_branches() {
             local default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
             echo "Ein zu löschneder Branch war ausgecheckt. Es wird ${default_branch} ausgecheckt"
             git checkout "${default_branch}"
-            git pull >/dev/null
         fi
 
         git branch -D "${branch}"
@@ -421,6 +423,12 @@ git_url() {
 
     echo -e "Repository URL: \e[96m${urlOfRepository}\e[0m"
     [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
+}
+
+git_pull_if_clean() {
+    git diff --quiet || return 1
+
+    git pull
 }
 
 ke() { # Kubectl Execute (Shell)
