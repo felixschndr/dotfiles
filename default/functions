@@ -145,7 +145,7 @@ git_checkout_history() {
 git_delete_old_branches() {
     if ! check_if_git_repo_exists; then return 1; fi
 
-    git fetch -p || return
+    git fetch -pq || return
     local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
     local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
 
@@ -155,7 +155,7 @@ git_delete_old_branches() {
     }
 
     if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
-        echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"  
+        echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"
         echo -e "    ${branches_to_be_deleted}"
         echo -e "\e[96;1mSoll fortgefahren werden?\e[0m"
     else
