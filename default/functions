@@ -28,21 +28,31 @@ cd() {
 }
 
 de() { # Docker Execute (Shell)
-    # shellcheck disable=2068
-    if ! check_arguments_for_docker_functions ${@}; then return; fi
-    docker exec -it "${1}" bash
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
+    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
+    if [[ ${#} -eq 1 ]]; then
+        docker exec -it "${1}" bash
+    else
+        docker exec -it --user "${2}" "${1}" bash
+    fi
 }
 
 dl() { # Docker Logs
-    # shellcheck disable=2068
-    if ! check_arguments_for_docker_functions ${@}; then return; fi
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
+    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
     docker logs -f -n 1000 "${1}"
 }
 
 _docker_containers_completion() {
-    for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-        COMPREPLY=("${COMPREPLY[@]}" "${item}")
-    done
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+            COMPREPLY=("${COMPREPLY[@]}" "${item}")
+        done
+    else
+        COMPREPLY=("root" "${USER}")
+    fi
 }
 
 complete -F _docker_containers_completion de dl
