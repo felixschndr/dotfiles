@@ -31,8 +31,9 @@ alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias time="stopwatch"
 
-[[ -n $(command -v code) ]] && alias c='code .'
 [[ -n ${TMUX} ]] && alias help='tmux_help'
+[[ -n $(command -v code) && -z $(command -v c) ]] && alias c='code .'
+[[ -n $(command -v python) && -z $(command -v py) ]] && alias py='python'
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
