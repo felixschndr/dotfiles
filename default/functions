@@ -31,14 +31,14 @@ ds() { # Docker Shell
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    docker exec -it ${1} bash
+    docker exec -it "${1}" bash
 }
 
 dl() { # Docker Logs
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    docker logs -f -n 1000 ${1}
+    docker logs -f -n 1000 "${1}"
 }
 
 _docker_containers_completion() {
@@ -169,6 +169,7 @@ git_last_pull() {
     local fetchHeadFile="$(git rev-parse --show-toplevel)/.git/FETCH_HEAD"
     # Wenn das Verzeichnis in Windows liegt, aber die Session im WSL ist muss der Pfad angepasst werden
     # C:/Users/fschneider/repos/bashrc --> /mnt/c/Users/fschneider/repos/bashrc
+    # shellcheck disable=2154
     if [[ ${is_wsl} == true ]]; then
         fetchHeadFile=${fetchHeadFile/C:/\/mnt\/c}
     fi
@@ -404,7 +405,7 @@ search_file() {
 ssh_permissions() {
     local ssh_path=${HOME}/.ssh
     [[ -d ${ssh_path} ]] || return
-    chmod 700 ${ssh_path}
+    chmod 700 "${ssh_path}"
     [[ -f ${ssh_path}/id_ed25519.pub ]] && chmod 644 ~/.ssh/id_ed25519.pub
     [[ -f ${ssh_path}/id_ed25519 ]] && chmod 600 ~/.ssh/id_ed25519
     [[ -f ${ssh_path}/authorized_keys ]] && chmod 600 ~/.ssh/authorized_keys
@@ -508,7 +509,7 @@ to_lf() {
     done
 }
 
-complete -F _longopt -W "alle" to_lf
+complete -F _longopt -W "alle" to_lf # Autovervollständigung mit allen verfügbaren Dateien
 
 upgrade() {
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
@@ -557,3 +558,5 @@ whats() {
     fi
     return 0
 }
+
+complete -F _command whats # Autovervollständigung mit allen verfügbaren Kommandos
