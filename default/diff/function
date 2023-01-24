@@ -217,21 +217,24 @@ commit_files() {
 
         print_line "-"
 
-        ask_for_commit_type
-        [[ ${?} == 1 ]] && return
-        commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
-        [[ ${?} == 1 ]] && return
-        [[ -n ${commit_type} ]] && commit_type+=" "
+        commit_type=""
+        if [[ ${HOSTNAME} != "ws-win-00224" || ${PWD} == *"/bashrc"* ]]; then
+            ask_for_commit_type
+            [[ ${?} == 1 ]] && return
+            commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
+            [[ ${?} == 1 ]] && return
+            [[ -n ${commit_type} ]] && commit_type+=" "
 
-        if [[ ${commit_type} == "skip"* ]]; then
-            echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
-            ((file_counter++))
-            continue
-        elif [[ ${commit_type} == "checkout"* ]]; then
-            ((file_counter++))
-            continue
-        elif [[ ${commit_type} == "rückgängig"* ]]; then
-            return 1
+            if [[ ${commit_type} == "skip"* ]]; then
+                echo -e "\e[33mDer Committyp war leer, somit wird die Datei übersprungen\e[0m"
+                ((file_counter++))
+                continue
+            elif [[ ${commit_type} == "checkout"* ]]; then
+                ((file_counter++))
+                continue
+            elif [[ ${commit_type} == "rückgängig"* ]]; then
+                return 1
+            fi
         fi
 
         echo -e "\e[1;96mWie soll die Commit-Nachricht lauten?\e[0m"
