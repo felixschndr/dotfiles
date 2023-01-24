@@ -68,7 +68,7 @@ file_info() {
         absolutePath=$(realpath "${file}")
         echo -e "Absoluter Pfad:\t${absolutePath}"
         echo -e "Größe:\t\t$(du -h "${file}" | cut -f1)"
-        echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" #sed baut Tausender-Punkte ein
+        echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" # sed baut Tausender-Punkte ein
         echo -e "Modifiziert:\t$(find "${file}" -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
         echo -e "Besitzer:\t$(find "${file}" -printf "%u")"
         echo -e "Gruppe:\t\t$(find "${file}" -printf "%g")"
@@ -92,7 +92,7 @@ file_info() {
 
 git_checkout_history() {
     local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
 
     git reflog --format=' - %<(14)%cr | %<(70)%gs | %s' |
         grep "checkout:" |
@@ -103,7 +103,7 @@ git_checkout_history() {
 
 git_history() {
     local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
 
     local space=" "
     local onlyCommitUrl=false
@@ -135,7 +135,7 @@ git_history() {
 
         commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
     else
-        commitHash=$(git rev-parse "${1}" 2>/dev/null) #Langen Commithash zum kurzen Input bekommen
+        commitHash=$(git rev-parse "${1}" 2>/dev/null) # Langen Commithash zum kurzen Input bekommen
         # shellcheck disable=2181
         if [[ ${?} != 0 ]]; then
             echo -e "\e[31mEs konnte kein Commit zu dem Hash gefunden werden\e[0m"
@@ -150,7 +150,7 @@ git_history() {
 
 git_issues() {
     local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
 
     local typeOfSession=$(is_session_ssh)
 
@@ -215,7 +215,7 @@ git_log() {
         read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
     fi
     read -r -d $'\0' -a commitAuthor <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2)"
-    read -r -d $'\0' -a statsOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" #TODO: sed entfernen da langsam
+    read -r -d $'\0' -a statsOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" # TODO: sed entfernen da langsam
     read -r -d $'\0' -a messageOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
 
     local lineCounter=0     # Holds the progress while iterating though the array
@@ -260,7 +260,7 @@ git_log() {
     ((lenOfMaxDeletions++))
 
     lineCounter=0
-    for line in "${hashandtime[@]}"; do #Ausgabe der ganzen Infos
+    for line in "${hashandtime[@]}"; do # Ausgabe der ganzen Infos
         echo -n "${line}"
         [[ ${repo} == "abm" ]] && echo -n "${commitAuthor[${lineCounter}]^^} | "
         local statsline=${statsOfCommit[${lineCounter}]}
@@ -299,7 +299,7 @@ git_log() {
 
 git_url() {
     local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 #Stoppen, falls es sich nicht um ein Git-Repo handelt
+    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
 
     local typeOfSession=$(is_session_ssh)
 
@@ -506,7 +506,7 @@ complete -F _longopt -W "alle" to_lf
 upgrade() {
     echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
 
-    if ! sudo apt upgrade "${1}"; then #Falls -y angegeben wurde
+    if ! sudo apt upgrade "${1}"; then # Falls -y angegeben wurde
         return
     fi
     echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
@@ -543,7 +543,7 @@ which() {
             [[ ${answer} =~ ^[YyJj]$ ]] && less "${fileLocation}"
 
         else
-            #Nicht anzeigen, wenn es sich um einen Alias handelt
+            # Nicht anzeigen, wenn es sich um einen Alias handelt
             [[ ${isFunction} == *"Alias"* ]] || echo -e "\nEs handelt sich um eine Binärdatei"
 
         fi
