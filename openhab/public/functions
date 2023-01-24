@@ -33,7 +33,7 @@ item_get() {
     local raw=false
     [[ ${1} == "--raw" ]] && raw=true && shift
 
-    for item in ${@}; do
+    for item in "${@}"; do
         state=$(curl -X GET "http://localhost:8080/rest/items/${item}/state" 2>/dev/null)
         [[ "${state}" == *"does not exist!"* ]] && echo -e "\n\e[31mDas angegebene Item \"${item}\" existiert nicht\e[0m" && return 1
         [[ ${raw} == true ]] && echo "${state}" || echo -e "\e[36mItem:\e[0m\t${item}\n\e[36mStatus:\e[0m\t${state}"
