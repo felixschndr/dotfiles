@@ -25,6 +25,7 @@ alias cp='cp -r'
 alias df="df -h"
 alias ip='ip -color'
 alias nano='nano -l -T 4'
+alias nanol='nano -T 4'
 alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias rm='rm -R'
