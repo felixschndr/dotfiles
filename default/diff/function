@@ -250,7 +250,7 @@ commit_files(){
         elif [[ ${commit_message} =~ ^[0-9]+$ ]]; then #Eine Zahl angegeben
             if [[ ${commit_messages[commit_message]} != "0" ]]; then #Gibt es einen Commit, auf den die Zahl trifft? Wenn ja, benutze ihn
                 echo -e "Es wird die Nachricht aus einem vorherigen Commit benutzt: \"${commit_messages[commit_message]}\""
-                git commit ${git_signature_arguments} "${file}" -m "${commit_messages[commit_message]}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+                eval "git commit ${git_signature_arguments} \"${file}\" -m \"${commit_messages[commit_message]}}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
                 last_commit_message=${commit_messages[commit_message]}
             else #Sonst verwerfe ihn
                 echo -e "\e[33mEs wurde keine Nachricht angegeben, somit die Datei wird übersprungen\e[0m"
@@ -269,7 +269,7 @@ commit_files(){
             answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             echo "git commit ${git_signature_arguments} -a -m \"${commit_type}${answer}\""
             git add .
-            git commit ${git_signature_arguments} -a -m "${commit_type}${answer}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            eval "git commit ${git_signature_arguments} -a -m \"${commit_type}${answer}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
             changed=true
             break 2
 
@@ -293,7 +293,7 @@ commit_files(){
                 continue
             fi
             echo "Die letzte Commit-Nachricht wird verwendet"
-            git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            eval "git commit ${git_signature_arguments} \"${file}\" -m \"${last_commit_message}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
 
         elif [[ ${commit_message} =~ ^[Uu]$ ]]; then #Letze Commitnachricht umbenennen
             echo -e "\n\e[96mWie soll die neue Commtnachricht heißen?\e[0m"
@@ -306,7 +306,7 @@ commit_files(){
             answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
             commit_messages[${#commit_messages[@]}]="${commit_type}${answer}" #Die neue Nachricht überschreibt die alte
             last_commit_message="${commit_type}""${commit_message}"
-            git commit ${git_signature_arguments} --amend -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            eval "git commit ${git_signature_arguments} --amend -m \"${last_commit_message}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
             return 1
 
         elif [[ ${commit_message} =~ ^[Rr]$ ]]; then #Letzten Commit rückgängig machen
@@ -329,7 +329,7 @@ commit_files(){
             commit_messages[$((${#commit_messages[@]} + 1 ))]="${commit_type}${commit_message}" #Den aktuellen Commit ins Array packen
             last_commit_message="${commit_type}${commit_message}"
             echo -e "git commit ${git_signature_arguments} \"${file}\" -m \"${last_commit_message}\""
-	        git commit ${git_signature_arguments} "${file}" -m "${last_commit_message}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+	        eval "git commit ${git_signature_arguments} \"${file}\" -m \"${last_commit_message}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
         fi
 
         ((file_counter ++))
@@ -367,7 +367,7 @@ push(){
             fi
             # shellcheck disable=2086
             answer="$(commitmessageToUpperCase ${answer})" #Den ersten Buchstaben der commit_message groß schreiben
-            git commit ${git_signature_arguments} --amend -m "${commit_type}${answer}" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
+            eval "git commit ${git_signature_arguments} --amend -m \"${commit_type}${answer}\"" && git_history -u "$(git rev-parse HEAD)" || echo -e "\e[31mEs gab ein Problem beim Commit!\e[0m"
             echo -e "\n\e[32mSollen die Änderungen nun gepusht werden?\e[0m"
             git --no-pager log "origin/${diffbranch}..HEAD" --pretty="| %h | %s" --reverse | nl
 
