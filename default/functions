@@ -336,6 +336,8 @@ repeat() {
     done
 }
 
+complete -F _command repeat # Autovervollständigung mit allen verfügbaren Kommandos
+
 sa() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Name angegeben\e[0m" && return 1
     [[ -f ${1} ]] && echo -e "\e[31mDie Datei exisitiert bereits\e[0m" && return 1
