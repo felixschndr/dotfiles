@@ -15,13 +15,18 @@ function timer_start {
 }
 
 function timer_stop {
-    timer_show=$((SECONDS - timer))
-    ((minuten = (timer_show % 3600) / 60))
-    ((sekunden = timer_show % 60))
     timer_show=""
-    if [[ ! (${minuten} == 0 && ${sekunden} -lt 10) ]]; then
-        [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm %ds" ${minuten} ${sekunden}) || timer_show=$(printf "%ds" ${sekunden})
-    fi
+    delta=$((SECONDS - timer))
+    [[ ${delta} -lt 10 ]] && {
+        unset timer
+        return
+    }
+
+    ((minuten = (delta % 3600) / 60))
+    ((sekunden = delta % 60))
+
+    [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm " ${minuten})
+    timer_show+=$(printf "%ds" ${sekunden})
 
     unset timer
 }
@@ -41,11 +46,7 @@ PS1+="[${DEFAULT}\t"
 PS1+="${GRAU}]-[${DEFAULT}"
 
 # Zeichen für Returncode
-PS1+='`if [ $? = 0 ]; then\
-    echo "\[\e[32m\]:)";\
-else
-    echo "\[\e[31m\]:(";\
-fi`'
+PS1+='`[[ $? = 0 ]] && echo "\[\e[32m\]:)" || echo "\[\e[31m\]:("`'
 
 # ]-[
 PS1+="${GRAU}]-[${DEFAULT}"
@@ -75,12 +76,13 @@ PS1+="${GRAU}]-[${DEFAULT}"
 PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
-PS1+='`if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
-    echo "\[\e[31m\]";\
-elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then\
-    echo "\[\e[31m\]";\
-else\
-    echo "\[\e[32m\]";\
+PS1+='`
+if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then
+    echo "\[\e[31m\]"
+elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then
+    echo "\[\e[31m\]"
+else
+    echo "\[\e[32m\]"
 fi`'
 
 # Git Branch, wenn es sich um ein Git Verzeichnis handelt
@@ -88,9 +90,7 @@ PS1+='`__git_ps1 " (%s)"`'
 
 # Wenn das Kommando länger als 10 Sekunden gedauert hat wird die Dauer ausgegeben
 PROMPT_COMMAND=timer_stop
-PS1+='`if [[ -n ${timer_show} ]]; then\
-    echo "\[\e[1;30m\]]-[\[\e[0m\]${timer_show}";\
-fi`'
+PS1+='`[[ -n ${timer_show} ]] && echo "\[\e[1;30m\]]-[\[\e[0m\]${timer_show}"`'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
 PS1+="${GRAU}]"$'\n' # \n: https://stackoverflow.com/a/21561763/14638014
