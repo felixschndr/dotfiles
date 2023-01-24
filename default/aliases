@@ -6,7 +6,6 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
-alias dc='cd'
 alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"
 alias l='ls'
 alias ll='ls'
@@ -34,6 +33,7 @@ alias time="stopwatch"
 [[ -n ${TMUX} ]] && alias help='tmux_help'
 [[ -n $(command -v code) && -z $(command -v c) ]] && alias c='code .'
 [[ -n $(command -v python) && -z $(command -v py) ]] && alias py='python'
+[[ -n $(command -v docker-compose) && -z $(command -v dc) ]] && alias dc='docker-compose'
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
