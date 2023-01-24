@@ -4,6 +4,13 @@ complete -d cd                                                     # Damit werde
 shopt -s cdspell                                                   # Korrigiert kleine Typos bei Pfaden nach dem Abschicken
 [[ $(echo "${BASH_VERSION}" | cut -c1) -ge 4 ]] && shopt -s autocd # In dir wechseln ohne cd (erst ab BASH v.4 verfügbar)
 
+bind 'set show-all-if-ambiguous on'  # Spart ein mal <TAB> drücken bevor die Autocompletion angezeigt wird
+bind 'set completion-ignore-case on' # Ignoriert Groß- und Kleinschreibung bei der Autocompletion
+bind 'set completion-map-case on'    # Ähnlich wie completion-ignore-case, setzt "-" und "_" als äquivalent
+
+bind '"\e[A": history-search-backward' # Sucht history mit dem schon bestehenden String anstatt ihn zu verwerfen
+bind '"\e[B": history-search-forward'  # Siehe https://stackoverflow.com/a/42299929
+
 LS_COLORS=${LS_COLORS//ex=01;32:/ex=32:} # Die Farbe von ausführbaren Programmen ersetzen von grau zu grün
 
 export HISTCONTROL=ignoreboth              # Schreibe nicht in die history was doppelt ist oder in HISTIGNORE steht
