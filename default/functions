@@ -525,7 +525,7 @@ upgrade() {
     fi
 }
 
-which() {
+whats() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
