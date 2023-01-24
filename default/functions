@@ -142,6 +142,31 @@ git_checkout_history() {
         tac |
         sed 's/checkout: moving from //g;s/to/-->/g'
 }
+git_delete_old_branches() {
+    if ! check_if_git_repo_exists; then return 1; fi
+
+    git fetch -p || return
+    local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
+    local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
+
+    [[ -z ${branches_to_be_deleted} ]] && {
+        echo -e "\e[32mEs gibt keine Branches, die gelöscht werden müssen\e[0m"
+        return
+    }
+
+    if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
+        echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"  
+        echo -e "    ${branches_to_be_deleted}"
+        echo -e "\e[96;1mSoll fortgefahren werden?\e[0m"
+    else
+        echo -e "\e[96;1mDie folgenden Branches werden gelöscht:\e[0m"
+        echo -e "${branches_to_be_deleted}" | sed 's/ /\n/g' | nl
+        echo -e "\e[96;1mSoll fortgefahren werden?\e[0m"
+    fi
+
+    read -r -e -n1 answer
+    [[ ${answer} =~ ^[YyJj]$ ]] && for branch in ${branches_to_be_deleted}; do git branch -D "${branch}"; done
+}
 
 git_history() {
     local urlOfRepository=$(git_base_url)
