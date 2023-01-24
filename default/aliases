@@ -12,7 +12,6 @@ alias ll='ls'
 alias lll='ls'
 alias sl='ls'
 alias la="ls -A"
-alias rm='rm -R'
 
 alias upgradable='apt list --upgradable'
 alias update='sudo apt update && apt list --upgradable'
@@ -28,12 +27,14 @@ alias ip='ip -color'
 alias nano='nano -l -T 4'
 alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
+alias rm='rm -R'
 alias time="stopwatch"
 
 [[ -n ${TMUX} ]] && alias help='tmux_help'
+
 [[ -n $(command -v code) && -z $(command -v c) ]] && alias c='code .'
-[[ -n $(command -v python) && -z $(command -v py) ]] && alias py='python'
 [[ -n $(command -v docker-compose) && -z $(command -v dc) ]] && alias dc='docker-compose'
+[[ -n $(command -v python) && -z $(command -v py) ]] && alias py='python'
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
