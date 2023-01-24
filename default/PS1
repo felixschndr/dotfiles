@@ -78,7 +78,7 @@ PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
 PS1+='`
-if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then
+if [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked|umbenannt|renamed) ]]; then
     echo "\[\e[31m\]"
 elif [[ $(git --no-pager log origin/$(git rev-parse --abbrev-ref HEAD 2>&1)..HEAD --pretty="%cd" 2>&1) =~ (fatal|:) ]]; then
     echo "\[\e[31m\]"
