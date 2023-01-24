@@ -1,0 +1,20 @@
+_mdadm_completion() {
+	if [[ ${COMP_CWORD} -eq 1 ]]; then
+		for item in $(echo -e "--detail\n--examine" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+            COMPREPLY=("${COMPREPLY[@]}" "${item}")
+        done
+	fi
+	if [[ ${COMP_CWORD} -eq 2 ]]; then
+		if [[ ${COMP_WORDS[1]} == "--detail" ]]; then
+			for item in $(lsblk | grep -oe "sd[a-z][0-9]" | sort -u | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+				COMPREPLY=("${COMPREPLY[@]}" "${item}")
+			done
+		elif [[ ${COMP_WORDS[1]} == "--examine" ]]; then
+			for item in $(echo "/dev/md0" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+				COMPREPLY=("${COMPREPLY[@]}" "${item}")
+			done
+		fi
+	fi
+}
+
+complete -F _mdadm_completion mdadm
