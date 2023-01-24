@@ -375,6 +375,13 @@ git_log() {
     done
 }
 
+git_sign_old_commits() {
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Commithash angegeben\e[0m" && return 1
+    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
+    git rebase --exec 'git commit --amend --no-edit -n -S' -i "${1}"
+}
+
 git_sign_off() { # Zum Anzeigen der Signierungsnachricht
     echo "Signed-off-by: $(git config user.name) <$(git config user.email)>"
 }
