@@ -456,6 +456,27 @@ stopwatch() {
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @"${duration}" +%M:%S.%3N) gedauert"
 }
 
+toggle_venv(){
+    local git_root_path=$(git rev-parse --show-toplevel)
+    local venv_directory=""
+    if [[ -d ${git_root_path}/venv ]]; then
+        venv_directory="${git_root_path}/venv"
+    elif [[ -d ${git_root_path}/.venv ]]; then
+        venv_directory="${git_root_path}/.venv"
+    else
+        echo -e "\e[31mKonnte das venv nicht finden"
+        return 1
+    fi
+
+    if [[ -n ${VIRTUAL_ENV} ]]; then
+        deactivate && echo -e "Venv wurde \e[31mdeaktiviert\e[0m✔️"
+    else
+        # shellcheck disable=1091
+        source "${venv_directory}/bin/activate" && echo -e "Venv wurde \e[32maktiviert\e[0m✔️"
+    fi
+
+}
+
 tmux() {
     local sessionName="${HOSTNAME}"
 
