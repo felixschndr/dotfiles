@@ -52,13 +52,13 @@ item_send() {
     echo -e "\e[36mAlter Status:\e[0m\t${oldState}"
 
     outputFile=$(mktemp)
-    ssh openhabian@localhost -p8101 "smarthome:send ${1} ${2}" >"${outputFile}"
+    ssh openhabian@localhost -i /home/openhabian/.ssh/openhab_karaf -p8101 "smarthome:send ${1} ${2}" >"${outputFile}"
 
     if [[ $(cat "${outputFile}") == *"not valid"* ]]; then
         echo -e "\n\e[33mDas Kommando konnte nicht gesendet werden.\e[0m Mögliche Kommandos sind:"
         tail -n +3 "${outputFile}" | sed 's/  /  - /g'
         echo -ne "Es wird versucht ein Update für den Status durchzuführen\r"
-        ssh openhabian@localhost -p8101 "smarthome:update ${1} ${2}" >"${outputFile}"
+        ssh openhabian@localhost -i /home/openhabian/.ssh/openhab_karaf -p8101 "smarthome:update ${1} ${2}" >"${outputFile}"
 
         if [[ $(cat "${outputFile}") == *"not valid"* ]]; then
             echo -e "\e[31mDer neue Status wurde auch vom update nicht akzeptiert! \e[0m"
