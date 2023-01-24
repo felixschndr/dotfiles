@@ -4,22 +4,24 @@ alias ..="cd .."; alias ,,=".."; alias ...="cd ../.."; alias ....="cd ../../..";
 alias dc='cd'
 alias ls="ls -lh --color=always --time-style='+%H:%M %d.%m.%Y'"; alias l='ls'; alias ll='ls'; alias lll='ls'; alias sl='ls'; alias la="ls -A"
 alias rm='rm -R'
-alias status='git status'
-alias update='sudo apt update && apt list --upgradable'
-alias upgradable='apt list --upgradable'
-alias mygrep='grep -ins --color=always'
-alias nano='nano -lS -T 4'
-alias less='less -IN'
-alias b='exec $SHELL'
-alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
-alias tf='tail -f -n 1000'
-alias df="df -h"
-alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
-alias time="stopwatch"
-alias ct="cd /tmp/; [[ -d testing ]] || git clone git@github.com:Trysupe/testing.git; cd testing/"
-alias ip='ip -color'
 
-#[[ -n $(command -v rsync) ]] && alias cp='rsync -arh --info=progress2'
+alias upgradable='apt list --upgradable'
+alias update='sudo apt update && apt list --upgradable'
+
+alias b='exec $SHELL'
+alias ct="cd /tmp/; [[ -d testing ]] || git clone git@github.com:Trysupe/testing.git; cd testing/"
+alias mygrep='grep -ins --color=always'
+alias tf='tail -f -n 1000'
+
+alias cp='cp -r'
+alias df="df -h"
+alias ip='ip -color'
+alias git="git --no-pager" #Kein Pager für alle git Befehle anzeigen
+alias nano='nano -l -T 4'
+alias less='less -IN'
+alias pwd='pwd -P' #Den absoluten Pfad angeben und keine Symnlinks verwenden
+alias time="stopwatch"
+
 [[ -n $(command -v code) ]] && alias c='code .'
            [[ -n ${TMUX} ]] && alias help='tmux_help'
 
