@@ -211,7 +211,7 @@ commit_files() {
             echo -ne "\e[33m"
             git diff --summary "${file}" | sed 's/ mode change/Die Rechte der Datei haben sich geändert von/' |
                 sed 's/100//g' | sed 's/\=>/auf/' | grep -oE --color=never '.+[0-9]' # Zeigt Rechteänderungen an
-            echo -e "\e[0m"
+            echo -ne "\e[0m"
             if [[ ${git_diff_empty} == "true" ]]; then
                 git --no-pager diff --cached --color-words --unified=5 "${file}" 2>/dev/null | tail -n +7
             else
