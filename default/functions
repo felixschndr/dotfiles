@@ -171,6 +171,10 @@ git_issues() {
     return 0
 }
 
+git_last_commit_url() {
+    git_history -u 1
+}
+
 git_last_pull() {
     if ! check_if_git_repo_exists; then return 1; fi
 
@@ -271,8 +275,8 @@ git_log() {
         echo -n "${line}"
         if [[ ${repo} == "work" ]]; then
             local mailAddress="${commitAuthor[${lineCounter}]}"
-            local pre_name=$(cut -d "." -f1 <<< "${mailAddress}" | cut -c1)
-            local sur_name=$(cut -d "." -f2 <<< "${mailAddress}" | cut -c1)
+            local pre_name=$(cut -d "." -f1 <<<"${mailAddress}" | cut -c1)
+            local sur_name=$(cut -d "." -f2 <<<"${mailAddress}" | cut -c1)
             local initials=${pre_name^}${sur_name^}
             echo -n "${initials} | "
         fi
@@ -456,7 +460,7 @@ stopwatch() {
     echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @"${duration}" +%M:%S.%3N) gedauert"
 }
 
-toggle_venv(){
+toggle_venv() {
     local git_root_path=$(git rev-parse --show-toplevel)
     local venv_directory=""
     if [[ -d ${git_root_path}/venv ]]; then
@@ -568,7 +572,7 @@ upgrade() {
 
     local reboot_required_packages_file="/var/run/reboot-required.pkgs"
     if [[ -f ${reboot_required_packages_file} ]]; then
-        if [[ $(wc -l <<< ${reboot_required_packages_file}) == 1 ]]; then
+        if [[ $(wc -l <<<${reboot_required_packages_file}) == 1 ]]; then
             echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
             cat ${reboot_required_packages_file}
         else
