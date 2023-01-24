@@ -296,6 +296,10 @@ git_log() {
     done
 }
 
+git_sign_off() { # Zum Anzeigen der Signierungsnachricht
+    echo "Signed-off-by: $(git config user.name) <$(git config user.email)>"
+}
+
 git_url() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
