@@ -111,6 +111,27 @@ file_info() {
     return 0
 }
 
+gca() { # git commit amend
+    if ! check_if_git_repo_exists; then return 1; fi
+
+    if [[ -z $(git status --porcelain=v1) ]]; then
+        echo -e "\e[31mEs gibt keine Unstaged changes!\e[0m"
+        return 1
+    fi
+
+    git add .
+    git commit -a --amend --no-edit >/dev/null
+
+    echo -e "\e[32mDer Commit wurde amended\e[0m\n\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
+    read -r -e -n1 answer
+    [[ ${answer} =~ ^[YyJj]$ ]] && {
+        git push --force
+        echo -e "\n"
+    }
+
+    git_last_commit_url
+}
+
 git_checkout_history() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
