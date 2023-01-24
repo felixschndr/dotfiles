@@ -87,6 +87,15 @@ ask_for_commit_type(){
         fi
         echo "checkout" > /tmp/.diffcommit
         return
+    elif [[ ${commit_type_input} =~ [Rr] ]]; then # Letzen Commit rückgängig machen
+        local commit_message=$(git log -n 1 --pretty="%s")
+        local date=$(git log -n 1 --pretty="%ad" --date=format:'%A, den %d.%m.')
+        local time=$(git log -n 1 --pretty="%ad" --date=format:'%H:%M:%S')
+        local hash=$(git rev-parse --short HEAD)
+        echo -e "\e[33mDer letzte Commit wird rückgängig gemacht:\e[0m\n    Nachricht: \e[1;96m${commit_message}\e[0m\n        Datum: ${date}\n      Uhrzeit: ${time}\n         Hash: ${hash}"
+        git reset --soft HEAD^ || echo -e "\e[31mEs gab ein Problem beim Rückgängig machen des Commits!"
+        echo "rückgängig" > /tmp/.diffcommit
+        return
     fi
     local amount_of_commit_types=$(echo "${commit_type_input}" | wc -w)
     local commit_type_counter=0
@@ -208,6 +217,8 @@ commit_files(){
         elif [[ ${commit_type} == "checkout"* ]]; then
             ((file_counter ++))
             continue
+        elif [[ ${commit_type} == "rückgängig"* ]]; then
+            return 1
         fi
 
 
