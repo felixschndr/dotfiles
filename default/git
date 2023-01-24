@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# Ein Lock erstellen, dass die Einstellungen nicht versucht gleichzeitig mehrmal gesetzt zu werden
-lock_file=/tmp/bashrc_lock_file_$(date '+%d-%m-%y')
-
-[[ -f "${lock_file}" ]] && return
-touch "${lock_file}"
+return
 
 git config --global user.name "Felix Schneider"
 git config --global core.autocrlf "input"
@@ -20,5 +16,3 @@ else
     git config --global --unset credential.helper
 fi
 alias git='git --no-pager'
-
-rm -f "${lock_file}"
