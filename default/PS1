@@ -22,7 +22,7 @@ function timer_stop {
     ((sekunden=timer_show % 60))
     timer_show=""
     if [[ ! (${minuten} == 0 && ${sekunden} -lt 10) ]]; then
-        [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm%ds" ${minuten} ${sekunden}) || timer_show=$(printf "%ds" ${sekunden})
+        [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm %ds" ${minuten} ${sekunden}) || timer_show=$(printf "%ds" ${sekunden})
     fi
 
     unset timer
