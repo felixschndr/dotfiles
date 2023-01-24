@@ -27,17 +27,15 @@ cd() {
     command cd "${targetDirectory}" || return 1
 }
 
-ds() { # Docker Shell
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-
+de() { # Docker Execute (Shell)
+    # shellcheck disable=2068
+    if ! check_arguments_for_docker_functions ${@}; then return; fi
     docker exec -it "${1}" bash
 }
 
 dl() { # Docker Logs
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-
+    # shellcheck disable=2068
+    if ! check_arguments_for_docker_functions ${@}; then return; fi
     docker logs -f -n 1000 "${1}"
 }
 
@@ -47,7 +45,7 @@ _docker_containers_completion() {
     done
 }
 
-complete -F _docker_containers_completion ds dl
+complete -F _docker_containers_completion de dl
 
 file_info() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
