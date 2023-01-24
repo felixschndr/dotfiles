@@ -21,5 +21,4 @@ else
 fi
 alias git='git --no-pager'
 
-sleep 5
-rm -f "${lock_file}"
+{ sleep 5; rm -f "${lock_file}"; } &
