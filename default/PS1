@@ -24,7 +24,7 @@ function timer_stop {
     if [[ ! (${m} == 0 && ${s} -lt 10) ]]; then
         [[ ${m} != 0 ]] && timer_show=$(printf "%dm%ds" $m $s) || timer_show=$(printf "%ds" $s)
     fi
-    
+
     unset timer
 }
 
