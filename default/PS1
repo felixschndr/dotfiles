@@ -17,12 +17,12 @@ function timer_start {
 }
 
 function timer_stop {
-    timer_show=$(($SECONDS - $timer))
-    ((m=(${timer_show}%3600)/60))
-    ((s=${timer_show}%60))
+    timer_show=$((SECONDS - timer))
+    ((minuten=(timer_show % 3600) / 60))
+    ((sekunden=timer_show % 60))
     timer_show=""
-    if [[ ! (${m} == 0 && ${s} -lt 10) ]]; then
-        [[ ${m} != 0 ]] && timer_show=$(printf "%dm%ds" $m $s) || timer_show=$(printf "%ds" $s)
+    if [[ ! (${minuten} == 0 && ${sekunden} -lt 10) ]]; then
+        [[ ${minuten} != 0 ]] && timer_show=$(printf "%dm%ds" ${minuten} ${sekunden}) || timer_show=$(printf "%ds" ${sekunden})
     fi
 
     unset timer
