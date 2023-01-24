@@ -154,7 +154,9 @@ git_delete_old_branches() {
         return
     }
 
-    echo "Aktueller Branch: $(git rev-parse --abbrev-ref HEAD)"
+    local checkedout_branch=$(git rev-parse --abbrev-ref HEAD)
+
+    echo "Aktueller Branch: ${checkedout_branch}"
     if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
         echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"
         echo -e "    ${branches_to_be_deleted}"
@@ -166,7 +168,18 @@ git_delete_old_branches() {
     fi
 
     read -r -e -n1 answer
-    [[ ${answer} =~ ^[YyJj]$ ]] && for branch in ${branches_to_be_deleted}; do git branch -D "${branch}"; done
+    [[ ${answer} =~ ^[YyJj]$ ]] || return
+
+    for branch in ${branches_to_be_deleted}; do
+        if [[ "${branch}" == "${checkedout_branch}" ]]; then
+            local default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+            echo "Ein zu löschneder Branch war ausgecheckt. Es wird ${default_branch} ausgecheckt"
+            git checkout "${default_branch}"
+            git pull >/dev/null
+        fi
+
+        git branch -D "${branch}"
+    done
 }
 
 git_delete_old_branches_in_current_dir() {
