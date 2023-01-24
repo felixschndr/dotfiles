@@ -1,7 +1,8 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [{
+    "actions": [
+        {
             "command": {
                 "action": "resizePane",
                 "direction": "up"
@@ -230,6 +231,7 @@
             "bellStyle": "taskbar",
             "closeOnExit": "always",
             "colorScheme": "Solarized Dark",
+            "cursorShape": "bar",
             "experimental.retroTerminalEffect": false,
             "font": {
                 "face": "Cascadia Mono",
@@ -238,7 +240,8 @@
             "historySize": 10000,
             "startingDirectory": "%USERPROFILE%"
         },
-        "list": [{
+        "list": [
+            {
                 "commandline": "%PROGRAMFILES%/Git/usr/bin/bash.exe -i -l",
                 "guid": "{54e969a7-a2f1-43e0-bbb9-2a6b9117d07b}",
                 "icon": "%PROGRAMFILES%/Git/mingw64/share/git/git-for-windows.ico",
@@ -246,15 +249,18 @@
             },
             {
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "PowerShell"
+                "name": "PowerShell",
+                "elevate": true
             },
             {
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "Eingabeaufforderung"
+                "name": "Eingabeaufforderung",
+                "elevate": true
             }
         ]
     },
-    "schemes": [{
+    "schemes": [
+        {
             "background": "#0C0C0C",
             "black": "#0C0C0C",
             "blue": "#0037DA",
