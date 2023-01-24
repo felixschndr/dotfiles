@@ -343,6 +343,41 @@ git_url() {
     [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
+ke() { # Kubectl Execute (Shell)
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
+    [[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
+    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
+    shell_binary=$(kubectl exec -it -n "${1}" "${2}" -- sh -c "command -v bash" 2>/dev/null | tr -d '\015')
+    [[ -z ${shell_binary} ]] && shell_binary="sh"
+
+    kubectl exec -it -n "${1}" "${2}" -- "${shell_binary}"
+}
+
+kl() { # Kubectl Logs
+    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
+    [[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
+    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+
+    kubectl logs -f -n "${1}" "${2}"
+}
+
+_kubernetes_pod_completion() {
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+            COMPREPLY=("${COMPREPLY[@]}" "${item}")
+        done
+    elif [[ ${COMP_CWORD} -eq 2 ]]; then
+        namespace=${COMP_WORDS[1]}
+        available_pods=$(kubectl get pod -n "${namespace}" -o custom-columns=":metadata.name" --no-headers)
+        for pod in $(echo "${available_pods}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+            COMPREPLY+=("${pod}")
+        done
+    fi
+}
+
+complete -F _kubernetes_pod_completion ke kl
+
 psgrep() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
 
