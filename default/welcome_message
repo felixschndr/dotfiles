@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ ${USER} == "root" ]]                               && return
+[[ ${USER} == "root" ]] && return
 [[ ${HOSTNAME} =~ (bassi|cronus|Asterix|Miraculix) ]] && return
 
 text=$(curl http://whatthecommit.com/index.txt 2>/dev/null)
@@ -8,6 +8,6 @@ text=$(curl http://whatthecommit.com/index.txt 2>/dev/null)
 
 command="echo -e \"${text}\""
 [[ -n $(command -v cowthink 2>/dev/null) ]] && command+=" | cowthink"
-[[ -n $(command -v lolcat 2>/dev/null) ]]   && command+=" | lolcat"
+[[ -n $(command -v lolcat 2>/dev/null) ]] && command+=" | lolcat"
 
 eval "${command}"

@@ -1,17 +1,17 @@
 #!/bin/bash
 
-complete -d cd # Damit werden files ausgeblendet bei der Vervollständigung
-shopt -s cdspell # Korrigiert kleine Typos bei Pfaden nach dem Abschicken
+complete -d cd                                                   # Damit werden files ausgeblendet bei der Vervollständigung
+shopt -s cdspell                                                 # Korrigiert kleine Typos bei Pfaden nach dem Abschicken
 [[ $(echo "$BASH_VERSION" | cut -c1) -ge 4 ]] && shopt -s autocd # In dir wechseln ohne cd (erst ab BASH v.4 verfügbar)
 
 LS_COLORS=${LS_COLORS//ex=01;32:/ex=32:} # Die Farbe von ausführbaren Programmen ersetzen von grau zu grün
 
-export HISTCONTROL=ignoreboth # Schreibe nicht in die history was doppelt ist oder in HISTIGNORE steht
+export HISTCONTROL=ignoreboth                # Schreibe nicht in die history was doppelt ist oder in HISTIGNORE steht
 export HISTIGNORE="clear:ll:* --help:man:cd" # Kommandos, die nicht in die History aufgenommen werden
-export HISTTIMEFORMAT="%d.%m. %H:%M:%S - " # Format der History anpassen
-export HISTSIZE=10000 # Anzahl der Kommandos, die im Memory gespeichert bleiben
-export HISTFILESIZE=30000 # Anzahl der Kommandos, die in .bash_history gespeichert bleiben
-shopt -s histappend # Kommandos werden an die History angehängt statt die History zu überschreiben
+export HISTTIMEFORMAT="%d.%m. %H:%M:%S - "   # Format der History anpassen
+export HISTSIZE=10000                        # Anzahl der Kommandos, die im Memory gespeichert bleiben
+export HISTFILESIZE=30000                    # Anzahl der Kommandos, die in .bash_history gespeichert bleiben
+shopt -s histappend                          # Kommandos werden an die History angehängt statt die History zu überschreiben
 
 export LANG=de_DE.UTF-8
 export LANGUAGE=de_DE.UTF-8
