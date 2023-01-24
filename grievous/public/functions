@@ -1,3 +1,5 @@
+#!/bin/bash
+
 _mdadm_completion() {
 	if [[ ${COMP_CWORD} -eq 1 ]]; then
 		for item in $(echo -e "--detail\n--examine" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
