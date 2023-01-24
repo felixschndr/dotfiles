@@ -228,7 +228,8 @@
             "colorScheme": "Solarized Dark",
             "experimental.retroTerminalEffect": false,
             "font": {
-                "face": "Cascadia Mono"
+                "face": "Cascadia Mono",
+                "weight": "semi-light"
             },
             "historySize": 10000,
             "startingDirectory": "%USERPROFILE%"
