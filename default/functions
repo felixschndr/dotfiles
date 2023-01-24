@@ -173,7 +173,7 @@ git_issues() {
 
 git_last_commit_url() {
     echo "Nachricht:  $(git log -n 1 --pretty="%s")"
-    echo "Uhrzeit:    $(git log -n 1 --pretty="%ad" --date=format:"%a | %d.%m. | %H:%M:%S")"
+    echo "Uhrzeit:    $(git log -n 1 --pretty="%ad" --date=format:"%A, der %d.%m. um %H:%M:%S Uhr")"
     git_history -u 1
 }
 
