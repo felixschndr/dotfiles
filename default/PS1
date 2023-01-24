@@ -11,7 +11,7 @@ CYAN="\[\e[1;36m\]"
 
 # Berechnung dafür wie lang das Kommando gedauert hat
 function timer_start {
-    timer=${timer:-$SECONDS}
+    timer=${timer:-${SECONDS}}
 }
 
 function timer_stop {
