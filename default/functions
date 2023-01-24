@@ -201,7 +201,7 @@ git_last_pull() {
 git_log() {
     if ! check_if_git_repo_exists; then return 1; fi
 
-    [[ $(git_url -u) == *"abm-local.de"* ]] && repo="abm" || repo=""
+    [[ $(git_url -u) == *"de-cix"* ]] && repo="work" || repo=""
 
     local amountOfCommits="30"
     local commitsOfBranchToShow="$(git rev-parse --abbrev-ref HEAD)" # Argument supplied by default/diff/function that supplies what commits to show (..origin/${branch}"
@@ -221,7 +221,7 @@ git_log() {
     else
         read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
     fi
-    read -r -d $'\0' -a commitAuthor <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae" | cut -c -2)"
+    read -r -d $'\0' -a commitAuthor <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae")"
     read -r -d $'\0' -a statsOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" # TODO: sed entfernen da langsam
     read -r -d $'\0' -a messageOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
 
@@ -269,7 +269,13 @@ git_log() {
     lineCounter=0
     for line in "${hashandtime[@]}"; do # Ausgabe der ganzen Infos
         echo -n "${line}"
-        [[ ${repo} == "abm" ]] && echo -n "${commitAuthor[${lineCounter}]^^} | "
+        if [[ ${repo} == "work" ]]; then
+            local mailAddress="${commitAuthor[${lineCounter}]}"
+            local pre_name=$(cut -d "." -f1 <<< "${mailAddress}" | cut -c1)
+            local sur_name=$(cut -d "." -f2 <<< "${mailAddress}" | cut -c1)
+            local initials=${pre_name^}${sur_name^}
+            echo -n "${initials} | "
+        fi
         local statsline=${statsOfCommit[${lineCounter}]}
 
         local filesChanged=$(echo "${statsline}" | cut -d " " -f1)
