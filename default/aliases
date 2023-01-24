@@ -42,6 +42,7 @@ is_wsl=false
 # https://github.com/microsoft/WSL/issues/4401#issuecomment-811830248
 # Zusätzlich keinen pager verwenden
 [[ ${is_wsl} == true ]] && alias git='git.exe --no-pager' || alias git="git --no-pager"
+# shellcheck disable=2139
 [[ ${is_wsl} == true ]] && alias cdh="cd /mnt/c/Users/${USER}" # In das Homeverzeichnis in Windows wechseln
 
 export log_auth="/var/log/auth.log"
