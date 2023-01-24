@@ -154,6 +154,7 @@ git_delete_old_branches() {
         return
     }
 
+    echo "Aktueller Branch: $(git rev-parse --abbrev-ref HEAD)"
     if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
         echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"
         echo -e "    ${branches_to_be_deleted}"
@@ -166,6 +167,19 @@ git_delete_old_branches() {
 
     read -r -e -n1 answer
     [[ ${answer} =~ ^[YyJj]$ ]] && for branch in ${branches_to_be_deleted}; do git branch -D "${branch}"; done
+}
+
+git_delete_old_branches_in_current_dir() {
+    local start_directory=${PWD}
+    local git_repositories=$(find "${PWD}" -name .git -type d -prune)
+
+    for repository in ${git_repositories}; do
+        cd "${repository}/../" || continue
+        echo "Prüfe $(realpath --relative-to="${start_directory}" "${PWD}")"
+        git_delete_old_branches
+    done
+
+    cd "${start_directory}" || false
 }
 
 git_history() {
