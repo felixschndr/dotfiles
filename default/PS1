@@ -72,11 +72,7 @@ PS1+="\H"
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
-if [[ -f /proc/version ]]; then
-    if [[ $(cat /proc/version) =~ (M|m)icrosoft ]]; then
-        is_wsl=true
-    fi
-fi
+[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && is_wsl=true
 
 # WSL Ausgabe
 #    - bei WSL: "]-[WSL" Einschub
@@ -87,10 +83,10 @@ PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[31m\]WSL"`'
 PS1+="${GRAU}]-[${DEFAULT}"
 
 # Pfad, es wird noch ein "/" angehängt, wenn der aktuelle Pfad != "/" ist
-PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
+PS1+="${CYAN}${PWD}"'`[[ ${PWD} != "/" ]] && echo "/"`'"${DEFAULT}"
 
 # Git Farbe
-PS1+='`if [[ ${is_wsl} == false ]]; then\
+PS1+='`if [[ ${PWD} != *"/fschneider/repos/"* ]]; then\
     if [[ "$(svn info 2>&1)" == *"Wurzelpfad der Arbeitskopie"* ]]; then\
         echo "\[\e[32m\] (svn)";\
     elif [[ $(git status 2>/dev/null) =~ (modified|geändert|ahead| vor |behind|hinter|deleted|gelöscht|neu|new|Unversioniert|Untracked) ]]; then\
@@ -103,7 +99,7 @@ PS1+='`if [[ ${is_wsl} == false ]]; then\
 fi`'
 
 # Git Branch, wenn es sich um ein Git Verzeichnis handelt
-PS1+='`[[ ${is_wsl} == false ]] && echo "$(__git_ps1 " (%s)")"`'
+PS1+='`[[ ${PWD} != *"/fschneider/repos/"* ]] && echo "$(__git_ps1 " (%s)")"`'
 
 # Wenn das Kommando länger als 10 Sekunden gedauert hat wird die Dauer ausgegeben
 PROMPT_COMMAND=timer_stop
