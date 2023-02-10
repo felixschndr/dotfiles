@@ -712,7 +712,7 @@ upgrade() {
 
     local reboot_required_packages_file="/var/run/reboot-required.pkgs"
     if [[ -f ${reboot_required_packages_file} ]]; then
-        if [[ $(wc -l <<<${reboot_required_packages_file}) == 1 ]]; then
+        if [[ $(wc -l <${reboot_required_packages_file}) == 1 ]]; then
             echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
             cat ${reboot_required_packages_file}
         else
