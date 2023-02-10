@@ -2,7 +2,7 @@
 
 _mdadm_completion() {
 	if [[ ${COMP_CWORD} -eq 1 ]]; then
-		for item in $(echo -e "--detail\n--examine" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+		for item in $(echo -e "--add\n--detail\n--examine" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
             COMPREPLY=("${COMPREPLY[@]}" "${item}")
         done
 	fi
@@ -11,11 +11,16 @@ _mdadm_completion() {
 			for item in $(lsblk -o "PATH" | grep -e "sd[a-z][0-9]" | sort -u | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
 				COMPREPLY=("${COMPREPLY[@]}" "${item}")
 			done
-		elif [[ ${COMP_WORDS[1]} == "--detail" ]]; then
+		elif [[ ${COMP_WORDS[1]} == "--add" || ${COMP_WORDS[1]} == "--detail" ]]; then
 			for item in $(lsblk -o "PATH,TYPE" | grep raid | sort -u | cut -d " " -f1 | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
 				COMPREPLY=("${COMPREPLY[@]}" "${item}")
 			done
 		fi
+	fi
+	if [[ ${COMP_CWORD} -eq 3 ]]; then
+		for item in $(lsblk -o "PATH" | grep -e "sd[a-z][0-9]" | sort -u | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY=("${COMPREPLY[@]}" "${item}")
+		done
 	fi
 }
 
