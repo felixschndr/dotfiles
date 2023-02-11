@@ -476,7 +476,7 @@ _kubernetes_pod_completion() {
     fi
 }
 
-complete -F _kubernetes_pod_completion ke kl
+[[ -n $(command -v kubectl) ]] && complete -F _kubernetes_pod_completion ke kl
 
 psgrep() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
