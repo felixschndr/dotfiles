@@ -41,8 +41,17 @@ de() { # Docker Execute (Shell)
     [[ -z ${shell_binary} ]] && shell_binary="sh"
 
     if [[ ${#} -eq 1 ]]; then
-        docker exec -it "${1}" "${shell_binary}"
+        local available_users=$(_docker_container_get_available_users "${1}")
+        if [[ $(wc -l <<<"${available_users}") == 2 && ${available_users} == *"root"* ]]; then
+            # shellcheck disable=2001
+            user=$(echo "${available_users}" | sed 's/root//')
+            docker exec -it --user "${user}" "${1}" "${shell_binary}"
+        else
+            docker exec -it "${1}" "${shell_binary}"
+        fi
+
     else
+
         docker exec -it --user "${2}" "${1}" "${shell_binary}"
     fi
 }
@@ -54,21 +63,24 @@ dl() { # Docker Logs
     docker logs -f -n 1000 "${1}"
 }
 
+_docker_container_get_available_users() {
+    docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
+}
+
 _docker_containers_completion() {
     if [[ ${COMP_CWORD} -eq 1 ]]; then
         for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
             COMPREPLY=("${COMPREPLY[@]}" "${item}")
         done
     elif [[ ${COMP_CWORD} -eq 2 && ${COMP_WORDS[0]} == "de" ]]; then
-        container_name=${COMP_WORDS[1]}
-        available_users=$(docker exec -it "${container_name}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd | cut -d':' -f1")
+        local available_users=$(_docker_container_get_available_users "${COMP_WORDS[1]}")
         for user in $(echo "${available_users}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
             COMPREPLY+=("${user}")
         done
     fi
 }
 
-complete -F _docker_containers_completion de dl
+[[ -n $(command -v docker) ]] && complete -F _docker_containers_completion de dl
 
 file_info() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
