@@ -354,7 +354,7 @@ git_log() {
         local deletions=0
         [[ ${newline} == *"deletion"* ]] && deletions=$(echo "${newline}" | grep -Eo '[0-9]+' | tail -1)
 
-        statsOfCommit[${lineCounter}]="${filesChanged} ${insertions} ${deletions}"
+        statsOfCommit[lineCounter]="${filesChanged} ${insertions} ${deletions}"
 
         [[ ${filesChanged} -gt ${maxFilesChanged} ]] && maxFilesChanged=${filesChanged}
         [[ ${insertions} -gt ${maxInserions} ]] && maxInserions=${insertions}
