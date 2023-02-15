@@ -38,6 +38,7 @@ alias time="stopwatch"
 [[ -z $(command -v c) ]] && alias c='code .'
 [[ -z $(command -v dc) ]] && alias dc='docker-compose'
 [[ -z $(command -v dcdu) ]] && alias dcdu='docker-compose down; docker-compose up -d'
+[[ -z $(command -v dcdub) ]] && alias dcdub='dcdu --build'
 [[ -z $(command -v dps) ]] && alias dps='docker ps'
 [[ -z $(command -v pc) ]] && alias pc='pre-commit run --all-files'
 [[ -z $(command -v py) ]] && alias py='python'
