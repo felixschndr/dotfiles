@@ -223,7 +223,7 @@
     "confirmCloseAllTabs": false,
     "copyFormatting": "none",
     "copyOnSelect": true,
-    "defaultProfile": "{54e969a7-a2f1-43e0-bbb9-2a6b9117d07b}",
+    "defaultProfile": "{17bf3de4-5353-5709-bcf9-835bd952a95e}",
     "launchMode": "maximized",
     "multiLinePasteWarning": false,
     "profiles": {
@@ -242,20 +242,21 @@
         },
         "list": [
             {
-                "commandline": "%PROGRAMFILES%/Git/usr/bin/bash.exe -i -l",
-                "guid": "{54e969a7-a2f1-43e0-bbb9-2a6b9117d07b}",
-                "icon": "%PROGRAMFILES%/Git/mingw64/share/git/git-for-windows.ico",
-                "name": "Bash"
+                "guid": "{17bf3de4-5353-5709-bcf9-835bd952a95e}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl",
+                "startingDirectory": "/home/felix/"
             },
             {
+                "elevate": true,
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "PowerShell",
-                "elevate": true
+                "name": "PowerShell"
             },
             {
+                "elevate": true,
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "Eingabeaufforderung",
-                "elevate": true
+                "name": "Eingabeaufforderung"
             }
         ]
     },
