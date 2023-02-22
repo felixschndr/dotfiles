@@ -36,15 +36,14 @@ alias time="stopwatch"
 [[ -n ${TMUX} ]] && alias help='tmux_help'
 
 [[ -z $(command -v c) ]] && alias c='code .'
-[[ -z $(command -v dc) ]] && alias dc='docker-compose'
+[[ -z $(command -v d) ]] && alias d='docker' && complete -F _docker d
+[[ -z $(command -v dc) ]] && alias dc='docker-compose' && complete -F _docker_compose dc
 [[ -z $(command -v dcdu) ]] && alias dcdu='docker-compose down; docker-compose up -d'
 [[ -z $(command -v dcdub) ]] && alias dcdub='dcdu --build'
 [[ -z $(command -v dps) ]] && alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
 [[ -z $(command -v pc) ]] && alias pc='pre-commit run --all-files'
 [[ -z $(command -v py) ]] && alias py='python'
-[[ -z $(command -v k) ]] && alias k='kubectl'
-
-complete -o default -F __start_kubectl k
+[[ -z $(command -v k) ]] && alias k='kubectl' && complete -o default -F __start_kubectl k
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false
