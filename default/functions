@@ -63,25 +63,6 @@ dl() { # Docker Logs
     docker logs -f -n 1000 "${1}"
 }
 
-_docker_container_get_available_users() {
-    docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
-}
-
-_docker_containers_completion() {
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY=("${COMPREPLY[@]}" "${item}")
-        done
-    elif [[ ${COMP_CWORD} -eq 2 && ${COMP_WORDS[0]} == "de" ]]; then
-        local available_users=$(_docker_container_get_available_users "${COMP_WORDS[1]}")
-        for user in $(echo "${available_users}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY+=("${user}")
-        done
-    fi
-}
-
-[[ -n $(command -v docker) ]] && complete -F _docker_containers_completion de dl
-
 file_info() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
 
@@ -154,6 +135,7 @@ git_checkout_history() {
         tac |
         sed 's/checkout: moving from //g;s/to/-->/g'
 }
+
 git_delete_old_branches() {
     if ! check_if_git_repo_exists; then return 1; fi
 
@@ -454,22 +436,6 @@ kl() { # Kubectl Logs
 
     kubectl logs -f -n "${1}" "${2}"
 }
-
-_kubernetes_pod_completion() {
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY=("${COMPREPLY[@]}" "${item}")
-        done
-    elif [[ ${COMP_CWORD} -eq 2 ]]; then
-        namespace=${COMP_WORDS[1]}
-        available_pods=$(kubectl get pod -n "${namespace}" -o custom-columns=":metadata.name" --no-headers)
-        for pod in $(echo "${available_pods}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY+=("${pod}")
-        done
-    fi
-}
-
-[[ -n $(command -v kubectl) ]] && complete -F _kubernetes_pod_completion ke kl
 
 psgrep() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
