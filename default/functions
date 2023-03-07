@@ -237,21 +237,6 @@ git_history() {
     echo -e "\e[32mCommit URL:\e[0m ${space}\e[96m${urlOfCommit}\e[0m"
 }
 
-git_issues() {
-    local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
-
-    local typeOfSession=$(is_session_ssh)
-
-    local urlOfIssues="${urlOfRepository}""/issues/"
-
-    echo -e "URL: \e[96m${urlOfIssues}\e[0m"
-
-    [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" ]] && xdg-open "${urlOfIssues}"
-
-    return 0
-}
-
 git_last_commit_url() {
     echo "Nachricht:  $(git log -n 1 --pretty="%s")"
     echo "Uhrzeit:    $(git log -n 1 --pretty="%ad" --date=format:"%A, der %d.%m. um %H:%M:%S Uhr")"
@@ -404,10 +389,6 @@ git_sign_old_commits() {
     git rebase --exec 'git commit --amend --no-edit -n -S' -i "${1}"
 }
 
-git_sign_off() { # Zum Anzeigen der Signierungsnachricht
-    echo "Signed-off-by: $(git config user.name) <$(git config user.email)>"
-}
-
 git_url() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
@@ -437,76 +418,6 @@ kl() { # Kubectl Logs
     kubectl logs -f -n "${1}" "${2}"
 }
 
-psgrep() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
-
-    ps aux | head -n 1
-    # shellcheck disable=2009
-    ps aux -H | grep -i "${*}"
-}
-
-repeat() {
-    [ ${#} -gt 2 ] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-
-    [[ -z ${2} ]] && sleeptime="1.0" || sleeptime="${2//,/\.}"
-
-    local counter=0
-    while (true); do
-        ((counter++))
-
-        header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   |   Kommando: ${1}   "
-        [ "${#header}" -ge "$(tput cols)" ] && header="   $(date +%T)   |   Durchlauf: ${counter}   |   Alle ${sleeptime//,/\.}s   "
-        echo -e "\n\e[96;1m"
-        center "${header}"
-        echo -e "\e[0m"
-
-        eval "${1}"
-        read -r -t "${sleeptime}"
-    done
-}
-
-complete -F _command repeat # Autovervollständigung mit allen verfügbaren Kommandos
-
-sa() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Name angegeben\e[0m" && return 1
-    [[ -f ${1} ]] && echo -e "\e[31mDie Datei exisitiert bereits\e[0m" && return 1
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
-
-    filename="${1}"
-    touch "${filename}"
-    chmod +x "${filename}"
-
-    if [[ ${filename} == *".sh" ]]; then
-        echo -e "#!/bin/bash\n\n" >>"${filename}"
-
-    elif [[ ${filename} == *".py" ]]; then
-        echo -e "#!/usr/bin/python3\n# -*- coding: utf-8 -*-\n\n" >>"${filename}"
-
-    fi
-
-    [[ -n $(command -v code) ]] && code "${filename}" || nano +8 "${filename}"
-
-    echo -e "\e[32mSoll das Script ausgeführt werden?\e[0m"
-    read -r -e -n1 answer
-    if [[ ${answer} =~ ^[YyJj]$ ]]; then
-        if [[ -f ${filename} ]]; then
-            echo -e "\e[1;96m"
-            center "${filename}"
-            echo -e "\n\e[0m"
-            eval "${filename}"
-
-        else
-            echo -e "\e[31mDas Script existiert nicht mehr!\e[0m"
-            return 1
-
-        fi
-
-    else
-        echo -e "\e[33mDas Script wird nicht ausgeführt\e[0m"
-        return 1
-    fi
-}
-
 search_string() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
@@ -531,42 +442,6 @@ search_file() {
         find "${@}" -iname "*${fileToSearchFor}*" -not -path "*/\.git/*" | grep -i "${fileToSearchFor}" --color=always ||
             echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
     fi
-}
-
-ssh_permissions() {
-    local ssh_path=${HOME}/.ssh
-    [[ -d ${ssh_path} ]] || return
-    chmod 700 "${ssh_path}"
-    [[ -f ${ssh_path}/id_ed25519.pub ]] && chmod 644 ~/.ssh/id_ed25519.pub
-    [[ -f ${ssh_path}/id_ed25519 ]] && chmod 600 ~/.ssh/id_ed25519
-    [[ -f ${ssh_path}/authorized_keys ]] && chmod 600 ~/.ssh/authorized_keys
-    [[ -f ${ssh_path}/config ]] && chmod 600 ~/.ssh/config
-
-    [[ -d /var/lib/openhab2 ]] || return
-    sudo -u openhab chmod 700 /var/lib/openhab2/.ssh
-    sudo -u openhab chmod 644 /var/lib/openhab2/.ssh/id_ed25519.pub
-    sudo -u openhab chmod 600 /var/lib/openhab2/.ssh/id_ed25519 #/var/lib/openhab2/.ssh/config
-}
-
-stopwatch() {
-    [ ${#} -lt 1 ] && echo -e "\e[31mEs wurde kein Befehl angegeben\e[0m" && return 1
-
-    local commandToRun="${*//\"/\\\"}" # Ersetze '"' durch '\"'
-
-    local startOfExecution=$(date +%s,%N)
-
-    eval "${commandToRun}"
-
-    local endOfExecution=$(date +%s,%N)
-
-    local secondsSinceEpochTillStartOfExecutions=$(echo "${startOfExecution}" | cut -d',' -f1)
-    local nanosecondsAtStartOfExecutions=$(echo "${startOfExecution}" | cut -d',' -f2)
-    local secondsSinceEpochTillEndOfExecutions=$(echo "${endOfExecution}" | cut -d',' -f1)
-    local nanosecondsAtEndOfExecutions=$(echo "${endOfExecution}" | cut -d',' -f2)
-
-    local duration="0""$(bc <<<"scale=3; ${secondsSinceEpochTillEndOfExecutions} - ${secondsSinceEpochTillStartOfExecutions} + (${nanosecondsAtEndOfExecutions} -${nanosecondsAtStartOfExecutions})/1000000000")"
-
-    echo -e "\e[1m\n\e[36mDas Auführen hat $(date -u --date @"${duration}" +%M:%S.%3N) gedauert"
 }
 
 toggle_venv() {
