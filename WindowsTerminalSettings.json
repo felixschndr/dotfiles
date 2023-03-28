@@ -249,6 +249,7 @@
                 "startingDirectory": "~"
             },
             {
+                "adjustIndistinguishableColors": "always",
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                 "elevate": false,
                 "guid": "{fa63fb53-d3f1-4dc0-a30a-323ad2d11d5e}",
@@ -256,18 +257,22 @@
                 "name": "PowerShell"
             },
             {
+                "adjustIndistinguishableColors": "always",
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                 "elevate": true,
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
                 "name": "PowerShell als Admin"
             },
             {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
                 "elevate": false,
                 "guid": "{b6684069-b3e3-4c04-92b8-1f2e95d62841}",
                 "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
                 "name": "CMD"
             },
             {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
                 "elevate": true,
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
