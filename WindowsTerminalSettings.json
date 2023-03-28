@@ -249,6 +249,7 @@
                 "startingDirectory": "~"
             },
             {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                 "elevate": false,
                 "guid": "{fa63fb53-d3f1-4dc0-a30a-323ad2d11d5e}",
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
