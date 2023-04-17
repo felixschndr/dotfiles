@@ -168,7 +168,7 @@ git_delete_old_branches() {
     for branch in ${branches_to_be_deleted}; do
         if [[ "${branch}" == "${checkedout_branch}" ]]; then
             local default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-            echo "Ein zu löschneder Branch war ausgecheckt. Es wird ${default_branch} ausgecheckt"
+            echo "Ein zu löschender Branch ist ausgecheckt. Es wird ${default_branch} ausgecheckt"
             git checkout "${default_branch}" >/dev/null
             git pull >/dev/null
         fi
@@ -185,6 +185,7 @@ git_delete_old_branches_in_current_dir() {
         cd "${repository}/../" || continue
         echo "Prüfe $(realpath --relative-to="${start_directory}" "${PWD}")"
         git_delete_old_branches
+        echo ""
     done
 
     cd "${start_directory}" || false
