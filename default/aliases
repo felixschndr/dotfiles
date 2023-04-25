@@ -22,7 +22,7 @@ alias mygrep='grep -ins --color=always'
 alias tf='tail -f -n 1000'
 
 alias cp='cp -r'
-alias df="df -h"
+alias df="df -h --exclude-type=overlay"
 alias ip='ip -color'
 alias nano='nano -l -T 4'
 alias nanol='command nano -T 4'
