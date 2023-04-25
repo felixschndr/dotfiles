@@ -14,10 +14,11 @@ bind '"\e[B": history-search-forward'  # Siehe https://stackoverflow.com/a/42299
 LS_COLORS=${LS_COLORS//ex=01;32:/ex=32:} # Die Farbe von ausführbaren Programmen ersetzen von grau zu grün
 
 export HISTCONTROL=ignoreboth              # Schreibe nicht in die history was doppelt ist oder in HISTIGNORE steht
-export HISTIGNORE="clear:ll:man:cd"        # Kommandos, die nicht in die History aufgenommen werden
+export HISTIGNORE="clear"                  # Kommandos, die nicht in die History aufgenommen werden
 export HISTTIMEFORMAT="%d.%m. %H:%M:%S - " # Format der History anpassen
 export HISTSIZE=10000                      # Anzahl der Kommandos, die im Memory gespeichert bleiben
 export HISTFILESIZE=30000                  # Anzahl der Kommandos, die in .bash_history gespeichert bleiben
+export PROMPT_COMMAND='history -a'         # Synchronisert alle Bashhistories von mehreren Terminals https://askubuntu.com/a/80380
 shopt -s histappend                        # Kommandos werden an die History angehängt statt die History zu überschreiben
 shopt -s checkwinsize                      # Nach jedem Kommando die Größe des Fensters checken
 
