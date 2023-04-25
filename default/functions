@@ -384,10 +384,21 @@ git_log() {
 }
 
 git_sign_old_commits() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Commithash angegeben\e[0m" && return 1
     [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    git rebase --exec 'git commit --amend --no-edit -n -S' "${1}"
+    if [[ -z ${1} ]]; then
+        git log --show-signature | less
+        echo -n "Bis zu welchem Commit soll signiert werden? "
+        read -r -e hash
+    else
+        hash=${1}
+    fi
+
+    git rebase --exec 'git commit --amend --no-edit -n -S' "${hash}"
+
+    echo "Soll ein Force Push gemacht werden?"
+    read -r -e -n1 answer
+    [[ ${answer} =~ (Y|y|J|j) ]] && git push --force
 }
 
 git_url() {
