@@ -28,7 +28,7 @@ alias nano='nano -l -T 4'
 alias nanol='command nano -T 4'
 alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
-alias rm='rm -IR'
+alias rm='rm -I --verbose'
 alias ssu='sudo --preserve-env=SSH_CLIENT su' # Die Variable speichern für PS1
 alias sudo='sudo '                            # https://wiki.archlinux.org/title/Sudo#Passing_aliases
 alias time="stopwatch"

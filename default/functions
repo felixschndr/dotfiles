@@ -139,7 +139,6 @@ git_checkout_history() {
 git_delete_old_branches() {
     if ! check_if_git_repo_exists; then return 1; fi
 
-
     git fetch -pq || return
     local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
     local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
@@ -546,7 +545,7 @@ to_lf() {
         tmp_file=$(mktemp)
         tr -d '\015' <"${file}" >"${tmp_file}"
         mv "${tmp_file}" "${file}"
-        rm -f "${tmp_file}"
+        command rm -f "${tmp_file}"
     done
 }
 

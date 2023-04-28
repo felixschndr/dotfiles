@@ -36,7 +36,7 @@ check_for_unmanaged_files() {
             # Nochmal git benutzen um auch Dateien zu unterstützen, die ein Leerzeichen im Namen haben
             git ls-files -z -o --exclude-standard | xargs -0 git add
         fi
-        rm -f "${untracked_files}"
+        command rm -f "${untracked_files}"
     fi
 
     outputOfGitStatus=$(git status 2>&1)
@@ -513,7 +513,7 @@ pull() {
         git pull 2>&1 | sed 's/://' | sed 's/ /\n/g' | sed -n '/:/,/Please/{/:/b;/Please/b;p}' |
             sed -e 's/^[[:space:]]*/ - /' | tee /tmp/.files_that_need_checkout
         files_that_need_checkout=$(cat /tmp/.files_that_need_checkout)
-        rm /tmp/.files_that_need_checkout
+        command rm /tmp/.files_that_need_checkout
         echo -ne "\e[33m"
         print_line "="
         echo -ne "\e[0m"
