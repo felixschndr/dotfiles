@@ -225,7 +225,7 @@ commit_files() {
         if [[ ${HOSTNAME} != "ws-win-00224" || ${PWD} == *"/bashrc"* ]]; then
             ask_for_commit_type
             [[ ${?} == 1 ]] && return
-            commit_type=$(cat /tmp/.diffcommit && rm -f /tmp/.diffcommit)
+            commit_type=$(cat /tmp/.diffcommit && command rm -f /tmp/.diffcommit)
             [[ ${?} == 1 ]] && return
             [[ -n ${commit_type} ]] && commit_type+=" "
 
