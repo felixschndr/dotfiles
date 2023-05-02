@@ -393,7 +393,11 @@ git_sign_old_commits() {
         hash=${1}
     fi
 
+    local git_stash_pop_needed=$(git stash push)
+
     git rebase --exec 'git commit --amend --no-edit -n -S' "${hash}"
+
+    [[ ${git_stash_pop_needed} == *"Saved"* ]] && git stash pop --quiet
 
     echo "Soll ein Force Push gemacht werden?"
     read -r -e -n1 answer
