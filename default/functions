@@ -433,6 +433,28 @@ kl() { # Kubectl Logs
     kubectl logs -f -n "${1}" "${2}"
 }
 
+pip() { # Check if venv is active before installing anything
+    if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
+        echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
+        return 1
+    fi
+    # shellcheck disable=2068
+    command pip $@
+}
+
+pip_install_requirements() {
+    local possible_files=(requirements.txt requirements-dev.txt requirements-test.txt)
+
+    local pip_command="pip install"
+
+    for file in "${possible_files[@]}"; do
+        [[ -f ${file} ]] && pip_command+=" -r ${file}"
+    done
+
+    echo "${pip_command}"
+    eval "${pip_command}"
+}
+
 search_string() {
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
