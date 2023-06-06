@@ -73,8 +73,8 @@ PS1+="\H"
 PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[0;32m\]WSL"`'
 
 # Python Venv Ausgabe
-#    - bei WSL: "]-[Venv" Einschub
-#    - sonst:   Nichts
+#    - bei Venv: "]-[Venv" Einschub
+#    - sonst:    Nichts
 PS1+='`[[ -n ${VIRTUAL_ENV} ]] && echo "\[\e[1;30m\]]-[\[\e[0;32m\]Venv"`'
 
 # ]-[
