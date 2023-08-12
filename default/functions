@@ -113,13 +113,13 @@ gca() { # git commit amend
     fi
 
     git add .
-    git commit -a --amend --no-edit >/dev/null
+    git commit -S -a --amend --no-edit >/dev/null
 
     echo -e "\e[32mDer Commit wurde amended\e[0m\n\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
     read -r -e -n1 answer
     [[ ${answer} =~ ^[YyJj]$ ]] && {
         git push --force
-        echo -e "\n"
+        echo
     }
 
     git_last_commit_url
@@ -376,7 +376,7 @@ git_log() {
     done
 }
 
-git_reset(){
+git_reset() {
     if ! check_if_git_repo_exists; then return 1; fi
 
     echo -e "\e[31mSicher, dass alle lokalen Änderungen verworfen werden sollen?\e[0m"
