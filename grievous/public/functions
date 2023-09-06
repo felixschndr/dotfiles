@@ -45,7 +45,7 @@ start_backup() {
     command tmux send-keys -t 0 'screen /home/felix/server/Backup/DatenBackup.sh '
     command tmux send-keys -t 1 'f=$(inotifywait -r -e create --format '%w%f' --quiet /home/felix/server/Backup/logs/); tail -f ${f}' ENTER
     command tmux send-keys -t 2 'htop' ENTER
-    command tmux send-keys -t 3 'f=$(inotifywait -r -e create --format '%w%f' --quiet /mnt/Backupplatte/ --include ".tar*"); watch -n 1 command ls -lh ${f}' ENTER
+    command tmux send-keys -t 3 'f=$(inotifywait -r -e create --format '%w%f' --quiet /mnt/Backupplatte/ --include ".tar*"); watch -n 1 command ls -lh $(dirname ${f})' ENTER
     command tmux send-keys -t 4 'watch -n 1 sensors' Enter
 
     command tmux select-pane -t 0
