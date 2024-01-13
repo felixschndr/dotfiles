@@ -546,14 +546,16 @@ tmux_help() {
     echo -e "\n\e[0m" \
         "\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
         "\nTeilen:" \
-        "\n    - Horizontal:      <\e[1;36m%\e[0m>" \
-        "\n    - Vertikal:        <\e[1;36m\"\e[0m>\n" \
+        "\n    - Horizontal:      <\e[1;36m\"\e[0m>" \
+        "\n    - Vertikal:        <\e[1;36m%\e[0m>\n" \
         "\nPanes:" \
         "\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
         "\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
         "\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
         "\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
-        "\nEinfügen: <\e[1;36mShift\e[0m> + <\e[1;36mMittlere Maustaste\e[0m>"
+        "\nWeitere:" \
+        "\n    - Lösen:           <\e[1;36mB\e[0m>\n" \
+        "\nEinfügen:              <\e[1;36mShift\e[0m> + <\e[1;36mRechte Maustaste\e[0m>"
 }
 
 to_lf() {
