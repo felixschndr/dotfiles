@@ -1,3 +1,0 @@
-#!/bin/bash
-
-export log_openhab='/var/log/openhab2/events.log'

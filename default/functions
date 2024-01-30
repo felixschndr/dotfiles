@@ -597,19 +597,8 @@ to_lf() {
 complete -F _longopt -W "alle" to_lf # Autovervollständigung mit allen verfügbaren Dateien
 
 upgrade() {
-    [[ $(hostname) == "openhab" ]] && echo -e "\e[1;96mAPT wird aufgerufen\n\e[0m"
-
     if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
         return
-    fi
-    echo -e "\n\e[32mUpdates Abgeschlossen\e[0m"
-
-    if [[ $(hostname) == "openhab" ]]; then
-        openHABIP="localhost"
-        itemToBeUpdated="System_Updates"
-        newState="0"
-        curl -X PUT --header "Content-Type: text/plain" --header "Accept: application/json" -d "${newState}" "http://${openHABIP}:8080/rest/items/${itemToBeUpdated}/state"
-        echo -e "\e[1;96mDie Anzahl der Updates wurde aktualisiert\e[0m"
     fi
 
     local reboot_required_packages_file="/var/run/reboot-required.pkgs"
