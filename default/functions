@@ -46,6 +46,15 @@ dca() { # docker compose all
 
 complete -W "up down" dca
 
+create_venv() {
+    echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" && \
+    python -m venv .venv && \
+    echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" && \
+    toggle_venv && \
+    echo -e "\e[1;96mInstalliere die Abhängigkeiten\e[0m" && \
+    pip_install_requirements
+}
+
 de() { # Docker Execute (Shell)
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
     [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
