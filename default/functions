@@ -65,15 +65,13 @@ de() { # Docker Execute (Shell)
     if [[ ${#} -eq 1 ]]; then
         local available_users=$(_docker_container_get_available_users "${1}")
         if [[ $(wc -l <<<"${available_users}") == 2 && ${available_users} == *"root"* ]]; then
-            # shellcheck disable=2001
-            user=$(echo "${available_users}" | sed 's/root//')
+            user=$(echo "${available_users}" | sed 's/root//' | tr -d '[:space:]')
             docker exec -it --user "${user}" "${1}" "${shell_binary}"
         else
             docker exec -it "${1}" "${shell_binary}"
         fi
 
     else
-
         docker exec -it --user "${2}" "${1}" "${shell_binary}"
     fi
 }
