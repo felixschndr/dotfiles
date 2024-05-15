@@ -5,6 +5,7 @@ return
 git config --global user.name "Felix Schneider"
 git config --global core.autocrlf "input"
 git config --global help.autocorrect 15
+git config --global push.autoSetupRemote true
 
 # In wsl die den credential manager von windows benutzen, da er um EINIGES schneller ist
 # https://stackoverflow.com/a/47350274
