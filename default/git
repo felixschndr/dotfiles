@@ -1,8 +1,10 @@
 #!/bin/bash
 
-return
+target_user_name="Felix Schneider"
 
-git config --global user.name "Felix Schneider"
+[[ $(git config user.name) == "${target_user_name}" ]] && return
+
+git config --global user.name "${target_user_name}"
 git config --global core.autocrlf "input"
 git config --global help.autocorrect 15
 git config --global push.autoSetupRemote true
