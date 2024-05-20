@@ -26,6 +26,7 @@ alias df="df -h --exclude-type=overlay"
 alias ip='ip -color'
 alias nano='nano -l -T 4'
 alias nanol='command nano -T 4'
+alias lsblk='lsblk -e 7 -o NAME,TYPE,FSUSED,FSAVAIL,SIZE,FSUSE%,MOUNTPOINT'
 alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias rm='rm -I --verbose'
