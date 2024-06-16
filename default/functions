@@ -47,12 +47,12 @@ dca() { # docker compose all
 complete -W "up down" dca
 
 create_venv() {
-    echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" && \
-    python -m venv .venv && \
-    echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" && \
-    toggle_venv && \
-    echo -e "\e[1;96mInstalliere die Abhängigkeiten\e[0m" && \
-    pip_install_requirements
+    echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" &&
+        python -m venv .venv &&
+        echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" &&
+        toggle_venv &&
+        echo -e "\e[1;96mInstalliere die Abhängigkeiten\e[0m" &&
+        pip_install_requirements
 }
 
 de() { # Docker Execute (Shell)
@@ -135,9 +135,13 @@ gca() { # git commit amend
     git add .
     git commit -S -a --amend --no-edit >/dev/null
 
-    echo -e "\e[32mDer Commit wurde amended\e[0m\n\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
-    read -r -e -n1 answer
-    [[ ${answer} =~ ^[YyJj]$ ]] && git push --force
+    echo -e "\e[32mDer Commit wurde amended\e[0m"
+
+    if git_has_remote_repository; then
+        echo -e "\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
+        read -r -e -n1 answer
+        [[ ${answer} =~ ^[YyJj]$ ]] && git push --force
+    fi
 
     git_last_commit_url
 }
@@ -204,6 +208,8 @@ git_delete_old_branches_in_current_dir() {
 git_history() {
     local urlOfRepository=$(git_base_url)
     [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
+
+    if ! git_has_remote_repository; then return; fi
 
     local space=" "
     local onlyCommitUrl=false
