@@ -42,6 +42,7 @@ alias sudo='sudo '                            # https://wiki.archlinux.org/title
 [[ -z $(command -v dcdub) ]] && alias dcdub='dc down; dc pull; dc up -d --build --force-recreate'
 [[ -z $(command -v dcl) ]] && alias dcl='dc logs -f'
 [[ -z $(command -v dps) ]] && alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
+[[ -z $(command -v lg) ]] && alias lg='lazygit'
 [[ -z $(command -v pc) ]] && alias pc='pre-commit run --all-files'
 [[ -z $(command -v py) ]] && alias py='python'
 [[ -z $(command -v k) ]] && alias k='kubectl' && complete -o default -F __start_kubectl k
