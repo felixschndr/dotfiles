@@ -1,0 +1,7 @@
+[user]
+    name = Felix Schneider
+    email = fs@felix-schneider.org
+[init]
+    defaultBranch = main
+[commit]
+    gpgsign = true
