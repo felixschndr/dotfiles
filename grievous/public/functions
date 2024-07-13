@@ -28,10 +28,10 @@ complete -F _mdadm_completion mdadm
 
 # shellcheck disable=2016
 start_backup() {
-	[[ ${PWD} == "/mnt/Backupplatte"* ]] && cd
+    [[ ${PWD} == "/mnt/Backupplatte"* ]] && cd
 
     local sessionName="${HOSTNAME}"
-	command tmux kill-session -t "${sessionName}"
+    command tmux kill-session -t "${sessionName}"
     command tmux new-session -s "${sessionName}" -d
 
     command tmux split-window -h

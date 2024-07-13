@@ -27,12 +27,12 @@ _k9s_context_completion() {
             COMPREPLY=("${COMPREPLY[@]}" "${item}")
         done
     else
-        if [[ ${COMP_WORDS[$(( COMP_CWORD - 1 ))]} == "--context" ]]; then
+        if [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--context" ]]; then
             local available_contexts=$(kubectl config get-contexts -o name)
             for context in $(echo "${available_contexts}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
                 COMPREPLY+=("${context}")
             done
-        elif [[ ${COMP_WORDS[$(( COMP_CWORD - 1 ))]} == "--namespace" ]]; then
+        elif [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--namespace" ]]; then
             local context_argument=""
             [[ ${COMP_WORDS[1]} == "--context" ]] && context_argument="--context ${COMP_WORDS[2]}"
 
