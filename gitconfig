@@ -5,3 +5,9 @@
     defaultBranch = main
 [commit]
     gpgsign = true
+[core]
+    autocrlf = input
+[help]
+    autocorrect = 15
+[push]
+    autoSetupRemote = true
