@@ -1,0 +1,5 @@
+promptToReturnFromSubprocess: false
+notARepository: skip
+os:
+  edit: nano {{filename}}
+  editAtLine: nano +{{line}} {{filename}}

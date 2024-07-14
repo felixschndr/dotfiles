@@ -1,0 +1,19 @@
+#!/bin/bash
+
+
+if ! grep -q "source /home/${USER}/dotfiles/sourcer" /home/${USER}/.bashrc; then
+	echo "Installing link to bashrc..."
+	echo "source /home/${USER}/dotfiles/sourcer" >> ~/.bashrc
+fi
+
+if ! crontab -l | grep -q "cd /home/${USER}/dotfiles/ && git pull"; then
+	echo "Installing crontab to update the repository regularly..."
+	(crontab -l 2>/dev/null; echo "0 */3 * * * cd /home/${USER}/dotfiles/ && git pull") | crontab -
+fi
+
+echo "Linking configuration files..."
+ln -sf /home/${USER}/dotfiles/Configurations/gitconfig   /home/${USER}/.gitconfig
+ln -sf /home/${USER}/dotfiles/Configurations/lazygit.yml /home/${USER}/.config/lazygit/config.yml
+
+echo "Finished 🎉"
+exit 0
