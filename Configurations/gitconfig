@@ -6,7 +6,7 @@
 [commit]
     gpgsign = true
 [core]
-    autocrlf = input
+    autocrlf = false # See https://stackoverflow.com/q/3206843
 [help]
     autocorrect = 15
 [push]
