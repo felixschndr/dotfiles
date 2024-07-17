@@ -11,3 +11,7 @@
     autocorrect = 15
 [push]
     autoSetupRemote = true
+
+# Include config for work
+[includeIf "gitdir:/home/fschneider/repos/de-cix-group/"]
+    path = /home/fschneider/.gitconfig_decix
