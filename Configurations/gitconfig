@@ -11,6 +11,8 @@
     autocorrect = 15
 [push]
     autoSetupRemote = true
+[log]
+    showSignature = true
 
 # Include config for work
 [includeIf "gitdir:/home/fschneider/repos/de-cix-group/"]
