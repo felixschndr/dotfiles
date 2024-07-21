@@ -1,7 +1,8 @@
 #!/bin/bash
 
+cd /home/felix/server
+
 [[ ${UID} == 0 ]] && return
-cd ${HOME}/server
 
 [[ -z $(git status --porcelain 2>/dev/null) ]] && return
 echo -e "\n\e[33mEs gibt Änderungen, die nicht eingecheckt sind:\e[0m"
