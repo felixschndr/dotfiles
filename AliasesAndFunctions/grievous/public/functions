@@ -25,30 +25,3 @@ _mdadm_completion() {
 }
 
 complete -F _mdadm_completion mdadm
-
-# shellcheck disable=2016
-start_backup() {
-    [[ ${PWD} == "/mnt/Backupplatte"* ]] && cd
-
-    local sessionName="${HOSTNAME}"
-    command tmux kill-session -t "${sessionName}"
-    command tmux new-session -s "${sessionName}" -d
-
-    command tmux split-window -h
-    command tmux split-window -v
-    command tmux resize-pane -D 7
-    command tmux split-window -v
-    command tmux select-pane -t 0
-    command tmux split-window -v
-    command tmux resize-pane -U 8
-
-    command tmux send-keys -t 0 'screen /home/felix/server/Backup/DatenBackup.sh '
-    command tmux send-keys -t 1 'f=$(inotifywait -r -e create --format '%w%f' --quiet /home/felix/server/Backup/logs/); tail -f ${f}' ENTER
-    command tmux send-keys -t 2 'htop' ENTER
-    command tmux send-keys -t 3 'f=$(inotifywait -r -e create --format '%w%f' --quiet /mnt/Backupplatte/ --include ".tar*"); watch -n 1 command ls -lh $(dirname ${f})' ENTER
-    command tmux send-keys -t 4 'watch -n 1 sensors' Enter
-
-    command tmux select-pane -t 0
-
-    command tmux -u attach-session -d
-}

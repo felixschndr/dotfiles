@@ -17,13 +17,10 @@ alias upgradable='apt list --upgradable'
 alias update='sudo apt update && apt list --upgradable'
 
 alias b='exec ${SHELL} -l' # -l ensures that the bashrc is loaded
-alias ct="cd /tmp/; [[ -d testing ]] || git clone git@github.com:Trysupe/testing.git; cd testing/"
-alias mygrep='grep -ins --color=always'
-alias tf='tail -f -n 1000'
-
 alias cp='cp -r'
 alias df="df -h --exclude-type=overlay"
 alias ip='ip -color'
+alias mygrep='grep -ins --color=always'
 alias nano='nano -l -T 4'
 alias nanol='command nano -T 4'
 alias lsblk='lsblk -e 7 -o NAME,TYPE,FSUSED,FSAVAIL,SIZE,FSUSE%,MOUNTPOINT'
@@ -32,20 +29,21 @@ alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
 alias rm='rm -I --verbose'
 alias ssu='sudo --preserve-env=SSH_CLIENT su' # Die Variable speichern für PS1
 alias sudo='sudo '                            # https://wiki.archlinux.org/title/Sudo#Passing_aliases
+alias tf='tail -f -n 1000'
 
 [[ -n ${TMUX} ]] && alias help='tmux_help'
 
-[[ -z $(command -v c) ]] && alias c='code .'
-[[ -z $(command -v d) ]] && alias d='docker' && complete -F _docker d
-[[ -z $(command -v dc) ]] && alias dc='docker compose' && complete -F _docker_compose dc
-[[ -z $(command -v dcdu) ]] && alias dcdu='dc down; dc up -d'
-[[ -z $(command -v dcdub) ]] && alias dcdub='dc down; dc pull; dc up -d --build --force-recreate'
-[[ -z $(command -v dcl) ]] && alias dcl='dc logs -f'
-[[ -z $(command -v dps) ]] && alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
-[[ -z $(command -v lg) ]] && alias lg='lazygit'
-[[ -z $(command -v pc) ]] && alias pc='pre-commit run --all-files'
-[[ -z $(command -v py) ]] && alias py='python'
-[[ -z $(command -v k) ]] && alias k='kubectl' && complete -o default -F __start_kubectl k
+alias c='code .'
+alias d='docker' && complete -F _docker d
+alias dc='docker compose' && complete -F _docker_compose dc
+alias dcdu='dc down; dc up -d'
+alias dcdub='dc down; dc pull; dc up -d --build --force-recreate'
+alias dcl='dc logs -f'
+alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
+alias lg='lazygit'
+alias pc='pre-commit run --all-files'
+alias py='python'
+alias k='kubectl' && complete -o default -F __start_kubectl k
 
 # Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
 is_wsl=false

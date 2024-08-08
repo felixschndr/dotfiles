@@ -27,12 +27,6 @@ cd() {
     command cd "${targetDirectory}" || return 1
 }
 
-cdgrp() { # cd in das Root-Verzeichnis vom aktuellen Git-Repo
-    if ! check_if_git_repo_exists; then return 1; fi
-
-    cd "$(git rev-parse --show-toplevel)" || return 1
-}
-
 dca() { # docker compose all
     local detach_argument
     [[ ${1} == "up" ]] && detach_argument="-d" || detach_argument=""
@@ -83,47 +77,6 @@ dl() { # Docker Logs
     docker logs -f -n 1000 "${1}"
 }
 
-file_info() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Dateiname angegeben\e[0m" && return 1
-
-    [[ ${1} == "." ]] && allFiles=$(find . -type f -not -path "*/\.git/*") || allFiles="${*}"
-
-    local counter=0
-    local amountOfFiles=$(echo "${allFiles}" | wc -w)
-
-    for file in ${allFiles}; do
-        ((counter++))
-
-        [[ -d ${file} ]] && echo -e "\e[31m\"${file}\" ist ein Ordner\e[0m" && continue
-        [[ ! -f ${file} ]] && echo -e "\e[31mDie Datei \"${file}\" exisitiert nicht\e[0m" && continue
-
-        filename=$(basename "${file}")
-        echo -e "\e[1;96mDateiname:\t${filename}\e[0m"
-        absolutePath=$(realpath "${file}")
-        echo -e "Absoluter Pfad:\t${absolutePath}"
-        echo -e "Größe:\t\t$(du -h "${file}" | cut -f1)"
-        echo -e "Anzahl Zeilen:\t$(wc -l <"${file}" | sed ':a;s/\B[0-9]\{3\}\>/.&/;ta')" # sed baut Tausender-Punkte ein
-        echo -e "Modifiziert:\t$(find "${file}" -printf "%CH:%CM:%.2CS Uhr, %Cd.%Cm.%CY (%CA)")"
-        echo -e "Besitzer:\t$(find "${file}" -printf "%u")"
-        echo -e "Gruppe:\t\t$(find "${file}" -printf "%g")"
-        echo -e "Rechte:\t\t$(find "${file}" -printf "%M (%m)" | cut -c 2-)"
-
-        [[ "${filename}" =~ ^\..{1,} ]] && fileHidden="Ja" || fileHidden="Nein"
-        echo -e "Versteckt:\t${fileHidden}"
-
-        if [[ $(file "${file}") == *"CRLF"* ]]; then
-            [[ "${absolutePath##*.}" == "sh" ]] && lineEndings="\e[31mCRLF\e[0m" || lineEndings="CRLF"
-        else
-            lineEndings="LF"
-        fi
-        echo -e "Zeilenenden:\t${lineEndings}"
-
-        [[ "${amountOfFiles}" -gt "${counter}" ]] && echo -e "\n\n"
-    done
-
-    return 0
-}
-
 gca() { # git commit amend
     if ! check_if_git_repo_exists; then return 1; fi
 
@@ -137,24 +90,13 @@ gca() { # git commit amend
 
     echo -e "\e[32mDer Commit wurde amended\e[0m"
 
-    if git_has_remote_repository; then
+    if [[ -n $(git remote -v 2>&1) ]]; then
         echo -e "\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
         read -r -e -n1 answer
         [[ ${answer} =~ ^[YyJj]$ ]] && git push --force
     fi
 
     git_last_commit_url
-}
-
-git_checkout_history() {
-    local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
-
-    git reflog --format=' - %<(14)%cr | %<(70)%gs | %s' |
-        grep "checkout:" |
-        head -n 15 |
-        tac |
-        sed 's/checkout: moving from //g;s/to/-->/g'
 }
 
 git_delete_old_branches() {
@@ -205,200 +147,6 @@ git_delete_old_branches_in_current_dir() {
     cd "${start_directory}" || false
 }
 
-git_history() {
-    local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
-
-    if ! git_has_remote_repository; then return; fi
-
-    local space=" "
-    local onlyCommitUrl=false
-    if [[ ${1} == "-u" ]]; then
-        local onlyCommitUrl=true
-        space=""
-        shift
-    fi
-
-    local urlOfHistoryOfRepository="${urlOfRepository}/commits"
-
-    if [[ ! ${1} =~ [0-9]+ ]]; then
-        echo -e "History URL: \e[96m${urlOfHistoryOfRepository}\e[0m"
-
-        local typeOfSession=$(is_session_ssh)
-        [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" ]] && xdg-open "${urlOfHistoryOfRepository}"
-        return 0
-
-    else
-        [[ ${onlyCommitUrl} == false ]] && echo -e "History URL: ${urlOfHistoryOfRepository}"
-    fi
-
-    local commitHash
-
-    if [[ ${1} =~ ^[0-9]{1,5}$ ]]; then
-        local amountOfCommitsInRepository=$(git rev-list --count HEAD)
-        local nthCommitToBeShown=$((${1} - 1))
-        [[ ${nthCommitToBeShown} -gt ${amountOfCommitsInRepository} ]] && echo -e "\e[31mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m" && return 1
-
-        commitHash=$(git log -1 HEAD~${nthCommitToBeShown} --pretty="%H")
-    else
-        commitHash=$(git rev-parse "${1}" 2>/dev/null) # Langen Commithash zum kurzen Input bekommen
-        # shellcheck disable=2181
-        if [[ ${?} != 0 ]]; then
-            echo -e "\e[31mEs konnte kein Commit zu dem Hash gefunden werden\e[0m"
-            return 1
-        fi
-    fi
-
-    local urlOfCommit="${urlOfRepository}/commit/${commitHash}"
-
-    echo -e "\e[32mCommit URL:\e[0m ${space}\e[96m${urlOfCommit}\e[0m"
-}
-
-git_last_commit_url() {
-    echo "Nachricht:  $(git log -n 1 --pretty="%s")"
-    echo "Uhrzeit:    $(git log -n 1 --pretty="%ad" --date=format:"%A, der %d.%m. um %H:%M:%S Uhr")"
-    git_history -u 1
-}
-
-git_last_pull() {
-    if ! check_if_git_repo_exists; then return 1; fi
-
-    local fetchHeadFile="$(git rev-parse --show-toplevel)/.git/FETCH_HEAD"
-    # Wenn das Verzeichnis in Windows liegt, aber die Session im WSL ist muss der Pfad angepasst werden
-    # C:/Users/fschneider/repos/bashrc --> /mnt/c/Users/fschneider/repos/bashrc
-    # shellcheck disable=2154
-    [[ ${is_wsl} == true ]] && fetchHeadFile=${fetchHeadFile/C:/\/mnt\/c}
-
-    [[ ! -f ${fetchHeadFile} ]] && return # Check if file exsits
-
-    local pullDate=$(date -r "${fetchHeadFile}" +%D)
-    local pullTime=$(date -r "${fetchHeadFile}" +'%H:%M:%S Uhr')
-
-    if [[ ${pullDate} == $(date +%D) ]]; then
-        echo -n "Der letzte Pull war heute"
-    elif [[ ${pullDate} == $(date +%D --date="1 day ago") ]]; then
-        echo -n "Der letzte Pull war gestern"
-    else
-        daysSince=$((($(date +%s) - $(date --date="${pullDate}" +%s)) / (60 * 60 * 24)))
-        echo -n "Der letzte Pull war vor ${daysSince} Tagen am $(LANG=de_DE.UTF-8 date -r "${fetchHeadFile}" +'%A, den %d.%m.')"
-    fi
-    echo " um ${pullTime}"
-
-    return 0
-}
-
-git_log() {
-    if ! check_if_git_repo_exists; then return 1; fi
-
-    [[ $(git_url -u) == *"de-cix"* ]] && repo="work" || repo=""
-
-    local amountOfCommits="30"
-    local commitsOfBranchToShow="$(git rev-parse --abbrev-ref HEAD)" # Argument supplied by default/diff/function that supplies what commits to show (..origin/${branch}"
-
-    [[ -n ${1} ]] && amountOfCommits="${1}"
-    [[ -n ${2} ]] && commitsOfBranchToShow="${2}"
-
-    local amountOfCommitsInRepository=$(git rev-list --count HEAD)
-    if [[ ${amountOfCommitsInRepository} -lt ${amountOfCommits} ]]; then
-        echo -e "\e[33mEs gibt nur ${amountOfCommitsInRepository} Commits in diesem Repo! \e[0m"
-        amountOfCommits=${amountOfCommitsInRepository}
-    fi
-
-    IFS=$'\n'
-    if [[ ${amountOfCommits} == 1 ]]; then
-        read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="    %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S")"
-    else
-        read -r -d $'\0' -a hashandtime <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="| %ad | %h | " --date=format:"%a | %d.%m. | %H:%M:%S" | nl)"
-    fi
-    read -r -d $'\0' -a commitAuthor <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%ae")"
-    read -r -d $'\0' -a statsOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty="%h§" --shortstat | sed -z 's/§\n\n//g')" # TODO: sed entfernen da langsam
-    read -r -d $'\0' -a messageOfCommit <<<"$(git --no-pager log -n"${amountOfCommits}" --reverse "${commitsOfBranchToShow}" --pretty=" %s")"
-
-    local lineCounter=0     # Holds the progress while iterating though the array
-    local maxFilesChanged=0 # Saves the maximum ammount of files changed of all commits
-    local maxInserions=0    # Saves the maximum ammount of intertions of all commits
-    local maxDeletions=0    # Saves the maximum ammount of deletions of all commits
-
-    # Maxmimale Anzahl geänderter Files, Insertions & Deletions herausfinden
-    for line in "${statsOfCommit[@]}"; do
-        local newline
-        # If there is no "changed" in the line the commit is probably a merge commit from a MR
-        # If so git doesn't show the usual "g files changed, h insertions(+), i deletions(-)" so it has to be fetched from git diff
-        if [[ ${line} == *changed* ]]; then
-            newline=$(echo "${line}" | cut -d " " -f2-)
-        else
-            local hash="${line//§/}"
-            newline="$(git diff "${hash}"^ "${hash}" --stat | grep "changed,")"
-        fi
-
-        local filesChanged=$(echo "${newline}" | grep -Eo '[0-9]+' | head -1)
-        local insertions=0
-        [[ ${newline} == *"insertion"* ]] && insertions=$(echo "${newline}" | grep -Eo '[0-9]+' | sed -n 2p)
-        local deletions=0
-        [[ ${newline} == *"deletion"* ]] && deletions=$(echo "${newline}" | grep -Eo '[0-9]+' | tail -1)
-
-        statsOfCommit[lineCounter]="${filesChanged} ${insertions} ${deletions}"
-
-        [[ ${filesChanged} -gt ${maxFilesChanged} ]] && maxFilesChanged=${filesChanged}
-        [[ ${insertions} -gt ${maxInserions} ]] && maxInserions=${insertions}
-        [[ ${deletions} -gt ${maxDeletions} ]] && maxDeletions=${deletions}
-        ((lineCounter++))
-        echo -ne "Log wird geparsed (${lineCounter}/${amountOfCommits})\r"
-    done
-
-    echo -ne "                                               \r" #"Log wird geparsed" überschreiben
-
-    local lenOfMaxFilesChanged=${#maxFilesChanged}
-    local lenOfMaxInserions=${#maxInserions}
-    local lenOfMaxDeletions=${#maxDeletions}
-
-    ((lenOfMaxInserions++))
-    ((lenOfMaxDeletions++))
-
-    lineCounter=0
-    for line in "${hashandtime[@]}"; do # Ausgabe der ganzen Infos
-        echo -n "${line}"
-        if [[ ${repo} == "work" ]]; then
-            local mailAddress="${commitAuthor[${lineCounter}]}"
-            local pre_name=$(cut -d "." -f1 <<<"${mailAddress}" | cut -c1)
-            local sur_name=$(cut -d "." -f2 <<<"${mailAddress}" | cut -c1)
-            local initials=${pre_name^}${sur_name^}
-            echo -n "${initials} | "
-        fi
-        local statsline=${statsOfCommit[${lineCounter}]}
-
-        local filesChanged=$(echo "${statsline}" | cut -d " " -f1)
-        local insertions=$(echo "${statsline}" | cut -d " " -f2)
-        local deletions=$(echo "${statsline}" | cut -d " " -f3)
-
-        printf "%${lenOfMaxFilesChanged}s" "${filesChanged}"
-        printf " (\e[32m%${lenOfMaxInserions}s\e[0m" "+${insertions}"
-        printf " \e[31m%${lenOfMaxDeletions}s\e[0m)" "-${deletions}"
-        echo -e " |${messageOfCommit[${lineCounter}]}"
-        ((lineCounter++))
-    done
-
-    [[ -n ${commitsOfBranchToShow} ]] && return
-
-    while true; do
-        echo -e "\n\e[96;1m"
-        center "Soll ein Commit angezeigt werden?"
-        echo -e "\e[0m"
-        read -r -e answer
-        [[ -z ${answer} ]] && break
-        local commitHash
-        if [[ ${answer} =~ ^[0-9]{1,2}$ && ${answer} -le ${amountOfCommits} ]]; then
-            commitHash=$(git --no-pager log -n 30 --reverse --pretty="%h" | sed -n "${answer}"p)
-        elif [[ ${answer} =~ ^[0-9a-z]{5,}$ ]]; then
-            commitHash=${answer}
-        else
-            echo -e "\e[31mDie Antwort konnte nicht interpretiert werden\e[0m"
-            continue
-        fi
-        git show "${commitHash}"
-    done
-}
-
 git_reset() {
     if ! check_if_git_repo_exists; then return 1; fi
 
@@ -431,16 +179,6 @@ git_sign_old_commits() {
     echo "Soll ein Force Push gemacht werden?"
     read -r -e -n1 answer
     [[ ${answer} =~ (Y|y|J|j) ]] && git push --force
-}
-
-git_url() {
-    local urlOfRepository=$(git_base_url)
-    [[ -z ${urlOfRepository} ]] && return 1 # Stoppen, falls es sich nicht um ein Git-Repo handelt
-
-    local typeOfSession=$(is_session_ssh)
-
-    echo -e "Repository URL: \e[96m${urlOfRepository}\e[0m"
-    [[ ${typeOfSession} != "ssh" && $(command -v "xdg-open" 2>/dev/null) != "" && ${1} != "-u" ]] && xdg-open "${urlOfRepository}"
 }
 
 ke() { # Kubectl Execute (Shell)
