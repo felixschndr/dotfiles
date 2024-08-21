@@ -8,6 +8,7 @@
 [core]
     autocrlf = false # See https://stackoverflow.com/q/3206843
     quotePath = false # For umlauts
+	pager = cat
 [help]
     autocorrect = 15
 [push]
