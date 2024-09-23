@@ -1,6 +1,7 @@
 [user]
     name = Felix Schneider
-    email = fs@felix-schneider.org
+    email = mail@fschneider.me
+    signingkey = D99C0E4E87C3413C
 [init]
     defaultBranch = main
 [commit]
