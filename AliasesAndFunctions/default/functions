@@ -104,8 +104,6 @@ gca() { # git commit amend
         read -r -e -n1 answer
         [[ ${answer} =~ ^[YyJj]$ ]] && git push --force
     fi
-
-    git_last_commit_url
 }
 
 git_delete_old_branches() {
