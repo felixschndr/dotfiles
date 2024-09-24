@@ -54,8 +54,7 @@ create_venv() {
         python -m venv .venv &&
         echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" &&
         toggle_venv &&
-        echo -e "\e[1;96mInstalliere die Abhängigkeiten\e[0m" &&
-        pip_install_requirements
+        python_install_requirements
 }
 
 de() { # Docker Execute (Shell)
@@ -216,17 +215,45 @@ pip() { # Check if venv is active before installing anything
     command pip $@
 }
 
+poetry() { # Check if venv is active before installing anything
+    if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
+        echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
+        return 1
+    fi
+    # shellcheck disable=2068
+    command poetry $@
+}
+
 pip_install_requirements() {
     local possible_files=(requirements.txt requirements-dev.txt requirements-test.txt)
 
     local pip_command="pip install"
 
+    found_at_least_one_file=false
     for file in "${possible_files[@]}"; do
-        [[ -f ${file} ]] && pip_command+=" -r ${file}"
+        [[ -f ${file} ]] && pip_command+=" -r ${file}" && found_at_least_one_file=true
     done
 
-    echo "${pip_command}"
+    [[ "${found_at_least_one_file}" = false ]] && return 1
+
+    echo "Installiere die Abhängigkeiten mit pip"
     eval "${pip_command}"
+}
+
+poetry_install_requirements() {
+    [[ ! -f pyproject.toml ]] && return 1
+
+    echo "Installiere die Abhängigkeiten mit poetry"
+    eval "poetry install"
+}
+
+python_install_requirements() {
+    if ! poetry_install_requirements; then
+        if ! pip_install_requirements; then
+            echo -e "\e[31m Es wurde keine Datei zum Instalieren von Abhängigkeiten gefunden!\e[0m"
+            return 1
+        fi
+    fi
 }
 
 search_string() {
