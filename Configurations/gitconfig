@@ -9,11 +9,13 @@
 [core]
     autocrlf = false # See https://stackoverflow.com/q/3206843
     quotePath = false # For umlauts
-	pager = cat
+    pager = cat
 [help]
     autocorrect = 15
 [push]
     autoSetupRemote = true
+[pull]
+    rebase = true
 [log]
     showSignature = true
 
