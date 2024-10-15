@@ -242,6 +242,9 @@ pip_install_requirements() {
 
 poetry_install_requirements() {
     [[ ! -f pyproject.toml ]] && return 1
+    if ! grep -q "\[tool.poetry\]" pyproject.toml; then
+        return 1
+    fi
 
     echo "Installiere die Abhängigkeiten mit poetry"
     eval "poetry install"
