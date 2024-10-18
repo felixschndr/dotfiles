@@ -44,7 +44,7 @@ dca() { # docker compose all
         -maxdepth 3 \
         -name "docker-compose.yml" \
         -print \
-        -exec docker-compose -f {} "${1}" ${detach_argument} \;
+        -exec docker compose -f {} "${1}" ${detach_argument} \;
 }
 
 complete -W "up down" dca
