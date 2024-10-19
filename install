@@ -24,5 +24,17 @@ if command -v lazygit >/dev/null 2>&1; then
     ln -sf "${repoLocation}/Configurations/lazygit.yml" "/home/${USER}/.config/lazygit/config.yml"
 fi
 
+if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then
+    echo -n "WSL detected, do you want to install the suders configuration that allows the usage of no password for elevated commands? [y/N] "
+    read -r -N 1 answer
+    if [[ $answer =~ ^[Yy]$ ]]; then
+        echo -e "\nInstalling sudoers configuration..."
+        # No linking possible since the config file has to broad permissions
+        sudo cp "${repoLocation}/Configurations/sudoers_no_password" "/etc/sudoers.d/"
+    else
+        echo "Skipping sudoers configuration..."
+    fi
+fi
+
 echo "Finished 🎉"
 exit 0
