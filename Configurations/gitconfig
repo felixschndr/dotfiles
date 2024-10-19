@@ -7,7 +7,7 @@
 [commit]
     gpgsign = true
 [core]
-    autocrlf = false # See https://stackoverflow.com/q/3206843
+    autocrlf = false  # See https://stackoverflow.com/q/3206843
     quotePath = false # For umlauts
     pager = cat
 [help]

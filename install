@@ -2,15 +2,18 @@
 
 repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! grep -q "source ${repoLocation}/sourcer" "/home/${USER}/.bashrc"; then
-	echo "Installing link to bashrc..."
-	echo "source ${repoLocation}/sourcer" >> ~/.bashrc
+    echo "Installing link to bashrc..."
+    echo "source ${repoLocation}/sourcer" >>~/.bashrc
 else
     echo "Link in bashrc already exists, skipping..."
 fi
 
 if ! crontab -l 2>/dev/null | grep -q "cd ${repoLocation} && git pull"; then
-	echo "Installing crontab to update the repository regularly..."
-	(crontab -l 2>/dev/null; echo "0 */3 * * * cd ${repoLocation} && git pull") | crontab -
+    echo "Installing crontab to update the repository regularly..."
+    (
+        crontab -l 2>/dev/null
+        echo "0 */3 * * * cd ${repoLocation} && git pull"
+    ) | crontab -
 else
     echo "Crontab already exists, skipping..."
 fi
