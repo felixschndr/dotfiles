@@ -38,14 +38,18 @@ if command -v lazygit >/dev/null 2>&1; then
 fi
 
 if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then
-    echo -n "WSL detected, do you want to install the suders configuration that allows the usage of no password for elevated commands? [y/N] "
-    read -r -N 1 answer
-    if [[ $answer =~ ^[Yy]$ ]]; then
-        echo -e "\nInstalling sudoers configuration..."
-        # No linking possible since the config file has to broad permissions
-        sudo cp "${repoLocation}/Configurations/sudoers_no_password" "/etc/sudoers.d/"
+    if [[ ! -f /etc/sudoers.d/sudoers_no_password ]]; then
+        echo -n "WSL detected, do you want to install the sudoers configuration that allows the usage of no password for elevated commands? [Y/N] "
+        read -r -N 1 answer
+        if [[ $answer =~ ^[Yy]$ ]]; then
+            echo -e "\nInstalling sudoers configuration..."
+            # No linking possible since the config file has to broad permissions
+            sudo cp "${repoLocation}/Configurations/sudoers_no_password" "/etc/sudoers.d/"
+        else
+            echo -e "\nSkipping sudoers configuration..."
+        fi
     else
-        echo "Skipping sudoers configuration..."
+        echo "WSL detected, but sudoers configuration is already present"
     fi
 fi
 
