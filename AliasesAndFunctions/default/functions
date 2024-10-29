@@ -187,6 +187,13 @@ git_sign_old_commits() {
     [[ ${answer} =~ (Y|y|J|j) ]] && git push --force
 }
 
+install_lazygit() { # install or update
+    latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
+    curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
+    sudo install lazygit /usr/local/bin
+    rm lazygit
+}
+
 ke() { # Kubectl Execute (Shell)
     [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
     [[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
