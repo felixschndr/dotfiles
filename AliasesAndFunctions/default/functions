@@ -98,11 +98,14 @@ gca() { # git commit amend
 
     echo -e "\e[32mDer Commit wurde amended\e[0m"
 
-    if [[ -n $(git remote -v 2>&1) ]]; then
+    [[ ${1} == "--no-push" ]] && return
+    if [[ -z ${1} ]]; then
         echo -e "\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
         read -r -e -n1 answer
-        [[ ${answer} =~ ^[YyJj]$ ]] && git push --force
+        [[ ${answer} =~ ^[Nn]$ ]] && return
     fi
+
+    git push --force-with-lease
 }
 
 git_delete_old_branches() {
@@ -184,7 +187,7 @@ git_sign_old_commits() {
 
     echo "Soll ein Force Push gemacht werden?"
     read -r -e -n1 answer
-    [[ ${answer} =~ (Y|y|J|j) ]] && git push --force
+    [[ ${answer} =~ ^[YyJj]$ ]] && git push --force-with-lease
 }
 
 install_lazygit() { # install or update
