@@ -9,7 +9,7 @@
 [core]
     autocrlf = false  # See https://stackoverflow.com/q/3206843
     quotePath = false # For umlauts
-    pager = cat
+    pager = less
 [help]
     autocorrect = 15
 [push]
