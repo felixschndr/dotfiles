@@ -1,56 +1,56 @@
 #!/bin/bash
 
 repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if ! grep -q "source ${repoLocation}/sourcer" "/home/${USER}/.bashrc"; then
-    echo "Installing link to bashrc..."
-    echo "source ${repoLocation}/sourcer" >>~/.bashrc
+if ! grep -q "source ${repoLocation}/sourcer" "${HOME}/.bashrc"; then
+	echo "Installing link to bashrc..."
+	echo "source ${repoLocation}/sourcer" >>~/.bashrc
 else
-    echo "Link in bashrc already exists, skipping..."
+	echo "Link in bashrc already exists, skipping..."
 fi
 
 if ! crontab -l 2>/dev/null | grep -q "cd ${repoLocation} && git pull"; then
-    echo "Installing crontab to update the repository regularly..."
-    (
-        crontab -l 2>/dev/null
-        echo "0 */3 * * * cd ${repoLocation} && git pull"
-    ) | crontab -
+	echo "Installing crontab to update the repository regularly..."
+	(
+		crontab -l 2>/dev/null
+		echo "0 */3 * * * cd ${repoLocation} && git pull"
+	) | crontab -
 else
-    echo "Crontab already exists, skipping..."
+	echo "Crontab already exists, skipping..."
 fi
 
 echo -n "Do you want to install or update Lazygit? [Y/N] "
-read -r -N 1 answer
+read -r -n 1 answer
 if [[ $answer =~ ^[Yy]$ ]]; then
-    echo -e "\nInstalling lazygit..."
-    source AliasesAndFunctions/default/functions
-    install_lazygit
+	echo -e "\nInstalling lazygit..."
+	source AliasesAndFunctions/default/functions
+	install_lazygit
 else
-    echo -e "\nSkipping installation of lazygit..."
+	echo -e "\nSkipping installation of lazygit..."
 fi
 
 echo "Linking configuration files..."
 if command -v git >/dev/null 2>&1; then
-    ln -sf "${repoLocation}/Configurations/gitconfig" "/home/${USER}/.gitconfig"
+	ln -sf "${repoLocation}/Configurations/gitconfig" "${HOME}/.gitconfig"
 fi
 if command -v lazygit >/dev/null 2>&1; then
-    mkdir -p "/home/${USER}/.config/lazygit/"
-    ln -sf "${repoLocation}/Configurations/lazygit.yml" "/home/${USER}/.config/lazygit/config.yml"
+	mkdir -p "${HOME}/.config/lazygit/"
+	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
 fi
 
 if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then
-    if [[ ! -f /etc/sudoers.d/sudoers_no_password ]]; then
-        echo -n "WSL detected, do you want to install the sudoers configuration that allows the usage of no password for elevated commands? [Y/N] "
-        read -r -N 1 answer
-        if [[ $answer =~ ^[Yy]$ ]]; then
-            echo -e "\nInstalling sudoers configuration..."
-            # No linking possible since the config file has to broad permissions
-            sudo cp "${repoLocation}/Configurations/sudoers_no_password" "/etc/sudoers.d/"
-        else
-            echo -e "\nSkipping sudoers configuration..."
-        fi
-    else
-        echo "WSL detected, but sudoers configuration is already present"
-    fi
+	if [[ ! -f /etc/sudoers.d/sudoers_no_password ]]; then
+		echo -n "WSL detected, do you want to install the sudoers configuration that allows the usage of no password for elevated commands? [Y/N] "
+		read -r -n 1 answer
+		if [[ $answer =~ ^[Yy]$ ]]; then
+			echo -e "\nInstalling sudoers configuration..."
+			# No linking possible since the config file has to broad permissions
+			sudo cp "${repoLocation}/Configurations/sudoers_no_password" "/etc/sudoers.d/"
+		else
+			echo -e "\nSkipping sudoers configuration..."
+		fi
+	else
+		echo "WSL detected, but sudoers configuration is already present"
+	fi
 fi
 
 echo "Finished 🎉"
