@@ -28,6 +28,12 @@ else
 	echo -e "\nSkipping installation of lazygit..."
 fi
 
+if ! which __git_ps1; then
+	echo "The git prompt is not installed, downloading..."
+	wget -O "${HOME}/.git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+	echo "source ${HOME}/.git-prompt.sh" >>"${HOME}"/.bashrc
+fi
+
 echo "Linking configuration files..."
 if command -v git >/dev/null 2>&1; then
 	ln -sf "${repoLocation}/Configurations/gitconfig" "${HOME}/.gitconfig"
