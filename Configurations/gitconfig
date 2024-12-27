@@ -20,7 +20,7 @@
     showSignature = true
 
 # Include config for work
-[includeIf "gitdir:DE-CIX-Group"]
-    path = /home/fschneider/.gitconfig_decix
+[includeIf "gitdir:**/DE-CIX-Group/**"]
+    path = ~/.gitconfig_decix
 [rerere]
     enabled = true # Reuse merge conflict resultions if available
