@@ -7,3 +7,4 @@ export C_INCLUDE_PATH=/usr/local/include
 export HOMEBREW_NO_ENV_HINTS=1
 # shellcheck disable=1091
 [[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
+alias docker="podman"
