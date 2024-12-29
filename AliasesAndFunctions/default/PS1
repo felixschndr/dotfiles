@@ -64,7 +64,7 @@ PS1+="${GRAU}]-[${DEFAULT}"
 PS1+='`[[ -z ${SSH_CLIENT} ]] && echo "\[\e[32m\]" || echo "\[\e[31m\]"`'
 
 # Hostname
-PS1+="\H"
+PS1+="$(hostname -s)"
 
 # WSL Ausgabe
 #    - bei WSL: "]-[WSL" Einschub
