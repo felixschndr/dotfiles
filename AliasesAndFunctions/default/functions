@@ -191,6 +191,10 @@ git_sign_old_commits() {
 }
 
 install_lazygit() { # install or update
+	if ! command -v jq &>/dev/null; then
+		echo -e "\e[31mjq ist nicht installiert\e[0m"
+		return 1
+	fi
     latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
     curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
     sudo install lazygit /usr/local/bin
