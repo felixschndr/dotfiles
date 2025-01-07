@@ -25,5 +25,5 @@ shopt -s checkwinsize                      # Nach jedem Kommando die Größe des
 export LANG=de_DE.UTF-8 2>/dev/null
 export LANGUAGE=de_DE.UTF-8 2>/dev/null
 export LC_ALL=de_DE.UTF-8 2>/dev/null
-
 export VIRTUAL_ENV_DISABLE_PROMPT=1 # Auschalten der automatischen Anspassung von $PS1 durch venv
+export EDITOR="nano"
