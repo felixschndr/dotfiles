@@ -1,0 +1,4 @@
+#!/bin/bash
+
+alias ls="ls -lh --color=always -D'%H:%M %d.%m.%Y'"
+alias docker="podman"

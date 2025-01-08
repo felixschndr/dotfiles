@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=2015,2155
+# shellcheck disable=1090,1091,2015,2155
 
 _docker_container_get_available_users() {
     docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
@@ -61,3 +61,9 @@ _kubernetes_pod_completion() {
 }
 
 [[ -n $(command -v kubectl) ]] && complete -F _kubernetes_pod_completion ke kl
+
+[[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
+[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker
+[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker-compose ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker-compose
+[[ -f ~/.podman-completion ]] && source ~/.podman-completion
+[[ -f ~/.git-completion.bash ]] && source ~/.git-completion.bash

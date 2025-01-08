@@ -26,7 +26,7 @@ alias nanol='command nano -T 4'
 alias lsblk='lsblk -e 7 -o NAME,TYPE,FSUSED,FSAVAIL,SIZE,FSUSE%,MOUNTPOINT'
 alias less='less -IN'
 alias pwd='pwd -P' # Den absoluten Pfad angeben und keine Symnlinks verwenden
-alias rm='rm -I --verbose'
+alias rm='rm -I -v'
 alias ssu='sudo --preserve-env=SSH_CLIENT su' # Die Variable speichern für PS1
 alias sudo='sudo '                            # https://wiki.archlinux.org/title/Sudo#Passing_aliases
 alias tf='tail -f -n 1000'

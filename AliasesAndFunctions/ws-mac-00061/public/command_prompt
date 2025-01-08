@@ -1,17 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=1090,1091
-
-alias ls="ls -lh --color=always -D'%H:%M %d.%m.%Y'"
 export PATH=${HOME}/Library/Python/3.13/bin:/usr/local/bin:${PATH}
 export LIBRARY_PATH=/usr/local/lib
 export C_INCLUDE_PATH=/usr/local/include
 export HOMEBREW_NO_ENV_HINTS=1
-
-[[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
-[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker
-[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker-compose ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker-compose
-[[ -f ~/.podman-completion ]] && source ~/.podman-completion
-[[ -f ~/.git-completion.bash ]] && source ~/.git-completion.bash
-
-alias docker="podman"
