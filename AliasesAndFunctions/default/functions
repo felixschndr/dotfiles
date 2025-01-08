@@ -3,438 +3,438 @@
 # shellcheck disable=2015,2155
 
 cd() {
-    # Macht ein normales cd, wenn ein Verzeichnis angegeben wurde
-    # Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
-    # Beispiel:
-    # ┌─[11:40:57]-[:)]-[fschneider@frank]-[/tmp/]
-    # └──> cd Resources/305075061F05.xml
-    #
-    # ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
-    # └──>
+	# Macht ein normales cd, wenn ein Verzeichnis angegeben wurde
+	# Schneidet den Dateinamen ab, wenn ein Verzeichnis mit folgendem Dateinamen angegeben wurde
+	# Beispiel:
+	# ┌─[11:40:57]-[:)]-[fschneider@frank]-[/tmp/]
+	# └──> cd Resources/305075061F05.xml
+	#
+	# ┌─[11:41:03]-[:)]-[fschneider@frank]-[/tmp/Resources/]
+	# └──>
 
-    [[ ${1} == "--" ]] && shift
+	[[ ${1} == "--" ]] && shift
 
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    local targetDirectory
-    [[ -z ${1} ]] && targetDirectory=${HOME} || targetDirectory=${1} # Bei keiner Angabe ins Homeverzeichnis wechseln
+	local targetDirectory
+	[[ -z ${1} ]] && targetDirectory=${HOME} || targetDirectory=${1} # Bei keiner Angabe ins Homeverzeichnis wechseln
 
-    local fileToBeChecked
-    [[ ${1} == "/"* ]] && fileToBeChecked="${1}" || fileToBeChecked="$(pwd)/${1}" # Check, ob ein absoluter Pfad angegeben wurde
+	local fileToBeChecked
+	[[ ${1} == "/"* ]] && fileToBeChecked="${1}" || fileToBeChecked="$(pwd)/${1}" # Check, ob ein absoluter Pfad angegeben wurde
 
-    [[ -f ${fileToBeChecked} ]] && targetDirectory=$(dirname "${1}")
+	[[ -f ${fileToBeChecked} ]] && targetDirectory=$(dirname "${1}")
 
-    command cd "${targetDirectory}" || return 1
+	command cd "${targetDirectory}" || return 1
 }
 
 check_if_git_repo_exists() { # Prüfen, ob ein GIT Repo gefunden wurde
-    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        return 0
-    fi
+	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+		return 0
+	fi
 
-    echo -e "\e[31mEs wurde kein GIT Repository gefunden!\e[0m" >&2
-    return 0
+	echo -e "\e[31mEs wurde kein GIT Repository gefunden!\e[0m" >&2
+	return 0
 }
 
 dca() { # docker compose all
-    local detach_argument
-    [[ ${1} == "up" ]] && detach_argument="-d" || detach_argument=""
-    # shellcheck disable=2086
-    find . \
-        -maxdepth 3 \
-        -name "docker-compose.yml" \
-        -print \
-        -exec docker compose -f {} "${1}" ${detach_argument} \;
+	local detach_argument
+	[[ ${1} == "up" ]] && detach_argument="-d" || detach_argument=""
+	# shellcheck disable=2086
+	find . \
+		-maxdepth 3 \
+		-name "docker-compose.yml" \
+		-print \
+		-exec docker compose -f {} "${1}" ${detach_argument} \;
 }
 
 complete -W "up down" dca
 
 create_venv() {
-    echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" &&
-        python -m venv .venv &&
-        echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" &&
-        toggle_venv &&
-        python_install_requirements
+	echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" &&
+		python -m venv .venv &&
+		echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" &&
+		toggle_venv &&
+		python_install_requirements
 }
 
 de() { # Docker Execute (Shell)
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
-    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
+	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    shell_binary=$(docker exec -it "${1}" sh -c "command -v bash" | tr -d '\015')
-    [[ -z ${shell_binary} ]] && shell_binary="sh"
+	shell_binary=$(docker exec -it "${1}" sh -c "command -v bash" | tr -d '\015')
+	[[ -z ${shell_binary} ]] && shell_binary="sh"
 
-    if [[ ${#} -eq 1 ]]; then
-        local available_users=$(_docker_container_get_available_users "${1}")
-        if [[ $(wc -l <<<"${available_users}") == 2 && ${available_users} == *"root"* ]]; then
-            user=$(echo "${available_users}" | sed 's/root//' | tr -d '[:space:]')
-            docker exec -it --user "${user}" "${1}" "${shell_binary}"
-        else
-            docker exec -it "${1}" "${shell_binary}"
-        fi
+	if [[ ${#} -eq 1 ]]; then
+		local available_users=$(_docker_container_get_available_users "${1}")
+		if [[ $(wc -l <<<"${available_users}") == 2 && ${available_users} == *"root"* ]]; then
+			user=$(echo "${available_users}" | sed 's/root//' | tr -d '[:space:]')
+			docker exec -it --user "${user}" "${1}" "${shell_binary}"
+		else
+			docker exec -it "${1}" "${shell_binary}"
+		fi
 
-    else
-        docker exec -it --user "${2}" "${1}" "${shell_binary}"
-    fi
+	else
+		docker exec -it --user "${2}" "${1}" "${shell_binary}"
+	fi
 }
 
 dl() { # Docker Logs
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
+	[[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    docker logs -f -n 1000 "${1}"
+	docker logs -f -n 1000 "${1}"
 }
 
 gca() { # git commit amend
-    if ! check_if_git_repo_exists; then return 1; fi
+	if ! check_if_git_repo_exists; then return 1; fi
 
-    if [[ -z $(git status --porcelain=v1) ]]; then
-        echo -e "\e[31mEs gibt keine Unstaged changes!\e[0m"
-        return 1
-    fi
+	if [[ -z $(git status --porcelain=v1) ]]; then
+		echo -e "\e[31mEs gibt keine Unstaged changes!\e[0m"
+		return 1
+	fi
 
-    git add .
-    git commit -S -a --amend --no-edit >/dev/null
+	git add .
+	git commit -S -a --amend --no-edit >/dev/null
 
-    echo -e "\e[32mDer Commit wurde amended\e[0m"
+	echo -e "\e[32mDer Commit wurde amended\e[0m"
 
-    [[ ${1} == "--no-push" ]] && return
-    if [[ -z ${1} ]]; then
-        echo -e "\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
-        read -r -e -n1 answer
-        [[ ${answer} =~ ^[Nn]$ ]] && return
-    fi
+	[[ ${1} == "--no-push" ]] && return
+	if [[ -z ${1} ]]; then
+		echo -e "\e[1;96mSoll noch ein Force Push gemacht werden?\e[0m"
+		read -r -e -n1 answer
+		[[ ${answer} =~ ^[Nn]$ ]] && return
+	fi
 
-    git push --force-with-lease
+	git push --force-with-lease
 }
 
 git_delete_old_branches() {
-    if ! check_if_git_repo_exists; then return 1; fi
+	if ! check_if_git_repo_exists; then return 1; fi
 
-    git fetch -pq || return
-    local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
-    local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
+	git fetch -pq || return
+	local branches_to_be_deleted=$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')
+	local amount_of_branches_to_be_deleted=$(echo "${branches_to_be_deleted}" | wc -l)
 
-    [[ -z ${branches_to_be_deleted} ]] && {
-        echo -e "\e[32mEs gibt keine Branches, die gelöscht werden müssen\e[0m"
-        return
-    }
+	[[ -z ${branches_to_be_deleted} ]] && {
+		echo -e "\e[32mEs gibt keine Branches, die gelöscht werden müssen\e[0m"
+		return
+	}
 
-    local checkedout_branch=$(git rev-parse --abbrev-ref HEAD)
+	local checkedout_branch=$(git rev-parse --abbrev-ref HEAD)
 
-    echo "Aktueller Branch: ${checkedout_branch}"
-    if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
-        echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"
-        echo -e "    ${branches_to_be_deleted}"
-    else
-        echo -e "\e[96;1mDie folgenden Branches werden gelöscht:\e[0m"
-        echo -e "${branches_to_be_deleted}" | sed 's/ /\n/g' | nl
-    fi
+	echo "Aktueller Branch: ${checkedout_branch}"
+	if [[ ${amount_of_branches_to_be_deleted} == 1 ]]; then
+		echo -e "\e[96;1mDer folgende Branch wird gelöscht:\e[0m"
+		echo -e "    ${branches_to_be_deleted}"
+	else
+		echo -e "\e[96;1mDie folgenden Branches werden gelöscht:\e[0m"
+		echo -e "${branches_to_be_deleted}" | sed 's/ /\n/g' | nl
+	fi
 
-    for branch in ${branches_to_be_deleted}; do
-        if [[ "${branch}" == "${checkedout_branch}" ]]; then
-            local default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-            git checkout "${default_branch}" >/dev/null
-            git pull >/dev/null
-        fi
+	for branch in ${branches_to_be_deleted}; do
+		if [[ "${branch}" == "${checkedout_branch}" ]]; then
+			local default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+			git checkout "${default_branch}" >/dev/null
+			git pull >/dev/null
+		fi
 
-        git branch -D "${branch}"
-    done
+		git branch -D "${branch}"
+	done
 }
 
 git_delete_old_branches_in_current_dir() {
-    local start_directory=${PWD}
-    local git_repositories=$(find "${PWD}" -name .git -type d -prune)
+	local start_directory=${PWD}
+	local git_repositories=$(find "${PWD}" -name .git -type d -prune)
 
-    for repository in ${git_repositories}; do
-        cd "${repository}/../" || continue
-        echo "Prüfe $(realpath --relative-to="${start_directory}" "${PWD}")"
-        git_delete_old_branches
-        echo ""
-    done
+	for repository in ${git_repositories}; do
+		cd "${repository}/../" || continue
+		echo "Prüfe $(realpath --relative-to="${start_directory}" "${PWD}")"
+		git_delete_old_branches
+		echo ""
+	done
 
-    cd "${start_directory}" || false
+	cd "${start_directory}" || false
 }
 
 git_reset() {
-    if ! check_if_git_repo_exists; then return 1; fi
+	if ! check_if_git_repo_exists; then return 1; fi
 
-    echo -e "\e[31mSicher, dass alle lokalen Änderungen verworfen werden sollen?\e[0m"
-    read -r -e -n1 answer
-    [[ ! ${answer} =~ ^[YyJj]$ ]] && return
+	echo -e "\e[31mSicher, dass alle lokalen Änderungen verworfen werden sollen?\e[0m"
+	read -r -e -n1 answer
+	[[ ! ${answer} =~ ^[YyJj]$ ]] && return
 
-    local checkedout_branch=$(git rev-parse --abbrev-ref HEAD)
+	local checkedout_branch=$(git rev-parse --abbrev-ref HEAD)
 
-    git reset --hard "origin/${checkedout_branch}"
+	git reset --hard "origin/${checkedout_branch}"
 }
 
 git_sign_old_commits() {
-    [[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ ${#} -gt 1 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    if [[ -z ${1} ]]; then
-        git log --show-signature | less
-        echo -n "Bis zu welchem Commit soll signiert werden? "
-        read -r -e hash
-    else
-        hash=${1}
-    fi
+	if [[ -z ${1} ]]; then
+		git log --show-signature | less
+		echo -n "Bis zu welchem Commit soll signiert werden? "
+		read -r -e hash
+	else
+		hash=${1}
+	fi
 
-    local git_stash_pop_needed=$(git stash push)
+	local git_stash_pop_needed=$(git stash push)
 
-    git rebase --exec 'git commit --amend --no-edit -n -S' "${hash}"
+	git rebase --exec 'git commit --amend --no-edit -n -S' "${hash}"
 
-    [[ ${git_stash_pop_needed} == *"Saved"* ]] && git stash pop --quiet
+	[[ ${git_stash_pop_needed} == *"Saved"* ]] && git stash pop --quiet
 
-    echo "Soll ein Force Push gemacht werden?"
-    read -r -e -n1 answer
-    [[ ${answer} =~ ^[YyJj]$ ]] && git push --force-with-lease
+	echo "Soll ein Force Push gemacht werden?"
+	read -r -e -n1 answer
+	[[ ${answer} =~ ^[YyJj]$ ]] && git push --force-with-lease
 }
 
 install_lazygit() { # install or update
-    latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
-    curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
-    sudo install lazygit /usr/local/bin
-    rm lazygit
+	latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
+	curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
+	sudo install lazygit /usr/local/bin
+	rm lazygit
 }
 
 ke() { # Kubectl Execute (Shell)
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
-    [[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
-    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
+	[[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
+	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    shell_binary=$(kubectl exec -it -n "${1}" "${2}" -- sh -c "command -v bash" 2>/dev/null | tr -d '\015')
-    [[ -z ${shell_binary} ]] && shell_binary="sh"
+	shell_binary=$(kubectl exec -it -n "${1}" "${2}" -- sh -c "command -v bash" 2>/dev/null | tr -d '\015')
+	[[ -z ${shell_binary} ]] && shell_binary="sh"
 
-    kubectl exec -it -n "${1}" "${2}" -- "${shell_binary}"
+	kubectl exec -it -n "${1}" "${2}" -- "${shell_binary}"
 }
 
 kl() { # Kubectl Logs
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
-    [[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
-    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Namespace angegeben\e[0m" && return 1
+	[[ -z ${2} ]] && echo -e "\e[31mEs wurde kein Podname angegeben\e[0m" && return 1
+	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    kubectl logs -f -n "${1}" "${2}"
+	kubectl logs -f -n "${1}" "${2}"
 }
 
 pip() { # Check if venv is active before installing anything
-    if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
-        echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
-        return 1
-    fi
-    # shellcheck disable=2068
-    command pip $@
+	if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
+		echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
+		return 1
+	fi
+	# shellcheck disable=2068
+	command pip $@
 }
 
 poetry() { # Check if venv is active before installing anything
-    if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
-        echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
-        return 1
-    fi
-    # shellcheck disable=2068
-    command poetry $@
+	if [[ ${1} =~ (install|uninstall) && -z ${VIRTUAL_ENV} ]]; then
+		echo -e "\e[31mEs ist kein venv aktiv!\e[0m"
+		return 1
+	fi
+	# shellcheck disable=2068
+	command poetry $@
 }
 
 pip_install_requirements() {
-    local possible_files=(requirements.txt requirements-dev.txt requirements-test.txt)
+	local possible_files=(requirements.txt requirements-dev.txt requirements-test.txt)
 
-    local pip_command="pip install"
+	local pip_command="pip install"
 
-    found_at_least_one_file=false
-    for file in "${possible_files[@]}"; do
-        [[ -f ${file} ]] && pip_command+=" -r ${file}" && found_at_least_one_file=true
-    done
+	found_at_least_one_file=false
+	for file in "${possible_files[@]}"; do
+		[[ -f ${file} ]] && pip_command+=" -r ${file}" && found_at_least_one_file=true
+	done
 
-    [[ "${found_at_least_one_file}" = false ]] && return 1
+	[[ "${found_at_least_one_file}" = false ]] && return 1
 
-    echo "Installiere die Abhängigkeiten mit pip"
-    eval "${pip_command}"
+	echo "Installiere die Abhängigkeiten mit pip"
+	eval "${pip_command}"
 }
 
 poetry_install_requirements() {
-    [[ ! -f pyproject.toml ]] && return 1
-    if ! grep -q "\[tool.poetry\]" pyproject.toml; then
-        return 1
-    fi
+	[[ ! -f pyproject.toml ]] && return 1
+	if ! grep -q "\[tool.poetry\]" pyproject.toml; then
+		return 1
+	fi
 
-    echo "Installiere die Abhängigkeiten mit poetry"
-    eval "poetry install"
+	echo "Installiere die Abhängigkeiten mit poetry"
+	eval "poetry install"
 }
 
 python_install_requirements() {
-    if ! poetry_install_requirements; then
-        if ! pip_install_requirements; then
-            echo -e "\e[31m Es wurde keine Datei zum Instalieren von Abhängigkeiten gefunden!\e[0m"
-            return 1
-        fi
-    fi
+	if ! poetry_install_requirements; then
+		if ! pip_install_requirements; then
+			echo -e "\e[31m Es wurde keine Datei zum Instalieren von Abhängigkeiten gefunden!\e[0m"
+			return 1
+		fi
+	fi
 }
 
 search_string() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
-    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    if [[ ${#} == 1 ]]; then
-        grep -inrs --color=always "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-    else
-        grep -inrs --color=always "${1}" "${2}" || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-    fi
+	if [[ ${#} == 1 ]]; then
+		grep -inrs --color=always "${1}" ./* || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+	else
+		grep -inrs --color=always "${1}" "${2}" || echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+	fi
 }
 
 search_file() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Suchbegriff angegeben\e[0m" && return 1
 
-    # grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
-    if [[ ${#} == 1 ]]; then
-        find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always ||
-            echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-    else
-        local fileToSearchFor=${1}
-        shift
-        find "${@}" -iname "*${fileToSearchFor}*" -not -path "*/\.git/*" | grep -i "${fileToSearchFor}" --color=always ||
-            echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
-    fi
+	# grep, um eine Fehlermeldung bei keinen Suchergebnissen anzeigen zu können und die Fundorte farbig zu markieren
+	if [[ ${#} == 1 ]]; then
+		find . -iname "*${1}*" -not -path "*/\.git/*" | grep -i "${1}" --color=always ||
+			echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+	else
+		local fileToSearchFor=${1}
+		shift
+		find "${@}" -iname "*${fileToSearchFor}*" -not -path "*/\.git/*" | grep -i "${fileToSearchFor}" --color=always ||
+			echo -e "\e[33mEs wurden keine Sucherergbnisse gefunden\e[0m"
+	fi
 }
 
 toggle_venv() {
-    [[ -n ${VIRTUAL_ENV} ]] && deactivate && echo -e "Venv wurde \e[31mdeaktiviert\e[0m✔️" && return
+	[[ -n ${VIRTUAL_ENV} ]] && deactivate && echo -e "Venv wurde \e[31mdeaktiviert\e[0m✔️" && return
 
-    local git_root_path=$(git rev-parse --show-toplevel 2>/dev/null)
-    [[ -z ${git_root_path} ]] && git_root_path=${PWD} # Für den Fall, dass es einen venv ordner gibt, aber es sich nicht um ein Git Repo handelt
+	local git_root_path=$(git rev-parse --show-toplevel 2>/dev/null)
+	[[ -z ${git_root_path} ]] && git_root_path=${PWD} # Für den Fall, dass es einen venv ordner gibt, aber es sich nicht um ein Git Repo handelt
 
-    local venv_directory=""
-    local possible_venv_folders=(venv .venv env .env)
-    for folder in "${possible_venv_folders[@]}"; do
-        local folder_to_check=${git_root_path}/${folder}
-        if [[ -d ${folder_to_check} ]]; then
-            venv_directory=${folder_to_check}
-            break
-        fi
-    done
-    if [[ -z ${venv_directory} ]]; then
-        echo -e "\e[31mKonnte das venv nicht finden"
-        return 1
-    fi
+	local venv_directory=""
+	local possible_venv_folders=(venv .venv env .env)
+	for folder in "${possible_venv_folders[@]}"; do
+		local folder_to_check=${git_root_path}/${folder}
+		if [[ -d ${folder_to_check} ]]; then
+			venv_directory=${folder_to_check}
+			break
+		fi
+	done
+	if [[ -z ${venv_directory} ]]; then
+		echo -e "\e[31mKonnte das venv nicht finden"
+		return 1
+	fi
 
-    # shellcheck disable=1091
-    source "${venv_directory}/bin/activate" && echo -e "Venv wurde \e[32maktiviert\e[0m✔️"
+	# shellcheck disable=1091
+	source "${venv_directory}/bin/activate" && echo -e "Venv wurde \e[32maktiviert\e[0m✔️"
 }
 
 tmux() {
-    local sessionName="${HOSTNAME}"
+	local sessionName="${HOSTNAME}"
 
-    # Check for existing session
-    # If there is one:  attach the existing one
-    # If there is none: create a new one and then attach it
-    if [[ "$(command tmux ls | grep -o "${sessionName}")" == "${sessionName}" ]]; then
-        command tmux attach-session -t "${sessionName}"
-    else # if it wasn't there then setup as below
-        command tmux new-session -s "${sessionName}" -d
-        command tmux rename-window "home"
-        command tmux split-window -h
-        command tmux split-window -v
-        command tmux send-keys -t 0.0 'shopt -s checkwinsize; tmux_help' Enter
-        command tmux select-pane -t 0
-        command tmux -u attach-session -d
-    fi
+	# Check for existing session
+	# If there is one:  attach the existing one
+	# If there is none: create a new one and then attach it
+	if [[ "$(command tmux ls | grep -o "${sessionName}")" == "${sessionName}" ]]; then
+		command tmux attach-session -t "${sessionName}"
+	else # if it wasn't there then setup as below
+		command tmux new-session -s "${sessionName}" -d
+		command tmux rename-window "home"
+		command tmux split-window -h
+		command tmux split-window -v
+		command tmux send-keys -t 0.0 'shopt -s checkwinsize; tmux_help' Enter
+		command tmux select-pane -t 0
+		command tmux -u attach-session -d
+	fi
 }
 
 tmux_help() {
-    echo -e "\e[1;36m"
-    center "TMUX Hilfe"
-    echo -e "\n\e[0m" \
-        "\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
-        "\nTeilen:" \
-        "\n    - Horizontal:      <\e[1;36m\"\e[0m>" \
-        "\n    - Vertikal:        <\e[1;36m%\e[0m>\n" \
-        "\nPanes:" \
-        "\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
-        "\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
-        "\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
-        "\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
-        "\nWeitere:" \
-        "\n    - Lösen:           <\e[1;36mB\e[0m>\n" \
-        "\nEinfügen:              <\e[1;36mShift\e[0m> + <\e[1;36mRechte Maustaste\e[0m>"
+	echo -e "\e[1;36m"
+	center "TMUX Hilfe"
+	echo -e "\n\e[0m" \
+		"\nStartkommando:         <\e[1;36mSTRG\e[0m> + <\e[1;36mB\e[0m>\n" \
+		"\nTeilen:" \
+		"\n    - Horizontal:      <\e[1;36m\"\e[0m>" \
+		"\n    - Vertikal:        <\e[1;36m%\e[0m>\n" \
+		"\nPanes:" \
+		"\n    - Layout wechseln: <\e[1;36mSpace\e[0m>    - Nächstes:            <\e[1;36mO\e[0m>" \
+		"\n    - Maximieren:      <\e[1;36mZ\e[0m>        - Panenummer anzeigen: <\e[1;36mQ\e[0m>" \
+		"\n    - Schließen:       <\e[1;36mX\e[0m>        - Zu Pane wechseln:    <\e[1;36mQ\e[0m> + <\e[1;36m0-9\e[0m>" \
+		"\n                                  - Alternativ:          <\e[1;36mPfeiltasten\e[0m>\n" \
+		"\nWeitere:" \
+		"\n    - Lösen:           <\e[1;36mB\e[0m>\n" \
+		"\nEinfügen:              <\e[1;36mShift\e[0m> + <\e[1;36mRechte Maustaste\e[0m>"
 }
 
 to_lf() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
 
-    if [[ "${1}" =~ (alle|^\.$) ]]; then
-        allFiles=$(find . -type f -not -path "*/\.git/*" -print0 | xargs --null file | grep "CRLF" | cut -d ":" -f1)
+	if [[ "${1}" =~ (alle|^\.$) ]]; then
+		allFiles=$(find . -type f -not -path "*/\.git/*" -print0 | xargs --null file | grep "CRLF" | cut -d ":" -f1)
 
-        [[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
+		[[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
 
-        echo -e "\e[96mSollen die folgenden Dateien zu LF konvertiert werden?\e[0m\n$(echo "${allFiles}" | sed 's/ /\n/g' | nl)\n"
+		echo -e "\e[96mSollen die folgenden Dateien zu LF konvertiert werden?\e[0m\n$(echo "${allFiles}" | sed 's/ /\n/g' | nl)\n"
 
-        read -r -e -n1 answer
-        [[ ! ${answer} =~ (Y|y|J|j) ]] && return
+		read -r -e -n1 answer
+		[[ ! ${answer} =~ (Y|y|J|j) ]] && return
 
-    else
-        allFiles=${*}
+	else
+		allFiles=${*}
 
-    fi
+	fi
 
-    for file in ${allFiles}; do
+	for file in ${allFiles}; do
 
-        if [[ ! -f ${file} ]]; then
-            echo -e "\e[33mDie Datei \"${file}\" existiert nicht\e[0m"
-            continue
-        fi
+		if [[ ! -f ${file} ]]; then
+			echo -e "\e[33mDie Datei \"${file}\" existiert nicht\e[0m"
+			continue
+		fi
 
-        [[ "$(file "${file}")" == *"CRLF"* ]] && lineEndings="\e[31mCRLF" || lineEndings="\e[32mLF"
+		[[ "$(file "${file}")" == *"CRLF"* ]] && lineEndings="\e[31mCRLF" || lineEndings="\e[32mLF"
 
-        echo -e "Ändere die Zeilenenden zu LF von \e[96;1m${file}\e[0m\n    War davor: ${lineEndings}\e[0m"
+		echo -e "Ändere die Zeilenenden zu LF von \e[96;1m${file}\e[0m\n    War davor: ${lineEndings}\e[0m"
 
-        tmp_file=$(mktemp)
-        tr -d '\015' <"${file}" >"${tmp_file}"
-        mv "${tmp_file}" "${file}"
-        command rm -f "${tmp_file}"
-    done
+		tmp_file=$(mktemp)
+		tr -d '\015' <"${file}" >"${tmp_file}"
+		mv "${tmp_file}" "${file}"
+		command rm -f "${tmp_file}"
+	done
 }
 
 complete -F _longopt -W "alle" to_lf # Autovervollständigung mit allen verfügbaren Dateien
 
 upgrade() {
-    if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
-        return
-    fi
+	if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
+		return
+	fi
 
-    local reboot_required_packages_file="/var/run/reboot-required.pkgs"
-    if [[ -f ${reboot_required_packages_file} ]]; then
-        if [[ $(wc -l <${reboot_required_packages_file}) == 1 ]]; then
-            echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
-            cat ${reboot_required_packages_file}
-        else
-            echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
-            sort -u ${reboot_required_packages_file} | nl
-        fi
-    fi
+	local reboot_required_packages_file="/var/run/reboot-required.pkgs"
+	if [[ -f ${reboot_required_packages_file} ]]; then
+		if [[ $(wc -l <${reboot_required_packages_file}) == 1 ]]; then
+			echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
+			cat ${reboot_required_packages_file}
+		else
+			echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
+			sort -u ${reboot_required_packages_file} | nl
+		fi
+	fi
 }
 
 whats() {
-    [[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m" && return 1
-    [[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
+	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m" && return 1
+	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1
 
-    type "${1}" || return 1
+	type "${1}" || return 1
 
-    local isFunction=$(type "${1}")
-    local fileLocation=$(command which "${1}" 2>/dev/null)
+	local isFunction=$(type "${1}")
+	local fileLocation=$(command which "${1}" 2>/dev/null)
 
-    if [[ (! ${isFunction} == *"ist eine Funktion"*) && -n ${fileLocation} ]]; then
+	if [[ (! ${isFunction} == *"ist eine Funktion"*) && -n ${fileLocation} ]]; then
 
-        if [[ $(file -L "${fileLocation}") =~ (ASCII|script) ]]; then
-            echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
-            read -r -e -n1 answer
+		if [[ $(file -L "${fileLocation}") =~ (ASCII|script) ]]; then
+			echo -e "\nSoll der Sourcecode angezeigt werden? \e[2m(J/N)\e[0m"
+			read -r -e -n1 answer
 
-            [[ ${answer} =~ ^[YyJj]$ ]] && less "${fileLocation}"
+			[[ ${answer} =~ ^[YyJj]$ ]] && less "${fileLocation}"
 
-        else
-            # Nicht anzeigen, wenn es sich um einen Alias handelt
-            [[ ${isFunction} =~ (A|a)lias ]] || echo -e "\nEs handelt sich um eine Binärdatei"
+		else
+			# Nicht anzeigen, wenn es sich um einen Alias handelt
+			[[ ${isFunction} =~ (A|a)lias ]] || echo -e "\nEs handelt sich um eine Binärdatei"
 
-        fi
-    fi
-    return 0
+		fi
+	fi
+	return 0
 }
 
 complete -F _command whats # Autovervollständigung mit allen verfügbaren Kommandos

@@ -3,61 +3,61 @@
 # shellcheck disable=1090,1091,2015,2155
 
 _docker_container_get_available_users() {
-    docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
+	docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
 }
 
 _docker_containers_completion() {
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY=("${COMPREPLY[@]}" "${item}")
-        done
-    elif [[ ${COMP_CWORD} -eq 2 && ${COMP_WORDS[0]} == "de" ]]; then
-        local available_users=$(_docker_container_get_available_users "${COMP_WORDS[1]}")
-        for user in $(echo "${available_users}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY+=("${user}")
-        done
-    fi
+	if [[ ${COMP_CWORD} -eq 1 ]]; then
+		for item in $(docker ps --format "{{.Names}}" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY=("${COMPREPLY[@]}" "${item}")
+		done
+	elif [[ ${COMP_CWORD} -eq 2 && ${COMP_WORDS[0]} == "de" ]]; then
+		local available_users=$(_docker_container_get_available_users "${COMP_WORDS[1]}")
+		for user in $(echo "${available_users}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY+=("${user}")
+		done
+	fi
 }
 
 [[ -n $(command -v docker) ]] && complete -F _docker_containers_completion de dl
 
 _k9s_context_completion() {
-    if [[ ${COMP_CWORD} -eq 1 || ${COMP_CWORD} -eq 3 ]]; then
-        for item in $(echo -e "--context\n--namespace\n--help" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY=("${COMPREPLY[@]}" "${item}")
-        done
-    else
-        if [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--context" ]]; then
-            local available_contexts=$(kubectl config get-contexts -o name)
-            for context in $(echo "${available_contexts}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-                COMPREPLY+=("${context}")
-            done
-        elif [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--namespace" ]]; then
-            local context_argument=""
-            [[ ${COMP_WORDS[1]} == "--context" ]] && context_argument="--context ${COMP_WORDS[2]}"
+	if [[ ${COMP_CWORD} -eq 1 || ${COMP_CWORD} -eq 3 ]]; then
+		for item in $(echo -e "--context\n--namespace\n--help" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY=("${COMPREPLY[@]}" "${item}")
+		done
+	else
+		if [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--context" ]]; then
+			local available_contexts=$(kubectl config get-contexts -o name)
+			for context in $(echo "${available_contexts}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+				COMPREPLY+=("${context}")
+			done
+		elif [[ ${COMP_WORDS[$((COMP_CWORD - 1))]} == "--namespace" ]]; then
+			local context_argument=""
+			[[ ${COMP_WORDS[1]} == "--context" ]] && context_argument="--context ${COMP_WORDS[2]}"
 
-            # shellcheck disable=2086
-            for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" ${context_argument} | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-                COMPREPLY=("${COMPREPLY[@]}" "${item}")
-            done
-        fi
-    fi
+			# shellcheck disable=2086
+			for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" ${context_argument} | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+				COMPREPLY=("${COMPREPLY[@]}" "${item}")
+			done
+		fi
+	fi
 }
 
 [[ -n $(command -v k9s) ]] && complete -F _k9s_context_completion k9s
 
 _kubernetes_pod_completion() {
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY=("${COMPREPLY[@]}" "${item}")
-        done
-    elif [[ ${COMP_CWORD} -eq 2 ]]; then
-        namespace=${COMP_WORDS[1]}
-        available_pods=$(kubectl get pod -n "${namespace}" -o custom-columns=":metadata.name" --no-headers)
-        for pod in $(echo "${available_pods}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
-            COMPREPLY+=("${pod}")
-        done
-    fi
+	if [[ ${COMP_CWORD} -eq 1 ]]; then
+		for item in $(kubectl get ns --no-headers -o custom-columns=":metadata.name" | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY=("${COMPREPLY[@]}" "${item}")
+		done
+	elif [[ ${COMP_CWORD} -eq 2 ]]; then
+		namespace=${COMP_WORDS[1]}
+		available_pods=$(kubectl get pod -n "${namespace}" -o custom-columns=":metadata.name" --no-headers)
+		for pod in $(echo "${available_pods}" | tr -d '\015' | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+			COMPREPLY+=("${pod}")
+		done
+	fi
 }
 
 [[ -n $(command -v kubectl) ]] && complete -F _kubernetes_pod_completion ke kl
