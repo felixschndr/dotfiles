@@ -28,10 +28,11 @@ else
 	echo -e "\nSkipping installation of lazygit..."
 fi
 
-if ! which __git_ps1; then
+git_prompt_file="${HOME}/.git-prompt.sh"
+if [[ ! -f "${git_prompt_file}" ]]; then
 	echo "The git prompt is not installed, downloading..."
-	wget -O "${HOME}/.git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-	echo "source ${HOME}/.git-prompt.sh" >>"${HOME}"/.bashrc
+	wget -O "${git_prompt_file}" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+	echo "source ${git_prompt_file}" >>"${HOME}"/.bashrc
 fi
 
 echo "Linking configuration files..."
