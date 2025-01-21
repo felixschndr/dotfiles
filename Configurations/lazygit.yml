@@ -22,3 +22,5 @@ customCommands:
     context: "localBranches, remoteBranches"
     command: bash -ic "git_delete_old_branches"
     stream: true
+git:
+  overrideGpg: true
