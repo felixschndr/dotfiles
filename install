@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=1091
+source AliasesAndFunctions/default/functions
+
 repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! grep -q "source ${repoLocation}/sourcer" "${HOME}/.bashrc"; then
 	echo "Installing link to bashrc..."
@@ -18,14 +21,9 @@ else
 	echo "Crontab already exists, skipping..."
 fi
 
-echo -n "Do you want to install or update Lazygit? [Y/N] "
-read -r -n 1 answer
-if [[ $answer =~ ^[Yy]$ ]]; then
+if ! command -v lazygit >/dev/null 2>&1; then
 	echo -e "\nInstalling lazygit..."
-	source AliasesAndFunctions/default/functions
 	install_lazygit
-else
-	echo -e "\nSkipping installation of lazygit..."
 fi
 
 git_prompt_file="${HOME}/.git-prompt.sh"
@@ -39,14 +37,11 @@ echo "Linking configuration files..."
 if command -v git >/dev/null 2>&1; then
 	ln -sf "${repoLocation}/Configurations/gitconfig" "${HOME}/.gitconfig"
 fi
-
-if command -v lazygit >/dev/null 2>&1; then
-	if [[ "$(uname)" == "Darwin" ]]; then
-		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/Library/Application Support/lazygit/config.yml"
-	else
-		mkdir -p "${HOME}/.config/lazygit/"
-		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
-	fi
+if is_mac_os; then
+	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/Library/Application Support/lazygit/config.yml"
+else
+	mkdir -p "${HOME}/.config/lazygit/"
+	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
 fi
 
 if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then

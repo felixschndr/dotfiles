@@ -191,10 +191,19 @@ git_sign_old_commits() {
 }
 
 install_lazygit() { # install or update
-	latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
-	curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
-	sudo install lazygit /usr/local/bin
-	rm lazygit
+	if is_mac_os; then
+		brew install lazygit
+	else
+		latest_version=$(curl -s "https://api.github.com/repos/felixschndr/lazygit-without-gpg-restriction/releases/latest" | jq -r '.tag_name')
+		curl -sLo lazygit "https://github.com/felixschndr/lazygit-without-gpg-restriction/releases/latest/download/lazygit_${latest_version}_linux"
+		sudo install lazygit /usr/local/bin
+		rm lazygit
+	fi
+}
+
+is_mac_os() {
+	if [[ "$(uname)" == "Darwin" ]]; then return 0; fi
+	return 1
 }
 
 ke() { # Kubectl Execute (Shell)
