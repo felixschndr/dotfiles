@@ -38,9 +38,14 @@ echo "Linking configuration files..."
 if command -v git >/dev/null 2>&1; then
 	ln -sf "${repoLocation}/Configurations/gitconfig" "${HOME}/.gitconfig"
 fi
+
 if command -v lazygit >/dev/null 2>&1; then
-	mkdir -p "${HOME}/.config/lazygit/"
-	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
+	if [[ "$(uname)" == "Darwin" ]]; then
+		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/Library/Application Support/lazygit/config.yml"
+	else
+		mkdir -p "${HOME}/.config/lazygit/"
+		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
+	fi
 fi
 
 if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then
