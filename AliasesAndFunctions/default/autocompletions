@@ -2,6 +2,46 @@
 
 # shellcheck disable=1090,1091,2015,2155
 
+_find_compose_file() {
+	local dir="$PWD"
+	while [[ "$dir" != "/" ]]; do
+		if [[ -f "$dir/docker-compose.yml" ]]; then
+			echo "$dir/docker-compose.yml"
+			return 0
+		elif [[ -f "$dir/docker-compose.yaml" ]]; then
+			echo "$dir/docker-compose.yaml"
+			return 0
+		fi
+		dir="$(dirname "$dir")"
+	done
+
+	if command -v git &>/dev/null; then
+		local gitroot
+		gitroot="$(git rev-parse --show-toplevel 2>/dev/null)"
+		if [[ -n "$gitroot" && -d "$gitroot" ]]; then
+			if [[ -f "$gitroot/docker-compose.yml" ]]; then
+				echo "$gitroot/docker-compose.yml"
+				return 0
+			elif [[ -f "$gitroot/docker-compose.yaml" ]]; then
+				echo "$gitroot/docker-compose.yaml"
+				return 0
+			fi
+		fi
+	fi
+
+	return 1
+}
+
+_docker_compose_completion() {
+	local compose_file="$(_find_compose_file)" || return 0
+
+	for item in $(docker compose -f "$compose_file" config --services 2>/dev/null | grep -P "^${COMP_WORDS[${COMP_CWORD}]}"); do
+		COMPREPLY=("${COMPREPLY[@]}" "${item}")
+	done
+}
+
+complete -F _docker_compose_completion dcdu
+
 _docker_container_get_available_users() {
 	docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
 }
