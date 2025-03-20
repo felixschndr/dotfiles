@@ -57,6 +57,14 @@ create_venv() {
 		python_install_requirements
 }
 
+dcdu() {
+	if [[ -z ${1} ]]; then
+		docker compose down && docker compose up -d
+	else
+		docker compose down "${1}" && docker compose up -d "${1}"
+	fi
+}
+
 de() { # Docker Execute (Shell)
 	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Containername angegeben\e[0m" && return 1
 	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1

@@ -36,7 +36,6 @@ alias tf='tail -f -n 1000'
 alias c='code .'
 alias d='docker' && complete -F _docker d
 alias dc='docker compose' && complete -F _docker_compose dc
-alias dcdu='dc down; dc up -d'
 alias dcdub='dc down; dc pull; dc up -d --build --force-recreate'
 alias dcl='dc logs -f'
 alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
