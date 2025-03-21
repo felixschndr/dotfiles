@@ -281,7 +281,7 @@ poetry_install_requirements() {
 python_install_requirements() {
 	if ! poetry_install_requirements; then
 		if ! pip_install_requirements; then
-			echo -e "\e[31m Es wurde keine Datei zum Instalieren von Abhängigkeiten gefunden!\e[0m"
+			echo -e "\e[31mEs wurde keine Datei zum Instalieren von Abhängigkeiten gefunden!\e[0m"
 			return 1
 		fi
 	fi
