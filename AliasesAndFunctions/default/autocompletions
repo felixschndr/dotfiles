@@ -109,3 +109,69 @@ if which brew >/dev/null 2>/dev/null; then
 fi
 [[ -f ~/.podman-completion ]] && source ~/.podman-completion
 [[ -f ~/.git-completion.bash ]] && source ~/.git-completion.bash
+
+__ssh_parse_hosts() {
+	awk '
+    /^[[:space:]]*#/            { next }    # Kommentar
+    /^[[:space:]]*Host[[:space:]]+/ {
+        for (i = 2; i <= NF; i++) {
+            if ($i !~ /[*?]/)               # exakt → unverändert
+                print $i
+            else if ($i ~ /^[^*?]+[*]$/) {  # genau ein * ganz am Ende
+                sub(/\*$/, "", $i)          # Stern entfernen (test* → test)
+                print $i
+            }
+        }
+    }' "$1" 2>/dev/null
+}
+
+__ssh_collect_cfg_files() {
+	local cfg="$1"
+	declare -A seen
+	local queue=("$cfg")
+
+	while ((${#queue[@]})); do
+		local f="${queue[0]}"
+		queue=("${queue[@]:1}")
+		[[ -r $f && -f $f && -z ${seen[$f]} ]] || continue
+		seen[$f]=1
+
+		while IFS= read -r inc; do
+			inc="${inc/#\~/$HOME}"
+			for path in $inc; do
+				[[ -e $path ]] && queue+=("$path")
+			done
+		done < <(awk '
+            /^[[:space:]]*Include[[:space:]]+/ {
+                for (i = 2; i <= NF; i++) print $i
+            }' "$f")
+	done
+
+	printf '%s\n' "${!seen[@]}"
+}
+
+__ssh_list_hosts() {
+	local main_cfg="$HOME/.ssh/config"
+	[[ -f $main_cfg ]] || return
+
+	declare -A hosts
+	local f
+	while read -r f; do
+		while read -r h; do hosts[$h]=1; done < <(__ssh_parse_hosts "$f")
+	done < <(__ssh_collect_cfg_files "$main_cfg")
+
+	printf '%s\n' "${!hosts[@]}"
+}
+
+_ssh_complete_with_includes() {
+	local cur
+	if declare -F _init_completion &>/dev/null; then
+		_init_completion || return
+	else
+		cur=${COMP_WORDS[COMP_CWORD]}
+	fi
+
+	mapfile -t COMPREPLY < <(compgen -W "$(__ssh_list_hosts)" -- "$cur")
+}
+
+complete -F _ssh_complete_with_includes ssh scp sftp
