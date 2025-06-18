@@ -7,20 +7,17 @@ customCommands:
   - key: <c-a>
     context: "commits, files"
     prompts:
-    - type: "menu"
-      title: "Soll ein Force Push gemacht werden?"
-      key: "forcePush"
-      options:
-        - value: "Ja"
-        - value: "Nein"
-    command:
-      argument='--no-push';
-      [[ {{ .Form.forcePush }} == "Ja" ]] && argument='push';
-      bash -ic "gca ${argument}"
-    stream: true
+      - type: "menu"
+        title: "Soll ein Force Push gemacht werden?"
+        key: "forcePush"
+        options:
+          - value: "Ja"
+          - value: "Nein"
+    command: argument='--no-push'; [[ {{ .Form.forcePush }} == "Ja" ]] && argument='push'; bash -ic "gca ${argument}"
+    output: log
   - key: <c-d>
     context: "localBranches, remoteBranches"
     command: bash -ic "git_delete_old_branches"
-    stream: true
+    output: log
 git:
   overrideGpg: true
