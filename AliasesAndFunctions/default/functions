@@ -264,7 +264,7 @@ pip_install_requirements() {
 
 	[[ "${found_at_least_one_file}" = false ]] && return 1
 
-	echo "Installiere die Abhängigkeiten mit pip"
+	echo "Installiere die Abhängigkeiten mit ${pip_command}"
 	eval "${pip_command}"
 }
 
