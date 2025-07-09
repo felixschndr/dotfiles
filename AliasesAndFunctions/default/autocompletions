@@ -40,7 +40,7 @@ _docker_compose_completion() {
 	done
 }
 
-complete -F _docker_compose_completion dcdu
+complete -F _docker_compose_completion dcdu dcl
 
 _docker_container_get_available_users() {
 	docker exec -it "${1}" sh -c "grep -v '/nologin\|/sync\|/false' /etc/passwd" | cut -d':' -f1 | sort
