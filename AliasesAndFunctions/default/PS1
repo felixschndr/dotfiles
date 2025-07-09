@@ -66,12 +66,6 @@ PS1+='`[[ -z ${SSH_CLIENT} ]] && echo "\[\e[32m\]" || echo "\[\e[31m\]"`'
 # Hostname
 PS1+="$(hostname -s)"
 
-# WSL Ausgabe
-#    - bei WSL: "]-[WSL" Einschub
-#    - sonst:   Nichts
-# shellcheck disable=2154
-PS1+='`[[ ${is_wsl} == true ]] && echo "\[\e[1;30m\]]-[\[\e[0;32m\]WSL"`'
-
 # Python Venv Ausgabe
 #    - bei Venv: "]-[Venv" Einschub
 #    - sonst:    Nichts

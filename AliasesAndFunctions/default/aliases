@@ -36,6 +36,7 @@ alias tf='tail -f -n 1000'
 alias c='code .'
 alias d='docker' && complete -F _docker d
 alias dc='docker compose'
+alias dcdu='dc up -d --force-recreate'
 alias dcdub='dc pull; dc up -d --build --force-recreate'
 alias dcl='dc logs -f'
 alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
@@ -43,10 +44,3 @@ alias lg='lazygit'
 alias pc='pre-commit run --all-files'
 alias py='python'
 alias k='kubectl' && complete -o default -F __start_kubectl k
-
-# Erkennung, ob die Session im WSL ist. Muss nur ein Mal gemacht werden
-is_wsl=false
-[[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]] && is_wsl=true
-
-# shellcheck disable=2139
-[[ ${is_wsl} == true ]] && alias cdh="cd /mnt/c/Users/${USER}" # In das Homeverzeichnis in Windows wechseln
