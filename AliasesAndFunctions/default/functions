@@ -245,13 +245,13 @@ poetry() { # Check if venv is active before installing anything
 }
 
 pip_install_requirements() {
-	local possible_files=(requirements.txt requirements-dev.txt requirements-test.txt)
+	mapfile -t possible_files < <(find . -maxdepth 1 -type f -name "requirements*.txt")
 
 	local pip_command="pip install"
 
 	found_at_least_one_file=false
 	for file in "${possible_files[@]}"; do
-		[[ -f ${file} ]] && pip_command+=" -r ${file}" && found_at_least_one_file=true
+		pip_command+=" -r ${file}" && found_at_least_one_file=true
 	done
 
 	[[ "${found_at_least_one_file}" = false ]] && return 1
