@@ -1,5 +1,10 @@
 #!/bin/bash
 
+case $- in
+	*i*) ;;
+	*) return;;
+esac
+
 ########### Farben ###########
 GRAU="\[\e[1;30m\]"
 DEFAULT="\[\e[0m\]"

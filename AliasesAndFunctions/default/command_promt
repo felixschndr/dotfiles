@@ -1,5 +1,10 @@
 #!/bin/bash
 
+case $- in
+	*i*) ;;
+	*) return;;
+esac
+
 complete -d cd                                                     # Damit werden files ausgeblendet bei der Vervollständigung
 shopt -s cdspell                                                   # Korrigiert kleine Typos bei Pfaden nach dem Abschicken
 [[ $(echo "${BASH_VERSION}" | cut -c1) -ge 4 ]] && shopt -s autocd # In dir wechseln ohne cd (erst ab BASH v.4 verfügbar)
