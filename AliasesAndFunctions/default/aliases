@@ -18,7 +18,7 @@ alias update='sudo apt update && apt list --upgradable'
 
 alias b='exec ${SHELL} -l' # -l ensures that the bashrc is loaded
 alias cp='cp -r'
-alias df="df -h --exclude-type=overlay"
+alias df="df -h --exclude-type=overlay --exclude-type=tmpfs"
 alias ip='ip -color'
 alias mygrep='grep -ins --color=always'
 alias nano='nano -l -T 4'
