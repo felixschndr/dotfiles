@@ -1,0 +1,2 @@
+serverconfig_dir="/home/felix/server/Serverconfig/"
+alias configure_server='ANSIBLE_CONFIG=${serverconfig_dir}ansible.cfg ansible-playbook ${serverconfig_dir}playbook.yaml -i ${serverconfig_dir}/inventory.ini'
