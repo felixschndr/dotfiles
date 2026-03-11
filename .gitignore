@@ -1,2 +1,6 @@
 private/
 .idea/
+
+# Ignore MacOS hidden files
+**/._*
+**/.DS_Store
