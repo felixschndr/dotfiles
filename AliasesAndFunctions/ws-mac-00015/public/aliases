@@ -3,3 +3,4 @@
 alias ls="ls -lh --color=always -D'%H:%M %d.%m.%Y'"
 alias docker="podman"
 alias pip="python3 -m pip"
+alias server='osascript -e "try" -e "mount volume  \"smb://grievous.fs/Config\"" -e "end try" >/dev/null && code /Volumes/Config 2>/dev/null && ssh grievous'
