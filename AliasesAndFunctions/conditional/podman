@@ -1,0 +1,7 @@
+#!/bin/bash
+
+[[ -z $(command -v podman) ]] && return
+
+alias docker="podman"
+
+export DOCKER_HOST="unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"

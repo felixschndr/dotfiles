@@ -1,10 +1,10 @@
 #!/bin/bash
 
-repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly repo_location="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-allFiles=$(find "${repoLocation}"/AliasesAndFunctions/{default,"$(hostname -s | tr '[:upper:]' '[:lower:]')"} -type f 2>/dev/null)
+readonly all_files=$(find "${repo_location}"/AliasesAndFunctions/{default,"$(hostname -s | tr '[:upper:]' '[:lower:]')",conditional} -type f 2>/dev/null)
 
-for file in ${allFiles}; do
+for file in ${all_files}; do
 	# shellcheck disable=1090
 	source "${file}"
 done

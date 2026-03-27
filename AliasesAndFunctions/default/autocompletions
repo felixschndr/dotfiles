@@ -104,8 +104,8 @@ _kubernetes_pod_completion() {
 
 [[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
 if which brew >/dev/null 2>/dev/null; then
-	[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker
-	[[ -f "$(brew --prefix)"/etc/bash_completion.d/docker-compose ]] && source "$(brew --prefix)"/etc/bash_completion.d/docker-compose
+	[[ -f /opt/homebrew/etc/bash_completion.d/docker ]] && source /opt/homebrew/etc/bash_completion.d/docker
+	[[ -f /opt/homebrew/etc/bash_completion.d/docker-compose ]] && source /opt/homebrew/etc/bash_completion.d/docker-compose
 fi
 [[ -f ~/.podman-completion ]] && source ~/.podman-completion
 [[ -f ~/.git-completion.bash ]] && source ~/.git-completion.bash

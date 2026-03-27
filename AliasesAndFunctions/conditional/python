@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# We have to check whether pip is an executable since pip is shadowed by a shell function
+[[ ! -x "$(command -v pip)" ]] && alias pip="python3 -m pip"
+
+# Set this via an alias when user is not allowed to symlink these properly
+if ! groups | grep -q "sudo"; then
+    latest_python=$(
+        compgen -c python \
+        | grep -E '^python3\.[0-9]+$' \
+        | sort -V \
+        | tail -n1
+    )
+    alias python="${latest_python}"
+    alias python3="${latest_python}"
+fi
