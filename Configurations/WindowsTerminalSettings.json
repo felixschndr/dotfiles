@@ -14,7 +14,7 @@
                 "action": "splitPane",
                 "split": "right"
             },
-            "keys": "ctrl+shift+e"
+            "keys": "ctrl+shift+r"
         },
         {
             "command": {
@@ -188,7 +188,7 @@
                 "action": "splitPane",
                 "split": "down"
             },
-            "keys": "ctrl+shift+o"
+            "keys": "ctrl+shift+d"
         },
         {
             "command": {
