@@ -42,5 +42,11 @@ alias dcl='dc logs -f'
 alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
 alias lg='lazygit'
 alias pc='pre-commit run --all-files'
-alias py='python'
+# shellcheck disable=2010,2155
+readonly python_version=$(ls /usr/bin/python3.* 2>/dev/null | grep -oP '3\.\d+' | sort -V | tail -n 1)
+alias py="python"
+alias python="python3"
+# shellcheck disable=2139
+alias python3="python${python_version}"
+
 alias k='kubectl' && complete -o default -F __start_kubectl k
