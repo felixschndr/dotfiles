@@ -28,8 +28,6 @@ alias ssu='sudo --preserve-env=SSH_CLIENT su' # Die Variable speichern für PS1
 alias sudo='sudo '                            # https://wiki.archlinux.org/title/Sudo#Passing_aliases
 alias tf='tail -f -n 1000'
 
-[[ -n ${TMUX} ]] && alias help='tmux_help'
-
 alias c='code .'
 alias d='docker' && complete -F _docker d
 alias dc='docker compose'
