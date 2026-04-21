@@ -302,23 +302,6 @@ toggle_venv() {
 	source "${venv_directory}/bin/activate" && echo -e "Venv wurde \e[32maktiviert\e[0m✔️"
 }
 
-upgrade() {
-	if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
-		return
-	fi
-
-	local reboot_required_packages_file="/var/run/reboot-required.pkgs"
-	if [[ -f ${reboot_required_packages_file} ]]; then
-		if [[ $(wc -l <${reboot_required_packages_file}) == 1 ]]; then
-			echo -ne "\e[33m\nReboot wird benötigt wegen des Pakets:\e[0m\n\t"
-			cat ${reboot_required_packages_file}
-		else
-			echo -e "\e[33m\nReboot wird benötigt wegen folgenden Paketen:\e[0m"
-			sort -u ${reboot_required_packages_file} | nl
-		fi
-	fi
-}
-
 whats() {
 	[[ -z ${1} ]] && echo -e "\e[31mEs wurde kein Programm angegeben\e[0m" && return 1
 	[[ ${#} -gt 2 ]] && echo -e "\e[31mEs wurden zu viele Argumente angegeben\e[0m" && return 1

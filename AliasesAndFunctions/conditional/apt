@@ -1,6 +1,0 @@
-#!/bin/bash
-
-[[ ! "$(which apt)" ]] && return
-
-alias upgradable='apt list --upgradable'
-alias update='sudo apt update && apt list --upgradable'
