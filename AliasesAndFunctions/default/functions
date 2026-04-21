@@ -36,19 +36,6 @@ check_if_git_repo_exists() { # Prüfen, ob ein GIT Repo gefunden wurde
 	return 0
 }
 
-dca() { # docker compose all
-	local detach_argument
-	[[ ${1} == "up" ]] && detach_argument="-d" || detach_argument=""
-	# shellcheck disable=2086
-	find . \
-		-maxdepth 3 \
-		-name "docker-compose.yml" \
-		-print \
-		-exec docker compose -f {} "${1}" ${detach_argument} \;
-}
-
-complete -W "up down" dca
-
 create_venv() {
 	echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" &&
 		python -m venv .venv &&
