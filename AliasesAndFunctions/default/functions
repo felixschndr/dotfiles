@@ -129,20 +129,6 @@ git_delete_old_branches() {
 	done
 }
 
-git_delete_old_branches_in_current_dir() {
-	local start_directory=${PWD}
-	local git_repositories=$(find "${PWD}" -name .git -type d -prune)
-
-	for repository in ${git_repositories}; do
-		cd "${repository}/../" || continue
-		echo "Prüfe $(realpath --relative-to="${start_directory}" "${PWD}")"
-		git_delete_old_branches
-		echo ""
-	done
-
-	cd "${start_directory}" || false
-}
-
 git_reset() {
 	if ! check_if_git_repo_exists; then return 1; fi
 
