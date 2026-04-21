@@ -302,44 +302,6 @@ toggle_venv() {
 	source "${venv_directory}/bin/activate" && echo -e "Venv wurde \e[32maktiviert\e[0m✔️"
 }
 
-to_lf() {
-	[[ -z ${1} ]] && echo -e "\e[31mEs wurde keine Datei, die umgewandelt werden soll, angegeben\e[0m" && return 1
-
-	if [[ "${1}" =~ (alle|^\.$) ]]; then
-		allFiles=$(find . -type f -not -path "*/\.git/*" -print0 | xargs --null file | grep "CRLF" | cut -d ":" -f1)
-
-		[[ -z ${allFiles} ]] && echo -e "\e[33mEs wurde keine Datei, die CRLF Dateienden hat\e[0m" && return
-
-		echo -e "\e[96mSollen die folgenden Dateien zu LF konvertiert werden?\e[0m\n$(echo "${allFiles}" | sed 's/ /\n/g' | nl)\n"
-
-		read -r -e -n1 answer
-		[[ ! ${answer} =~ (Y|y|J|j) ]] && return
-
-	else
-		allFiles=${*}
-
-	fi
-
-	for file in ${allFiles}; do
-
-		if [[ ! -f ${file} ]]; then
-			echo -e "\e[33mDie Datei \"${file}\" existiert nicht\e[0m"
-			continue
-		fi
-
-		[[ "$(file "${file}")" == *"CRLF"* ]] && lineEndings="\e[31mCRLF" || lineEndings="\e[32mLF"
-
-		echo -e "Ändere die Zeilenenden zu LF von \e[96;1m${file}\e[0m\n    War davor: ${lineEndings}\e[0m"
-
-		tmp_file=$(mktemp)
-		tr -d '\015' <"${file}" >"${tmp_file}"
-		mv "${tmp_file}" "${file}"
-		command rm -f "${tmp_file}"
-	done
-}
-
-complete -F _longopt -W "alle" to_lf # Autovervollständigung mit allen verfügbaren Dateien
-
 upgrade() {
 	if ! sudo apt upgrade "${1}"; then # ${1}: Falls -y angegeben wurde
 		return
