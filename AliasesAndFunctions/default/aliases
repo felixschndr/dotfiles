@@ -33,7 +33,7 @@ alias dc='docker compose'
 alias dcdu='dc up -d --force-recreate'
 alias dcdub='dc up --pull always -d --build --force-recreate'
 alias dcl='dc logs -f'
-alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"'
+alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}" | awk '\''NR==1{print; next} {print | "sort"}'\'''
 alias lg='lazygit'
 alias pc='pre-commit run --all-files'
 alias k='kubectl' && complete -o default -F __start_kubectl k
