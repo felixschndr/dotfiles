@@ -214,7 +214,7 @@ poetry() { # Check if venv is active before installing anything
 		return 1
 	fi
 	# shellcheck disable=2068
-	command poetry $@
+	command poetry ${@}
 }
 
 pip_install_requirements() {
@@ -235,7 +235,7 @@ pip_install_requirements() {
 
 poetry_install_requirements() {
 	[[ ! -f pyproject.toml ]] && return 1
-	if ! grep -q "\[tool.poetry\]" pyproject.toml; then
+	if ! grep -qE "\[tool.poetry\]|dependencies" pyproject.toml; then
 		return 1
 	fi
 
