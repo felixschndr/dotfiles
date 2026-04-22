@@ -1,0 +1,12 @@
+#!/bin/bash
+
+[[ "${OSTYPE}" != darwin* ]] && return
+
+latest_python_version=$(
+    compgen -c python \
+    | grep -oE '3\.[0-9]+$' \
+    | sort -V \
+    | tail -n1
+)
+
+export PATH="/Users/${USER}/Library/Python/${latest_python_version}/bin:${PATH}"
