@@ -48,6 +48,8 @@ if is_mac_os; then
 	echo "Remember to set the iTerm settings folder to \"${repoLocation}/Configurations/\""
 fi
 
+echo "Remember to import the KeePassXC settings from \"${repoLocation}/Configurations/KeePassXC.ini\""
+
 if [[ $(cat /proc/version 2>/dev/null) =~ (M|m)icrosoft ]]; then
 	if [[ ! -f /etc/sudoers.d/sudoers_no_password ]]; then
 		echo -n "WSL detected, do you want to install the sudoers configuration that allows the usage of no password for elevated commands? [Y/N] "
