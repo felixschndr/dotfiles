@@ -46,6 +46,7 @@ fi
 
 if is_mac_os; then
 	echo "Remember to set the iTerm settings folder to \"${repoLocation}/Configurations/\""
+	echo "Remember to import the AltTab settings from \"${repoLocation}/Configurations/alt-tab.plist\""
 	echo "Remember to import the Rectangle settings from \"${repoLocation}/Configurations/Rectangle.json\""
 fi
 
