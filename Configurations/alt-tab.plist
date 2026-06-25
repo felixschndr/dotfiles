@@ -1,48 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>appearanceSize</key>
-	<string>1</string>
-	<key>crashPolicy</key>
-	<string>2</string>
-	<key>exceptions</key>
-	<string>[{"bundleIdentifier":"com.apple.finder","ignore":"0","hide":"2"},{"bundleIdentifier":"com.apple.ScreenSharing","ignore":"2","hide":"0"},{"bundleIdentifier":"com.microsoft.rdc.macos","ignore":"2","hide":"0"},{"bundleIdentifier":"com.teamviewer.TeamViewer","ignore":"2","hide":"0"},{"bundleIdentifier":"org.virtualbox.app.VirtualBoxVM","ignore":"2","hide":"0"},{"bundleIdentifier":"com.parallels.","ignore":"2","hide":"0"},{"bundleIdentifier":"com.citrix.XenAppViewer","ignore":"2","hide":"0"},{"bundleIdentifier":"com.citrix.receiver.icaviewer.mac","ignore":"2","hide":"0"},{"bundleIdentifier":"com.nicesoftware.dcvviewer","ignore":"2","hide":"0"},{"bundleIdentifier":"com.vmware.fusion","ignore":"2","hide":"0"},{"bundleIdentifier":"com.utmapp.UTM","ignore":"2","hide":"0"},{"bundleIdentifier":"com.McAfee.McAfeeSafariHost","ignore":"0","hide":"1"},{"bundleIdentifier":"com.anthropic.claudefordesktop","ignore":"0","hide":"2"},{"bundleIdentifier":"com.googlecode.iterm2","ignore":"0","hide":"2"},{"bundleIdentifier":"com.google.Chrome","ignore":"0","hide":"2"}]</string>
-	<key>holdShortcut</key>
 	<dict>
-		<key>secureData</key>
-		<data>
-		YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9i
-		amVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGmCwwZGhsc
-		VSRudWxs1g0ODxAREhMUFRQXGF1tb2RpZmllckZsYWdzXxAbY2hhcmFjdGVy
-		c0lnbm9yaW5nTW9kaWZpZXJzViRjbGFzc1pjaGFyYWN0ZXJzV2tleUNvZGVX
-		dmVyc2lvboAEgACABYAAgAOAAlExEf//EgAQAADSHR4fIFokY2xhc3NuYW1l
-		WCRjbGFzc2VzWlNSU2hvcnRjdXSiHyFYTlNPYmplY3QACAARABoAJAApADIA
-		NwBJAEwAUQBTAFoAYABtAHsAmQCgAKsAswC7AL0AvwDBAMMAxQDHAMkAzADR
-		ANYA4QDqAPUA+AAAAAAAAAIBAAAAAAAAACIAAAAAAAAAAAAAAAAAAAEB
-		</data>
-		<key>string</key>
-		<string>⌘</string>
+		<key>appearanceSize</key>
+		<string>1</string>
+		<key>crashPolicy</key>
+		<string>2</string>
+		<key>exceptions</key>
+		<string>
+			[{"hide":"2","bundleIdentifier":"com.apple.finder","ignore":"0"},{"hide":"0","bundleIdentifier":"com.apple.ScreenSharing","ignore":"2"},{"hide":"0","bundleIdentifier":"com.microsoft.rdc.macos","ignore":"2"},{"hide":"0","bundleIdentifier":"com.teamviewer.TeamViewer","ignore":"2"},{"hide":"0","bundleIdentifier":"org.virtualbox.app.VirtualBoxVM","ignore":"2"},{"hide":"0","bundleIdentifier":"com.parallels.","ignore":"2"},{"hide":"0","bundleIdentifier":"com.citrix.XenAppViewer","ignore":"2"},{"hide":"0","bundleIdentifier":"com.citrix.receiver.icaviewer.mac","ignore":"2"},{"hide":"0","bundleIdentifier":"com.nicesoftware.dcvviewer","ignore":"2"},{"hide":"0","bundleIdentifier":"com.vmware.fusion","ignore":"2"},{"hide":"0","bundleIdentifier":"com.utmapp.UTM","ignore":"2"},{"hide":"1","bundleIdentifier":"com.McAfee.McAfeeSafariHost","ignore":"0"},{"hide":"2","bundleIdentifier":"com.anthropic.claudefordesktop","ignore":"0"},{"hide":"2","bundleIdentifier":"com.googlecode.iterm2","ignore":"0"},{"hide":"2","bundleIdentifier":"com.google.Chrome","ignore":"0"},{"hide":"2","bundleIdentifier":"com.microsoft.VSCode","ignore":"0"},{"hide":"2","bundleIdentifier":"com.microsoft.Word","ignore":"0"},{"hide":"2","bundleIdentifier":"com.microsoft.Excel","ignore":"0"},{"hide":"2","bundleIdentifier":"com.apple.Preview","ignore":"0"},{"hide":"2","bundleIdentifier":"com.spotify.client","ignore":"0"},{"bundleIdentifier":"com.microsoft.edgemac","ignore":"0","hide":"2"},{"bundleIdentifier":"com.apple.keychainaccess","ignore":"0","hide":"2"},{"bundleIdentifier":"com.apple.Passwords","ignore":"0","hide":"2"}]</string>
+		<key>holdShortcut</key>
+		<dict>
+			<key>secureData</key>
+			<data> YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9i
+				amVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGmCwwZGhsc
+				VSRudWxs1g0ODxAREhMUFRQXGF1tb2RpZmllckZsYWdzXxAbY2hhcmFjdGVy
+				c0lnbm9yaW5nTW9kaWZpZXJzViRjbGFzc1pjaGFyYWN0ZXJzV2tleUNvZGVX
+				dmVyc2lvboAEgACABYAAgAOAAlExEf//EgAQAADSHR4fIFokY2xhc3NuYW1l
+				WCRjbGFzc2VzWlNSU2hvcnRjdXSiHyFYTlNPYmplY3QACAARABoAJAApADIA
+				NwBJAEwAUQBTAFoAYABtAHsAmQCgAKsAswC7AL0AvwDBAMMAxQDHAMkAzADR
+				ANYA4QDqAPUA+AAAAAAAAAIBAAAAAAAAACIAAAAAAAAAAAAAAAAAAAEB </data>
+			<key>string</key>
+			<string>⌘</string>
+		</dict>
+		<key>menubarIcon</key>
+		<string>2</string>
+		<key>menubarIconShown</key>
+		<string>false</string>
+		<key>mouseHoverEnabled</key>
+		<string>true</string>
+		<key>nextWindowGesture</key>
+		<string>3</string>
+		<key>previewFocusedWindow</key>
+		<string>false</string>
+		<key>settingsWindowShownOnFirstLaunch</key>
+		<string>true</string>
+		<key>shortcutCount</key>
+		<string>1</string>
+		<key>showOnScreen</key>
+		<string>2</string>
+		<key>updatePolicy</key>
+		<string>1</string>
+		<key>windowDisplayDelay</key>
+		<string>0</string>
 	</dict>
-	<key>menubarIcon</key>
-	<string>2</string>
-	<key>menubarIconShown</key>
-	<string>false</string>
-	<key>mouseHoverEnabled</key>
-	<string>true</string>
-	<key>nextWindowGesture</key>
-	<string>3</string>
-	<key>previewFocusedWindow</key>
-	<string>false</string>
-	<key>settingsWindowShownOnFirstLaunch</key>
-	<string>true</string>
-	<key>shortcutCount</key>
-	<string>1</string>
-	<key>showOnScreen</key>
-	<string>1</string>
-	<key>updatePolicy</key>
-	<string>1</string>
-	<key>windowDisplayDelay</key>
-	<string>0</string>
-</dict>
 </plist>
