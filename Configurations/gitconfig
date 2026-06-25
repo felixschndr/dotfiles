@@ -18,9 +18,9 @@
     rebase = true
 [log]
     showSignature = true
-
-# Include config for work
-[includeIf "gitdir:**/DE-CIX-Group/**"]
-    path = ~/.gitconfig_decix
 [rerere]
     enabled = true # Reuse merge conflict resultions if available
+
+# Include config for work
+[includeIf "gitdir:**/Data Center ACS/**"]
+	path = ~/.gitconfig_dfs
