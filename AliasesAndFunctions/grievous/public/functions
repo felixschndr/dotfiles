@@ -25,3 +25,26 @@ _mdadm_completion() {
 }
 
 complete -F _mdadm_completion mdadm
+
+checkout_homeassistant_pr() {
+	if [[ ${UID} != 0 ]]; then
+		echo -e "\e[31mThis script must be run as root.\e[0m"
+		return 1
+	fi
+	if [[ ${#} -ne 2 ]]; then
+		echo -e "\e[31mUsage: checkout_homeassistant_pr <domain> <PR number>\e[0m"
+		return 1
+	fi
+
+	cd /home/felix/server/HomeAssistant/data/homeassistant/config/ || return 1
+	curl -o- -L https://gist.githubusercontent.com/bdraco/43f8043cb04b9838383fd71353e99b18/raw/core_integration_pr | bash /dev/stdin -d "${1}" -p "${2}"
+}
+
+cleanup_homeassistant_pr() {
+	if [[ ${UID} != 0 ]]; then
+		echo -e "\e[31mThis script must be run as root.\e[0m"
+		return 1
+	fi
+
+	rm -rf "/home/felix/server/HomeAssistant/data/homeassistant/config/custom_components/${1}"
+}
