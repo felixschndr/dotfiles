@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# MacOS ships Pico by default
-if [[ $(readlink "$(command -v nano)") == *"pico"* ]]; then
-    alias nano='nano -l -T 4'
-    alias nanol='command nano -T 4'
-fi

@@ -3,6 +3,7 @@
 [[ "${OSTYPE}" != darwin* ]] && return
 
 alias ls="ls -lh --color=always -D'%H:%M %d.%m.%Y'"
+unalias nano
 
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_AUTO_UPDATE=1
