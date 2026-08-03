@@ -1,0 +1,99 @@
+#!/bin/bash
+
+export GLAB_SEND_TELEMETRY=false
+export GLAB_SHOW_WHATS_NEW=false
+
+
+# Token shall have "read_repository", "read_api", "self_rotate" and "write_repository"
+rotate_gitlab_token() {
+	# Everything runs in a subshell, so "set -euo pipefail" and the umask do not leak into the interactive shell
+	(
+		set -euo pipefail
+		umask 077
+
+		local token_file="${HOME}/.config/gitlab/token"
+		local netrc="${HOME}/.netrc"
+		local lifetime_days=30
+		local rotate_url="${GITLAB_URL}/api/v4/personal_access_tokens/self/rotate"
+		local token=""
+
+		if [[ -s ${token_file} ]]; then
+			local old_token expires_at response status
+			old_token=$(<"${token_file}")
+			expires_at=$(date -v"+${lifetime_days}d" +%Y-%m-%d 2>/dev/null ||
+				date -d "+${lifetime_days} days" +%Y-%m-%d)
+
+			# The HTTP status is appended to the body, so a rejected token can be told apart from a failed request
+			response=$(curl -s -m 30 -w '%{http_code}' -X POST -H "PRIVATE-TOKEN: ${old_token}" -d "expires_at=${expires_at}" "${rotate_url}") || response="000"
+			status="${response: -3}"
+			response="${response%???}"
+
+			case "${status}" in
+			200 | 201)
+				# Anchoring on "{" or "," prevents a match inside "job_token"
+				token=$(grep -oE '[{,]"token":"[^"]*"' <<<"${response}" | sed 's/.*:"//; s/"$//') || token=""
+				;;
+			401)
+				# Expired or revoked, only this case needs a human
+				echo "The stored token is not accepted anymore (HTTP 401)" >&2
+				;;
+			403)
+				# The token is still valid but not allowed to rotate itself
+				echo "The token may not rotate itself (HTTP 403), is the \"self_rotate\" scope missing?" >&2
+				;;
+			*)
+				echo "Rotating the token failed (HTTP ${status}), keeping the stored one" >&2
+				return 1
+				;;
+			esac
+		else
+			echo "No token stored in \"${token_file}\" yet" >&2
+		fi
+
+		# Only reached when the rotation did not produce a token, so the normal run stays non-interactive
+		if [[ -z ${token} ]]; then
+			read -rsp "Enter Token: " token
+			echo
+			[[ -n ${token} ]] || {
+				echo "No token entered" >&2
+				return 1
+			}
+		fi
+
+		mkdir -p "$(dirname "${token_file}")"
+		printf '%s\n' "${token}" >"${token_file}"
+
+		# With "--store-token" gitlabber prefers the keychain over GITLAB_TOKEN and would silently keep using the old token after a rotation
+		security delete-generic-password -s "gitlabber" -a "${GITLAB_URL}" >/dev/null 2>&1 || true
+		security delete-generic-password -s "gitlab-api-token" -a "${GITLAB_HOST}" >/dev/null 2>&1 || true
+
+		# glab prefers the environment over its own config, and there still sits the token the rotation just revoked
+		unset GITLAB_TOKEN GITLAB_PRIVATE_TOKEN
+		glab auth login --hostname "${GITLAB_HOST}" --api-protocol https --git-protocol https --stdin <<<"${token}"
+
+		touch "${netrc}"
+		{
+			awk -v h="${GITLAB_HOST}" '$1 == "machine" { skip = ($2 == h || $2 == "https://" h) } !skip' "${netrc}"
+			printf 'machine %s\nlogin oauth2\npassword %s\n' "${GITLAB_HOST}" "${token}"
+		} >"${netrc}.new"
+		mv "${netrc}.new" "${netrc}"
+
+		command -v pbcopy >/dev/null && printf '%s' "${token}" | pbcopy || true
+
+		echo "Done."
+		echo "PyCharm/IntelliJ: Settings → Version Control → GitLab → Account → paste the token from the clipboard"
+	) || return $?
+
+	_gitlab_export_token
+}
+
+# Put the token into the environment so the tools find it without a config file
+_gitlab_export_token() {
+	local token
+	token=$(cat "${HOME}/.config/gitlab/token") || return 0
+	[[ -z ${token} ]] && return 0
+
+	export GITLAB_TOKEN="${token}"         # glab, gitlabber
+	export GITLAB_PRIVATE_TOKEN="${token}" # the "gitlab" CLI from python-gitlab
+}
+_gitlab_export_token
