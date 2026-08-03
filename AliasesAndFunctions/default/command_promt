@@ -36,3 +36,5 @@ export EDITOR="nano"
 export PATH="$HOME/.local/bin:$PATH"
 
 export COMPOSE_BAKE=true
+export JIRA_CONFIG_FILE=${HOME}/.config/.jira/.config.yml
+export CONFLUENCE_READ_ONLY=true
