@@ -22,5 +22,5 @@
     enabled = true # Reuse merge conflict resultions if available
 
 # Include config for work
-[includeIf "gitdir:**/Data Center ACS/**"]
+[includeIf "gitdir:**/DFS/**"]
 	path = ~/.gitconfig_dfs
