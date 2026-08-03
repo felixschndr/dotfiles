@@ -69,7 +69,7 @@ PS1+="${GRAU}]-[${DEFAULT}"
 PS1+='`[[ -z ${SSH_CLIENT} ]] && echo "\[\e[32m\]" || echo "\[\e[31m\]"`'
 
 # Hostname
-PS1+="$(hostname -s)"
+PS1+="${PRETTY_HOSTNAME}"
 
 # Python Venv Ausgabe
 #    - bei Venv: "]-[Venv" Einschub
