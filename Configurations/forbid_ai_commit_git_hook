@@ -4,7 +4,7 @@ set -euo pipefail
 
 message_file="$1"
 
-forbidden_pattern='co-authored|claude'
+forbidden_pattern='anthropic|claude'
 
 if match="$(grep -inE "${forbidden_pattern}" "${message_file}")"; then
 	echo "commit-msg hook: the commit message contains a forbidden term." >&2
