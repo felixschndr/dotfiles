@@ -44,6 +44,15 @@ else
 	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
 fi
 
+if is_mac_os && command -v podman >/dev/null 2>&1; then
+	echo "Linking podman machine autostart LaunchAgent..."
+	mkdir -p "${HOME}/Library/LaunchAgents"
+	launchAgent="${HOME}/Library/LaunchAgents/com.podman.machine-default.plist"
+	ln -sf "${repoLocation}/Configurations/com.podman.machine-default.plist" "${launchAgent}"
+	launchctl bootout "gui/$(id -u)/com.podman.machine-default" 2>/dev/null
+	launchctl bootstrap "gui/$(id -u)" "${launchAgent}"
+fi
+
 if [[ -d "${HOME}/repos" ]]; then
 	echo "Linking forbid AI git commit hook into all repositories below ${HOME}/repos..."
 	hookSource="${repoLocation}/Configurations/forbid_ai_commit_git_hook"
