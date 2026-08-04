@@ -2,6 +2,11 @@
 
 # shellcheck disable=1090,1091,2015,2155
 
+for _bc in /opt/homebrew/etc/profile.d/bash_completion.sh /usr/local/etc/profile.d/bash_completion.sh /usr/share/bash-completion/bash_completion; do
+	[[ -r ${_bc} ]] && source "${_bc}" && break
+done
+unset _bc
+
 _find_compose_file() {
 	local dir="$PWD"
 	while [[ "$dir" != "/" ]]; do
@@ -59,7 +64,7 @@ _docker_containers_completion() {
 	fi
 }
 
-[[ -n $(command -v docker) ]] && complete -F _docker_containers_completion de dl
+[[ -n $(command -v docker) || -n $(command -v podman) ]] && complete -F _docker_containers_completion de dl
 
 _k9s_context_completion() {
 	if [[ ${COMP_CWORD} -eq 1 || ${COMP_CWORD} -eq 3 ]]; then
@@ -102,7 +107,6 @@ _kubernetes_pod_completion() {
 
 [[ -n $(command -v kubectl) ]] && complete -F _kubernetes_pod_completion ke kl
 
-[[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
 if which brew >/dev/null 2>/dev/null; then
 	[[ -f /opt/homebrew/etc/bash_completion.d/docker ]] && source /opt/homebrew/etc/bash_completion.d/docker
 	[[ -f /opt/homebrew/etc/bash_completion.d/docker-compose ]] && source /opt/homebrew/etc/bash_completion.d/docker-compose
