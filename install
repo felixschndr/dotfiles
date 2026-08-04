@@ -35,15 +35,18 @@ fi
 
 echo "Linking configuration files..."
 if command -v git >/dev/null 2>&1; then
+	echo "Linking gitconfig..."
 	ln -sf "${repoLocation}/Configurations/gitconfig" "${HOME}/.gitconfig"
 fi
-if is_mac_os; then
-	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/Library/Application Support/lazygit/config.yml"
-else
-	mkdir -p "${HOME}/.config/lazygit/"
-	ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
+if command -v lazygit >/dev/null 2>&1; then
+	echo "Linking lazygit configuration..."
+	if is_mac_os; then
+		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/Library/Application Support/lazygit/config.yml"
+	else
+		mkdir -p "${HOME}/.config/lazygit/"
+		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
+	fi
 fi
-
 if is_mac_os && command -v podman >/dev/null 2>&1; then
 	echo "Linking podman machine autostart LaunchAgent..."
 	mkdir -p "${HOME}/Library/LaunchAgents"
@@ -52,6 +55,13 @@ if is_mac_os && command -v podman >/dev/null 2>&1; then
 	launchctl bootout "gui/$(id -u)/com.podman.machine-default" 2>/dev/null
 	launchctl bootstrap "gui/$(id -u)" "${launchAgent}"
 fi
+if command -v claude >/dev/null 2>&1; then
+	echo "Linking claude configuration..."
+	mkdir -p "${HOME}/.claude"
+	ln -sf "${repoLocation}/Configurations/claude.json" "${HOME}/.claude/settings.json"
+	ln -sf "${repoLocation}/Configurations/claude.md" "${HOME}/.claude/CLAUDE.md"
+fi
+
 
 if [[ -d "${HOME}/repos" ]]; then
 	echo "Linking forbid AI git commit hook into all repositories below ${HOME}/repos..."
@@ -72,9 +82,10 @@ if [[ -d "${HOME}/repos" ]]; then
 			continue
 		fi
 
+		echo " - ${repository}"
 		mkdir -p "${hooksDirectory}"
 		ln -s "${hookSource}" "${hookTarget}"
-	done < <(find "${HOME}/repos" -name .git -prune -print0)
+	done < <(find "${HOME}/repos" -name .venv -prune -o -name .git -print0)
 else
 	echo "No \"${HOME}/repos\" directory found, skipping git hooks..."
 fi
