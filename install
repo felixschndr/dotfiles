@@ -4,12 +4,9 @@
 source AliasesAndFunctions/default/functions
 
 repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if ! grep -q "source ${repoLocation}/sourcer" "${HOME}/.bashrc"; then
-	echo "Installing link to bashrc..."
-	echo "source ${repoLocation}/sourcer" >>~/.bashrc
-else
-	echo "Link in bashrc already exists, skipping..."
-fi
+
+echo "Linking bashrc..."
+ln -sf "${repoLocation}/Configurations/bashrc" "${HOME}/.bashrc"
 
 if ! crontab -l 2>/dev/null | grep -q "cd ${repoLocation} && git pull"; then
 	echo "Installing crontab to update the repository regularly..."
@@ -30,7 +27,6 @@ git_prompt_file="${HOME}/.git-prompt.sh"
 if [[ ! -f "${git_prompt_file}" ]]; then
 	echo "The git prompt is not installed, downloading..."
 	wget -O "${git_prompt_file}" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-	echo "source ${git_prompt_file}" >>"${HOME}"/.bashrc
 fi
 
 echo "Linking configuration files..."

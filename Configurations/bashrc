@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# shellcheck disable=1090,1091,2155
+
+[[ $- == *i* ]] || return
+
+for _f in \
+	/opt/homebrew/etc/profile.d/bash_completion.sh \
+	/usr/share/bash-completion/bash_completion \
+	/etc/bash_completion \
+	"${HOME}/.git-prompt.sh" \
+	/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash\
+	${HOME}/.cargo/env; do
+	[[ -r ${_f} ]] && . "${_f}"
+done
+
+readonly DOTFILES="$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")"
+PRETTY_HOSTNAME=""
+[[ -r "${HOME}/.pretty_hostname" ]] && PRETTY_HOSTNAME="$(head -n 1 "${HOME}/.pretty_hostname" | tr -d '[:space:]')"
+[[ -n ${PRETTY_HOSTNAME} ]] || PRETTY_HOSTNAME="$(hostname -s)"
+export PRETTY_HOSTNAME
+
+command -v dircolors >/dev/null && eval "$(dircolors -b)"
+command -v lesspipe >/dev/null && eval "$(SHELL=/bin/sh lesspipe)"
+
+while IFS= read -r _file; do
+	source "${_file}"
+done < <(find "${DOTFILES}"/AliasesAndFunctions/{default,"$(echo "${PRETTY_HOSTNAME}" | tr '[:upper:]' '[:lower:]')",conditional} -type f 2>/dev/null)
+unset _file

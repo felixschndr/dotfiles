@@ -1,0 +1,10 @@
+#!/bin/bash
+
+[[ "${OSTYPE}" != darwin* ]] && return
+command -v pnpm >/dev/null || return
+
+export PNPM_HOME="${HOME}/Library/pnpm"
+case ":$PATH:" in
+*":${PNPM_HOME}/bin:"*) ;;
+*) export PATH="${PNPM_HOME}/bin:${PATH}" ;;
+esac

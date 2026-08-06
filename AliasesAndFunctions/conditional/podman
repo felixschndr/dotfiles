@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -z $(command -v podman) ]] && return
+command -v podman >/dev/null || return
 
 alias docker="podman"
 

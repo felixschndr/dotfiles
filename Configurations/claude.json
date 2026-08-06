@@ -83,6 +83,7 @@
             "Bash(ls:*)",
             "Bash(markdownlint:*)",
             "Bash(mypy:*)",
+            "Bash(npx tsc:*)",
             "Bash(npx vitest:*)",
             "Bash(pip install:*)",
             "Bash(pip list:*)",

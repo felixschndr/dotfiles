@@ -27,7 +27,6 @@ alias sudo='sudo --preserve-env=SSH_CLIENT ' # Save SSH state and https://wiki.a
 alias tf='tail -f -n 1000'
 
 alias c='code .'
-alias d='docker' && complete -F _docker d
 alias dc='docker compose'
 alias dcdu='dc up -d --force-recreate'
 alias dcdub='dc up --pull always -d --build --force-recreate'
