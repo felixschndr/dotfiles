@@ -58,6 +58,10 @@ if command -v claude >/dev/null 2>&1; then
 	ln -sf "${repoLocation}/Configurations/claude.md" "${HOME}/.claude/CLAUDE.md"
 fi
 
+if command -v pre-commit >/dev/null 2>&1; then
+	echo "Installing pre-commit hook..."
+	pre-commit install
+fi
 
 if [[ -d "${HOME}/repos" ]]; then
 	echo "Linking forbid AI git commit hook into all repositories below ${HOME}/repos..."
