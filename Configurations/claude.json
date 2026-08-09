@@ -2,6 +2,7 @@
     "permissions": {
         "defaultMode": "acceptEdits",
         "allow": [
+            "Bash(.venv/bin/python -m pytest:*)",
             "Bash(ansible-lint:*)",
             "Bash(argocd app diff:*)",
             "Bash(argocd app get:*)",
@@ -85,6 +86,7 @@
             "Bash(mypy:*)",
             "Bash(npx tsc:*)",
             "Bash(npx vitest:*)",
+            "Bash(pnpm vitest:*)",
             "Bash(pip install:*)",
             "Bash(pip list:*)",
             "Bash(pip show:*)",
@@ -95,7 +97,7 @@
             "Bash(poetry install:*)",
             "Bash(poetry lock:*)",
             "Bash(poetry show:*)",
-            "Bash(pre-commit run:*)",
+            "Bash(pre-commit:*)",
             "Bash(pwd)",
             "Bash(pyright:*)",
             "Bash(python3 -m json.tool:*)",
