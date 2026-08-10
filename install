@@ -8,6 +8,11 @@ repoLocation="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "Linking bashrc..."
 ln -sf "${repoLocation}/Configurations/bashrc" "${HOME}/.bashrc"
 
+if is_mac_os; then
+	echo "Adding .bashrc source line to .bash_profile..."
+	echo "[ -r ~/.bashrc ] && . ~/.bashrc" >"${HOME}/.bash_profile"
+fi
+
 if ! crontab -l 2>/dev/null | grep -q "cd ${repoLocation} && git pull"; then
 	echo "Installing crontab to update the repository regularly..."
 	(
