@@ -48,6 +48,16 @@ if command -v lazygit >/dev/null 2>&1; then
 		ln -sf "${repoLocation}/Configurations/lazygit.yml" "${HOME}/.config/lazygit/config.yml"
 	fi
 fi
+if command -v k9s >/dev/null 2>&1; then
+	echo "Linking k9s configuration..."
+	if is_mac_os; then
+		k9sDir="${HOME}/Library/Application Support/k9s"
+	else
+		k9sDir="${HOME}/.config/k9s"
+	fi
+	mkdir -p "${k9sDir}"
+	ln -sf "${repoLocation}/Configurations/k9s.yml" "${k9sDir}/config.yaml"
+fi
 if is_mac_os && command -v podman >/dev/null 2>&1; then
 	echo "Linking podman machine autostart LaunchAgent..."
 	mkdir -p "${HOME}/Library/LaunchAgents"

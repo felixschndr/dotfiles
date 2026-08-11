@@ -1,0 +1,5 @@
+k9s:
+  logger:
+    sinceSeconds: -1
+    tail: 5000
+    buffer: 10000
