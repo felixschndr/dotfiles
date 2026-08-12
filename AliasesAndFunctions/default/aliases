@@ -26,12 +26,18 @@ alias rm='rm -I -v'
 alias sudo='sudo --preserve-env=SSH_CLIENT ' # Save SSH state and https://wiki.archlinux.org/title/Sudo#Passing_aliases
 alias tf='tail -f -n 1000'
 
-alias c='code .'
-alias dc='docker compose'
-alias dcdu='dc up -d --force-recreate'
-alias dcdub='dc up --pull always -d --build --force-recreate'
-alias dcl='dc logs -f'
-alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}" | awk '\''NR==1{print; next} {print | "sort"}'\'''
-alias lg='lazygit'
-alias pc='cd "$(git rev-parse --show-toplevel)" && git add -A && pre-commit run --all-files'
-alias k='kubectl' && complete -o default -F __start_kubectl k
+command -v code >/dev/null 2>&1 && alias c='code .'
+command -v docker >/dev/null 2>&1 && {
+    alias dc='docker compose'
+    alias dcdu='dc up -d --force-recreate'
+    alias dcdub='dc up --pull always -d --build --force-recreate'
+    alias dcl='dc logs -f'
+    alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}" | awk '\''NR==1{print; next} {print | "sort"}'\'''
+}
+command -v kubectl >/dev/null 2>&1 && {
+    alias k='kubectl'
+    complete -o default -F __start_kubectl k
+}
+command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
+command -v pre-commit >/dev/null 2>&1 && alias pc='cd "$(git rev-parse --show-toplevel)" && git add -A && pre-commit run --all-files'
+command -v pycharm >/dev/null 2>&1 && alias p='pycharm .'
