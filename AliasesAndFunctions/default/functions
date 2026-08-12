@@ -37,8 +37,9 @@ check_if_git_repo_exists() { # Prüfen, ob ein GIT Repo gefunden wurde
 }
 
 create_venv() {
+	# shellcheck disable=2154
 	echo -e "\e[1;96mErstelle das virtuelle Environment\e[0m" &&
-		python -m venv .venv &&
+		"${latest_python}" -m venv .venv &&
 		echo -e "\e[1;96mAktiviere das virtuelle Environment\e[0m" &&
 		toggle_venv &&
 		python_install_requirements
