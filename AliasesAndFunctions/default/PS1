@@ -80,17 +80,19 @@ PS1+='`[[ -n ${VIRTUAL_ENV} ]] && echo "\[\e[1;30m\]]-[\[\e[0;32m\]Venv"`'
 PS1+="${GRAU}]-[${DEFAULT}"
 
 # Pfad, es wird noch ein "/" angehängt, wenn der aktuelle Pfad != "/" ist
-PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'"${DEFAULT}"
+PS1+="${CYAN}"'$(pwd)''`[[ $(pwd) != "/" ]] && echo "/"`'
 
 # shellcheck disable=2154
 PS1+='`
-_gs=$(git status --porcelain -b 2>/dev/null)
-if [[ $_gs == *ahead* || $_gs == *behind* ]] || grep -qE "^(\?\?|[ADR]| [ADR])" <<<"$_gs"; then
-    echo "\[\e[31m\]"
-elif grep -qE "^.?M" <<<"$_gs"; then
-    echo "\[\e[0;33m\]"
-else
-    echo "\[\e[32m\]"
+if [[ $PWD != /Volumes/* ]]; then
+    _gs=$(git status --porcelain -b 2>/dev/null)
+    if [[ $_gs == *ahead* || $_gs == *behind* ]] || grep -qE "^(\?\?|[ADR]| [ADR])" <<<"$_gs"; then
+        echo "\[\e[31m\]"
+    elif grep -qE "^.?M" <<<"$_gs"; then
+        echo "\[\e[0;33m\]"
+    else
+        echo "\[\e[32m\]"
+    fi
 fi`'
 
 # Git Branch, wenn es sich um ein Git Verzeichnis handelt
