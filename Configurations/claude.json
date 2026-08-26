@@ -154,6 +154,7 @@
       "mcp__n8n__validate_node_config",
       "mcp__n8n__validate_workflow",
       "Read(~/repos/**)",
+      "Skill(claude-api)",
       "Task",
       "WebFetch",
       "WebSearch",
