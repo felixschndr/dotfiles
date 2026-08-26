@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cd /home/felix/server
+cd /home/felix/server || return 1
