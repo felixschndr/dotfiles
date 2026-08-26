@@ -1,0 +1,4 @@
+#!/bin/bash
+
+serverconfig_dir="${HOME}/repos/Serverconfig/"
+alias configure_server='ANSIBLE_CONFIG=${serverconfig_dir}ansible.cfg ansible-playbook ${serverconfig_dir}playbook.yaml'
