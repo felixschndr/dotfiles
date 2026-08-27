@@ -32,7 +32,7 @@ command -v docker >/dev/null 2>&1 && {
     alias dcdu='dc up -d --force-recreate'
     alias dcdub='dc up --pull always -d --build --force-recreate'
     alias dcl='dc logs -f'
-    alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}" | awk '\''NR==1{print; next} {print | "sort"}'\'''
+    alias dps='echo -e "Es laufen \e[1;36m$(docker ps --format "{{.Names}}" | wc -l) Container\e[0m:" && docker ps --format "table {{.Names}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}" | awk '\''NR==1{print; next} {print | "sort"}'\'''
 }
 command -v kubectl >/dev/null 2>&1 && {
     alias k='kubectl'
