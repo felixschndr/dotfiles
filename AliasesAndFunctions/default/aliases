@@ -40,4 +40,4 @@ command -v kubectl >/dev/null 2>&1 && {
 }
 command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
 command -v pre-commit >/dev/null 2>&1 && alias pc='cd "$(git rev-parse --show-toplevel)" && git add -A && pre-commit run --all-files'
-command -v pycharm >/dev/null 2>&1 && alias p='pycharm .'
+command -v pycharm >/dev/null 2>&1 && alias p='open -na PyCharm --args .'
