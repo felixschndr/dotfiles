@@ -158,6 +158,7 @@
       "mcp__n8n__search_workflows",
       "mcp__n8n__validate_node_config",
       "mcp__n8n__validate_workflow",
+      "mcp__home-assistant",
       "Read(~/repos/**)",
       "Skill(claude-api)",
       "Task",
