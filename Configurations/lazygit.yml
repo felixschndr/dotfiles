@@ -1,8 +1,8 @@
 promptToReturnFromSubprocess: false
 notARepository: skip
 os:
-  edit: nano {{filename}}
-  editAtLine: nano +{{line}} {{filename}}
+  edit: 'command -v code >/dev/null && code --reuse-window -- {{filename}} || nano {{filename}}'
+  editAtLine: 'command -v code >/dev/null && code --reuse-window --goto -- {{filename}}:{{line}} || nano +{{line}} {{filename}}'
 customCommands:
   - key: <c-d>
     context: "localBranches, remoteBranches"
