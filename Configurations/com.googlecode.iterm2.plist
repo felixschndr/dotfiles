@@ -30,6 +30,8 @@
 	<true/>
 	<key>AlwaysOpenWindowAtStartup</key>
 	<true/>
+	<key>ClaudeCodeWorkgroupUpsellSuppressed</key>
+	<true/>
 	<key>Default Bookmark Guid</key>
 	<string>6F08B2FA-AD88-4895-A32A-7CB17EE72503</string>
 	<key>DimInactiveSplitPanes</key>
