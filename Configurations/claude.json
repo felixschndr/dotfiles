@@ -196,5 +196,6 @@
   "theme": "dark",
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "spinnerTipsEnabled": false
 }
