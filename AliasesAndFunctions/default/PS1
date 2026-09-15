@@ -92,7 +92,7 @@ fi`'
 PS1+='`__git_ps1 " (%s)"`'
 
 # Wenn das Kommando länger als 10 Sekunden gedauert hat wird die Dauer ausgegeben
-PROMPT_COMMAND=timer_stop
+PROMPT_COMMAND="history -a; timer_stop" # history -a synchronisiert alle Bashhistories von mehreren Terminals https://askubuntu.com/a/80380
 PS1+='`[[ -n ${timer_show} ]] && echo "\[\e[1;30m\]]-[\[\e[0m\]${timer_show}"`'
 
 # Klammer zu nach dem Pfad und in die nächste Zeile
