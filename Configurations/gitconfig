@@ -17,7 +17,7 @@
 [pull]
     rebase = true
 [log]
-    showSignature = true
+    showSignature = false
 [rerere]
     enabled = true # Reuse merge conflict resultions if available
 
