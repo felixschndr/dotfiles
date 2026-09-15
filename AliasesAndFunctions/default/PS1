@@ -15,17 +15,14 @@ CYAN="\[\e[1;36m\]"
 ##############################
 
 # Berechnung dafür wie lang das Kommando gedauert hat
-function timer_start {
-	timer=${timer:-${SECONDS}}
-}
+PS0='${PS1:$((timer=SECONDS,0)):0}'
 
 function timer_stop {
 	timer_show=""
+	[[ -z ${timer} ]] && return
 	delta=$((SECONDS - timer))
-	[[ ${delta} -lt 10 ]] && {
-		unset timer
-		return
-	}
+	unset timer
+	[[ ${delta} -lt 10 ]] && return
 
 	((stunden = (delta % 86400) / 3600))
 	((minuten = (delta % 3600) / 60))
@@ -34,11 +31,7 @@ function timer_stop {
 	[[ ${stunden} != 0 ]] && timer_show+=$(printf "%dh " ${stunden})
 	[[ ${minuten} != 0 ]] && timer_show+=$(printf "%dm " ${minuten})
 	timer_show+=$(printf "%ds" ${sekunden})
-
-	unset timer
 }
-
-trap 'timer_start' DEBUG # FIXME: Statt aufrufen beim Bauen der Kommandozeile lieber beim Kommandostart
 
 # Erstmal eine Leerzeile für mehr Platz
 PS1="\n"
