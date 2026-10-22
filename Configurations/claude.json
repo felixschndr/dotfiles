@@ -190,6 +190,7 @@
       }
     }
   },
+  "spinnerTipsEnabled": false,
   "effortLevel": "high",
   "askUserQuestionTimeout": "never",
   "tui": "default",
@@ -198,5 +199,9 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "spinnerTipsEnabled": false
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  }
 }
