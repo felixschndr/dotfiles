@@ -105,6 +105,7 @@
       "Bash(ls:*)",
       "Bash(markdownlint:*)",
       "Bash(mypy:*)",
+      "Bash(npx eslint:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
       "Bash(pnpm exec eslint:*)",
@@ -189,7 +190,8 @@
     "confluence@pchuri-confluence-cli": true,
     "frontend-design@claude-plugins-official": false,
     "ponytail@ponytail": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "pchuri-confluence-cli": {
@@ -216,8 +218,8 @@
   "tui": "default",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
+  "switchModelsOnFlag": true,
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "switchModelsOnFlag": true
+  "skipAutoPermissionPrompt": true
 }
