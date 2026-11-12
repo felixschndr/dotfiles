@@ -113,6 +113,18 @@ if which brew >/dev/null 2>/dev/null; then
 fi
 [[ -f ~/.podman-completion ]] && source ~/.podman-completion
 
+_dc_completion() {
+	complete -p docker &>/dev/null || { declare -F _completion_loader &>/dev/null && _completion_loader docker; }
+
+	COMP_WORDS=(docker compose "${COMP_WORDS[@]:1}")
+	((COMP_CWORD++))
+	COMP_LINE="docker compose${COMP_LINE#dc}"
+	((COMP_POINT += 12)) # len("docker compose") - len("dc")
+	__start_docker docker "${COMP_WORDS[COMP_CWORD]}" "${COMP_WORDS[COMP_CWORD - 1]}"
+}
+
+complete -F _dc_completion dc
+
 __ssh_parse_hosts() {
 	awk '
     /^[[:space:]]*#/            { next }    # Kommentar
