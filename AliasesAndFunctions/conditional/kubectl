@@ -1,0 +1,9 @@
+#!/bin/bash
+
+command -v kubectl >/dev/null || return
+
+KUBECONFIG="${HOME}/.kube/config"
+for f in "${HOME}"/.kube/configs/*.yaml; do
+    [[ -e "${f}" ]] && KUBECONFIG="${KUBECONFIG}:${f}"
+done
+export KUBECONFIG

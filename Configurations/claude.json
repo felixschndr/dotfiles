@@ -31,6 +31,7 @@
       "Bash(argocd cert list:*)",
       "Bash(argocd cluster get:*)",
       "Bash(argocd cluster list:*)",
+      "Bash(argocd context)",
       "Bash(argocd gpg get:*)",
       "Bash(argocd gpg list:*)",
       "Bash(argocd help:*)",
